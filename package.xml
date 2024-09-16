@@ -2,7 +2,7 @@
 <package format="2">
   <name>fsm_cartesio</name>
   <version>0.0.1</version>
-  <description>Collection of FSMs using CartesI/O</description>
+  <description>smach-based FSM for CartesI/O</description>
 
   <maintainer email="fabio.amadio@inria.fr">Fabio Amadio</maintainer>
 

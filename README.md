@@ -1,7 +1,6 @@
 # fsm_cartesio
 
-Collection of FSMs using CartesI/O [CartesI/O](https://github.com/ADVRHumanoids/CartesianInterface). FSMs are implemented through [smach](http://wiki.ros.org/smach).  
-
+[smach](http://wiki.ros.org/smach)-based FSM for [CartesI/O](https://github.com/ADVRHumanoids/CartesianInterface).
 
 ## Try out on Docker
 
@@ -34,5 +33,5 @@ roslaunch tiago_dual_cartesio_config cartesio.launch
 And in the second, run:
 
 ```bash
-...
+rosrun fsm_cartesio dummy_fsm
 ```

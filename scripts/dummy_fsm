@@ -1,75 +1,116 @@
 #!/usr/bin/env python
 
-# from cartesian_interface.pyci_all import *
-# import numpy as np
+from cartesian_interface.pyci_all import *
+import numpy as np
 import rospy
 import smach
-import smach_ros
-
-
-# define state Foo
-class Foo(smach.State):
-    def __init__(self):
-        smach.State.__init__(
-            self,
-            outcomes=["outcome1", "outcome2"],
-            input_keys=["foo_counter_in"],
-            output_keys=["foo_counter_out"],
-        )
-
-    def execute(self, userdata):
-        rospy.loginfo("Executing state FOO")
-        if userdata.foo_counter_in < 3:
-            userdata.foo_counter_out = userdata.foo_counter_in + 1
-            return "outcome1"
-        else:
-            return "outcome2"
-
-
-# define state Bar
-class Bar(smach.State):
-    def __init__(self):
-        smach.State.__init__(self, outcomes=["outcome1"], input_keys=["bar_counter_in"])
-
-    def execute(self, userdata):
-        rospy.loginfo("Executing state BAR")
-        rospy.loginfo("Counter = %f" % userdata.bar_counter_in)
-        return "outcome1"
+from cartesio_states import TaskMove, TaskWaypoints, ChangeTaskBaseLink
 
 
 def main():
     rospy.init_node("smach_example_state_machine")
 
     # Create a SMACH state machine
-    sm = smach.StateMachine(outcomes=["outcome4"])
-    sm.userdata.sm_counter = 0
+    sm = smach.StateMachine(outcomes=["fsm_success", "fsm_fail"])
+    sm.userdata.client = pyci.CartesianInterfaceRos()
+
+    # Define input data for each state
+    sm.userdata.left_task = "gripper_left_grasping_frame"
+    sm.userdata.left_waypoints = []
+    wp_l1 = pyci.WayPoint()
+    wp_l1.frame.translation = np.array([0.7693, 0.3481, 0.4492])
+    wp_l1.frame.quaternion = np.array([-0.7296, 0.05501, 0.07221, 0.6778])
+    wp_l1.time = 3.0
+    sm.userdata.left_waypoints.append(wp_l1)
+    wp_l2 = pyci.WayPoint()
+    wp_l2.frame.translation = np.array([0.5693, 0.3481, 0.3492])
+    wp_l2.frame.quaternion = np.array([0.7296, -0.05501, 0.07221, 0.6778])
+    wp_l2.time = 5.0
+    sm.userdata.left_waypoints.append(wp_l2)
+
+    sm.userdata.right_task = "gripper_right_grasping_frame"
+    sm.userdata.right_waypoints = []
+    wp_r1 = pyci.WayPoint()
+    wp_r1.frame.translation = np.array([0.7663, -0.3481, 0.4492])
+    wp_r1.frame.quaternion = np.array([0.7296, 0.05501, -0.07221, 0.6778])
+    wp_r1.time = 3.0
+    sm.userdata.right_waypoints.append(wp_r1)
+    wp_r2 = pyci.WayPoint()
+    wp_r2.frame.translation = np.array([0.5663, -0.3481, 0.3492])
+    wp_r2.frame.quaternion = np.array([-0.7296, -0.05501, -0.07221, 0.6778])
+    wp_r2.time = 5.0
+    sm.userdata.right_waypoints.append(wp_r2)
+
+    sm.userdata.mobile_task = "base_link"
+    sm.userdata.mobile_Tref = Affine3()
+    sm.userdata.mobile_Tref.translation = np.array([0.0, 0, 0.0762])
+    sm.userdata.mobile_Tref.quaternion = np.array([0, 0, 0.258819, 0.9659258])
+    sm.userdata.mobile_time = 3.0
+
+    sm.userdata.left_base_link = "world"
+    sm.userdata.right_base_link = "world"
 
     # Open the container
     with sm:
-        # Add states to the container
         smach.StateMachine.add(
-            "FOO",
-            Foo(),
-            transitions={"outcome1": "BAR", "outcome2": "outcome4"},
-            remapping={"foo_counter_in": "sm_counter", "foo_counter_out": "sm_counter"},
-        )
-        smach.StateMachine.add(
-            "BAR",
-            Bar(),
-            transitions={"outcome1": "FOO"},
-            remapping={"bar_counter_in": "sm_counter"},
+            "MOVE_LEFT",
+            TaskWaypoints(),
+            transitions={"succes": "MOVE_RIGHT", "fail": "fsm_fail"},
+            remapping={
+                "client": "client",
+                "task_name": "left_task",
+                "waypoints": "left_waypoints",
+                "waypoints": "left_waypoints",
+            },
         )
 
-    # Create and start the introspection server
-    sis = smach_ros.IntrospectionServer("sm_viewer_server", sm, "/SM_ROOT")
-    sis.start()
+        smach.StateMachine.add(
+            "MOVE_RIGHT",
+            TaskWaypoints(),
+            transitions={"succes": "CHANGE_LEFT_BS", "fail": "fsm_fail"},
+            remapping={
+                "client": "client",
+                "task_name": "right_task",
+                "waypoints": "right_waypoints",
+            },
+        )
+
+        smach.StateMachine.add(
+            "CHANGE_LEFT_BS",
+            ChangeTaskBaseLink(),
+            transitions={"succes": "CHANGE_RIGHT_BS", "fail": "fsm_fail"},
+            remapping={
+                "client": "client",
+                "task_name": "left_task",
+                "base_link": "left_base_link",
+            },
+        )
+
+        smach.StateMachine.add(
+            "CHANGE_RIGHT_BS",
+            ChangeTaskBaseLink(),
+            transitions={"succes": "MOVE_BASE", "fail": "fsm_fail"},
+            remapping={
+                "client": "client",
+                "task_name": "right_task",
+                "base_link": "right_base_link",
+            },
+        )
+
+        smach.StateMachine.add(
+            "MOVE_BASE",
+            TaskMove(),
+            transitions={"succes": "fsm_success", "fail": "fsm_fail"},
+            remapping={
+                "client": "client",
+                "task_name": "mobile_task",
+                "Tref": "mobile_Tref",
+                "time": "mobile_time",
+            },
+        )
 
     # Execute the state machine
     outcome = sm.execute()
-
-    # Wait for ctrl-c to stop the application
-    rospy.spin()
-    sis.stop()
 
 
 if __name__ == "__main__":
