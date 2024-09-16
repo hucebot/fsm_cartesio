@@ -206,10 +206,10 @@ WORKDIR /home/forest_ws/src/pal_gripper
 RUN git checkout humble-devel
 
 WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/hucebot/spacemouse_cartesio_bridge
+RUN git clone https://github.com/hucebot/fsm_cartesio
+WORKDIR /home/forest_ws/build/fsm_cartesio
+RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/fsm_cartesio && make -j8 && make install
 
-WORKDIR /home/forest_ws/build/spacemouse_cartesio_bridge
-RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/spacemouse_cartesio_bridge && make -j8 && make install
 
 WORKDIR /home/forest_ws
 
