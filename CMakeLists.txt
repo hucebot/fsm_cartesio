@@ -43,8 +43,10 @@ include_directories(
 ## Install ##
 #############
 
-catkin_install_python(PROGRAMS scripts/dummy_fsm
+catkin_install_python(PROGRAMS 
+  scripts/dummy_fsm 
+  src/states.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
   
 install(DIRECTORY launch config
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
