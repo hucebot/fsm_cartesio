@@ -4,7 +4,7 @@ import rospy
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from geometry_msgs.msg import Twist
-from std_msgs import Float32
+from std_msgs.msg import Float32
 from std_srvs.srv import SetBool, SetBoolResponse
 
 head_cmd_pub = None
