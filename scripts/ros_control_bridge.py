@@ -48,9 +48,7 @@ def set_initial_configuration(data: JointState):
     rospy.set_param("cartesian/home", home)
 
 
-def fill_cms_msg(
-    data: JointState, cmd_msg: JointTrajectory, rate: float, send_velocity=True
-):
+def fill_cms_msg(data: JointState, cmd_msg: JointTrajectory, send_velocity=True):
     global time_from_start
     for joint_name in cmd_msg.joint_names:
         cmd_msg.points[0].positions[cmd_msg.joint_names.index(joint_name)] = (
@@ -121,12 +119,14 @@ def set_send_commands(req: SetBool):
 
 def time_from_start_cb(msg: Float32):
     global time_from_start
-    if msg.data >= 0.1:
-        time_from_start = msg.data
-    else:
-        rospy.logwarn(
-            "Trying to set a 'time_from_start' too low. It must be >= 0.1secs"
-        )
+    if msg.data != time_from_start:
+        if msg.data >= 0.1:
+            rospy.loginfo(f"Setting time_from_start={time_from_start}")
+            time_from_start = msg.data
+        else:
+            rospy.logwarn(
+                "Trying to set a 'time_from_start' too low. It must be >= 0.1secs"
+            )
 
 
 if __name__ == "__main__":
