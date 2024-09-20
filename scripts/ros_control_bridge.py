@@ -121,8 +121,8 @@ def time_from_start_cb(msg: Float32):
     global time_from_start
     if msg.data != time_from_start:
         if msg.data >= 0.1:
-            rospy.loginfo(f"Setting time_from_start={time_from_start}")
             time_from_start = msg.data
+            rospy.loginfo(f"Setting time_from_start={time_from_start}")
         else:
             rospy.logwarn(
                 "Trying to set a 'time_from_start' too low. It must be >= 0.1secs"
