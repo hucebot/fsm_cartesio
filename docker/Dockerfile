@@ -214,3 +214,7 @@ WORKDIR /home/forest_ws
 
 RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper"' >> ~/.bashrc
 
+# Add bash convenience function for compiling individual pkgs
+COPY .compile.bash /home/
+RUN echo "source /home/.compile.bash" >> ~/.bashrc
+
