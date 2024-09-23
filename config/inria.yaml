@@ -24,3 +24,12 @@ right_camera_look_front:
     translation: [0.5, -0.37, 1.0]
     rotation: [0.0, 0.0, 0.0, 1.0]
     time: 20.0
+
+right_go_to_tag:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  ref_frame: "pose_tag_6"
+  offset:
+    translation: [0.15, 0.0, 0.0]
+    rotation: [0.0, 0.0, 1.0, 0.0]
+    time: 20.0

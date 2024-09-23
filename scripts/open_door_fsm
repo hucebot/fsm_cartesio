@@ -35,6 +35,7 @@ def main():
     sm.userdata.left_home = "left_home"
     sm.userdata.right_home = "right_home"
     sm.userdata.right_camera_look_front = "right_camera_look_front"
+    sm.userdata.right_go_to_tag = "right_go_to_tag"
 
     # Open the state machine container
     with sm:
@@ -43,10 +44,6 @@ def main():
             MoveToTargetFromCfg(),
             transitions={"succes": "RIGHT_HOME", "fail": "fsm_fail"},
             remapping={
-                "client": "client",
-                "tf_prefix": "tf_prefix",
-                "tf_buffer": "tf_buffer",
-                "config_path": "config_path",
                 "tag": "left_home",
             },
         )
@@ -55,23 +52,23 @@ def main():
             MoveToTargetFromCfg(),
             transitions={"succes": "RIGHT_CAMERA_LOOK_FORWARD", "fail": "fsm_fail"},
             remapping={
-                "client": "client",
-                "tf_prefix": "tf_prefix",
-                "tf_buffer": "tf_buffer",
-                "config_path": "config_path",
                 "tag": "right_home",
             },
         )
         smach.StateMachine.add(
             "RIGHT_CAMERA_LOOK_FORWARD",
             MoveToTargetFromCfg(),
+            transitions={"succes": "RIGHT_GO_TO_TAG", "fail": "fsm_fail"},
+            remapping={
+                "tag": "right_camera_look_front",
+            },
+        )
+        smach.StateMachine.add(
+            "RIGHT_GO_TO_TAG",
+            MoveToTargetFromCfg(),
             transitions={"succes": "fsm_success", "fail": "fsm_fail"},
             remapping={
-                "client": "client",
-                "tf_prefix": "tf_prefix",
-                "tf_buffer": "tf_buffer",
-                "config_path": "config_path",
-                "tag": "right_camera_look_front",
+                "tag": "right_go_to_tag",
             },
         )
 
