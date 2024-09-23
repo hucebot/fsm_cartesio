@@ -170,7 +170,7 @@ RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cm
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git
 WORKDIR /home/forest_ws/src/tiago_dual_cartesio_config
-RUN git checkout euRobin_hackaton_may24
+RUN git checkout euRobin_nov24
 
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/EnricoMingo/tiago_dual_robot.git

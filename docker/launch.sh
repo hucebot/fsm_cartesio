@@ -3,15 +3,13 @@ IsRunning=`docker ps -f name=cartesio_tiago_dual | grep -c "cartesio"`;
 if [ $IsRunning -eq "0" ]; then
     xhost +local:docker
     docker run --rm \
-        --gpus all \
         -e DISPLAY=$DISPLAY \
         -e XAUTHORITY=$XAUTHORITY \
         -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
-        -e NVIDIA_DRIVER_CAPABILITIES=all \
         -e 'QT_X11_NO_MITSHM=1' \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /tmp/docker_share:/tmp/docker_share \
-        -v `pwd`/..:/home/catkin_ws/src/fsm_cartesio \
+        -v `pwd`/..:/home/forest_ws/src/fsm_cartesio \
         --ipc host \
         --device /dev/dri \
         --device /dev/snd \

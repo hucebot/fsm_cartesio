@@ -5,6 +5,7 @@ import numpy as np
 import rospy
 import smach
 import time
+import tf2_ros
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 import yaml
 
@@ -27,7 +28,9 @@ class ChangeTaskBaseLink(smach.State):
             task.setBaseLink(userdata.task_base_link)
             userdata.client.update()
             return "succes"
-        except:
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
             return "fail"
 
 
@@ -57,7 +60,9 @@ class MoveToTarget(smach.State):
             )  # blocks till action is completed (or timeout has passed)
 
             return "succes"
-        except:
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
             return "fail"
 
 
@@ -92,6 +97,7 @@ class FollowWaypoints(smach.State):
             return "succes"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
             return "fail"
 
 
@@ -127,6 +133,7 @@ class FollowTrajectory(smach.State):
             return "succes"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
             return "fail"
 
 
@@ -189,13 +196,9 @@ class MoveToTargetFromCfg(smach.State):
                 time
             )  # blocks till action is completed (or timeout has passed)
             return "succes"
-        except (
-            tf2_ros.LookupException,
-            tf2_ros.ConnectivityException,
-            tf2_ros.ExtrapolationException,
-        ):
-            return "fail"
-        except:
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
             return "fail"
 
 
@@ -337,5 +340,7 @@ class SetGripperCmd(smach.State):
             self.gripper_cmd_pub.publish(cmd_msg)
             # TODO: check on the real robot if it's necessary to publish a trajectory and not a single point
             return "succes"
-        except:
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
             return "fail"
