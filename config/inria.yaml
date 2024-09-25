@@ -33,3 +33,21 @@ right_go_to_tag:
     translation: [0.15, 0.0, 0.0]
     rotation: [0.0, 0.0, 1.0, 0.0]
     time: 10.0
+
+left_go_to_handle:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  ref_frame: "pose_tag_6"
+  offset:
+    translation:
+      - [0.30, -0.6, 0.0]
+      - [0.20, -0.6, 0.0]
+      - [0.30, -0.6, 0.0]
+    rotation:
+      - [0.0, 0.7071068, 0.7071068, 0.0]
+      - [0.0, 0.7071068, 0.7071068, 0.0]
+      - [0.0, 0.7071068, 0.7071068, 0.0]
+    time:
+      - 10.0
+      - 5.0
+      - 5.0

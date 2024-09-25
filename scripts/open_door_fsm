@@ -41,7 +41,7 @@ def main():
     sm.userdata.left_home = "left_home"
     sm.userdata.right_home = "right_home"
     sm.userdata.right_camera_look_front = "right_camera_look_front"
-    sm.userdata.right_go_to_tag = "right_go_to_tag"
+    sm.userdata.left_go_to_handle = "left_go_to_handle"
 
     sm.userdata.parallel_gripper_controller = "parallel_gripper_left_controller"
 
@@ -66,18 +66,22 @@ def main():
         smach.StateMachine.add(
             "UPDATE_ODOM",
             UpdateOdom(),
-            transitions={"success": "GRASP_LEFT", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "GRASP_LEFT",
-            PalGripperGrasp(),
             transitions={"success": "RELEASE_LEFT", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
             "RELEASE_LEFT",
             PalGripperRelease(),
-            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+            transitions={"success": "LEFT_GO_TO_HANDLE_PRE_GRASP", "fail": "fsm_fail"},
         )
+        smach.StateMachine.add(
+            "LEFT_GO_TO_HANDLE_PRE_GRASP",
+            FollowWaypointsFromCfg(),
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+            remapping={
+                "tag": "left_go_to_handle",
+            },
+        )
+
 
     # Execute the state machine
     outcome = sm.execute()

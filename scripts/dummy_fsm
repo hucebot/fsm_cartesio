@@ -42,7 +42,7 @@ def main():
         smach.StateMachine.add(
             "MOVE_LEFT",
             FollowWaypointsFromCfg(),
-            transitions={"succes": "MOVE_RIGHT", "fail": "fsm_fail"},
+            transitions={"success": "MOVE_RIGHT", "fail": "fsm_fail"},
             remapping={
                 "client": "client",
                 "tf_prefix": "tf_prefix",
@@ -55,7 +55,7 @@ def main():
         smach.StateMachine.add(
             "MOVE_RIGHT",
             FollowWaypointsFromCfg(),
-            transitions={"succes": "MOVE_BASE", "fail": "fsm_fail"},
+            transitions={"success": "MOVE_BASE", "fail": "fsm_fail"},
             remapping={
                 "client": "client",
                 "tf_prefix": "tf_prefix",
@@ -68,7 +68,7 @@ def main():
         smach.StateMachine.add(
             "MOVE_BASE",
             MoveToTargetFromCfg(),
-            transitions={"succes": "fsm_success", "fail": "fsm_fail"},
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
             remapping={
                 "client": "client",
                 "tf_prefix": "tf_prefix",
