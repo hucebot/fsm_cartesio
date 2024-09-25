@@ -5,7 +5,7 @@ from cartesian_interface.srv import SetTransform, SetTransformRequest
 import numpy as np
 import rospy
 import smach
-from std_srvs.srv import Empty
+from std_srvs.srv import Empty, EmptyRequest
 import time
 import tf2_ros
 
@@ -392,18 +392,19 @@ class FollowTrajectoryFromCfg(smach.State):
 
 
 class PalGripperGrasp(smach.State):
-    smach.State.__init__(
-        self,
-        outcomes=["success", "fail"],
-        input_keys=[
-            "parallel_gripper_controller",  # Gripper controller name (type: 'str')
-        ],
-    )
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=["success", "fail"],
+            input_keys=[
+                "parallel_gripper_controller",  # Gripper controller name (type: 'str')
+            ],
+        )
 
     def execute(self, userdata):
         try:
-            srv_proxy = rospy.ServiceProxy(userdata.gripper_ctrl_name + "/grasp", Empty)
-            req = Empty()
+            srv_proxy = rospy.ServiceProxy(userdata.parallel_gripper_controller + "/grasp", Empty)
+            req = EmptyRequest()
             srv_proxy(req)
             return "success"
         except Exception as error:
@@ -413,20 +414,21 @@ class PalGripperGrasp(smach.State):
 
 
 class PalGripperRelease(smach.State):
-    smach.State.__init__(
-        self,
-        outcomes=["success", "fail"],
-        input_keys=[
-            "parallel_gripper_controller",  # Gripper controller name (type: 'str')
-        ],
-    )
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=["success", "fail"],
+            input_keys=[
+                "parallel_gripper_controller",  # Gripper controller name (type: 'str')
+            ],
+        )
 
     def execute(self, userdata):
         try:
             srv_proxy = rospy.ServiceProxy(
-                userdata.gripper_ctrl_name + "/release", Empty
+                userdata.parallel_gripper_controller + "/release", Empty
             )
-            req = Empty()
+            req = EmptyRequest()
             srv_proxy(req)
             return "success"
         except Exception as error:
