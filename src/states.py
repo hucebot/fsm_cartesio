@@ -332,71 +332,75 @@ class FollowWaypointsFromCfg(smach.State):
         )
 
     def execute(self, userdata):
-        # try:
-        userdata.client.update()
-        with open(userdata.config_path, "r") as file:
-            config = yaml.safe_load(file)
-        motion_def = config[userdata.tag]
-        ref_frame = motion_def["ref_frame"]
-        task_name = motion_def["task"]
-        task_base_link = motion_def["task_base_link"]
-        task = userdata.client.getTask(task_name)
-        task.setBaseLink(task_base_link)
+        try:
+            userdata.client.update()
+            with open(userdata.config_path, "r") as file:
+                config = yaml.safe_load(file)
+            motion_def = config[userdata.tag]
+            ref_frame = motion_def["ref_frame"]
+            task_name = motion_def["task"]
+            task_base_link = motion_def["task_base_link"]
+            task = userdata.client.getTask(task_name)
+            task.setBaseLink(task_base_link)
 
-        offs_translation = np.array(motion_def["offset"]["translation"]).reshape(-1, 3)
-        offs_rotation = np.array(motion_def["offset"]["rotation"]).reshape(-1, 4)
-        time = np.array(motion_def["offset"]["time"]).reshape(-1, 1)
-
-        if not (offs_translation.shape[0] == offs_rotation.shape[0] == time.shape[0]):
-            smach.logwarn("Inconsistent number of elements while parsing target")
-            return "fail"
-
-        if ref_frame == task_base_link:
-            # No offset
-            translation = offs_translation
-            rotation = offs_rotation
-            # Parsing waypoints
-            for i in range(translation.shape[0]):
-                point = Affine3()
-                point.translation = translation[i, :]
-                point.quaternion = rotation[i, :]
-                task.setPoseTarget(point, time[i, :])
-                task.waitReachCompleted(
-                    time[i, :]
-                )  # blocks till action is completed (or timeout has passed)
-        else:
-            # Express waypoints in base_link (from ref_frame)
-            t = userdata.tf_buffer.lookup_transform(
-                userdata.tf_prefix + task_base_link,
-                userdata.tf_prefix + ref_frame,
-                rospy.Time(),
+            offs_translation = np.array(motion_def["offset"]["translation"]).reshape(
+                -1, 3
             )
-            x = t.transform.translation.x
-            y = t.transform.translation.y
-            z = t.transform.translation.z
-            qx = t.transform.rotation.x
-            qy = t.transform.rotation.y
-            qz = t.transform.rotation.z
-            qw = t.transform.rotation.w
-            base_link_to_ref = Affine3()
-            base_link_to_ref.translation = np.array([x, y, z])
-            base_link_to_ref.quaternion = np.array([qx, qy, qz, qw])
-            # Parsing waypoints
-            for i in range(offs_translation.shape[0]):
-                offset = Affine3()
-                offset.translation = offs_translation[i, :]
-                offset.quaternion = offs_rotation[i, :]
-                point = base_link_to_ref * offset
-                task.setPoseTarget(point, time[i, :])
-                task.waitReachCompleted(
-                    time[i, :]
-                )  # blocks till action is completed (or timeout has passed)
+            offs_rotation = np.array(motion_def["offset"]["rotation"]).reshape(-1, 4)
+            time = np.array(motion_def["offset"]["time"]).reshape(-1, 1)
 
-        return "success"
-        # except Exception as error:
-        #     smach.logerr("An error occurred: " + type(error).__name__)
-        #     smach.logerr(error)
-        #     return "fail"
+            if not (
+                offs_translation.shape[0] == offs_rotation.shape[0] == time.shape[0]
+            ):
+                smach.logwarn("Inconsistent number of elements while parsing target")
+                return "fail"
+
+            if ref_frame == task_base_link:
+                # No offset
+                translation = offs_translation
+                rotation = offs_rotation
+                # Parsing waypoints
+                for i in range(translation.shape[0]):
+                    point = Affine3()
+                    point.translation = translation[i, :]
+                    point.quaternion = rotation[i, :]
+                    task.setPoseTarget(point, time[i, :])
+                    task.waitReachCompleted(
+                        time[i, :]
+                    )  # blocks till action is completed (or timeout has passed)
+            else:
+                # Express waypoints in base_link (from ref_frame)
+                t = userdata.tf_buffer.lookup_transform(
+                    userdata.tf_prefix + task_base_link,
+                    userdata.tf_prefix + ref_frame,
+                    rospy.Time(),
+                )
+                x = t.transform.translation.x
+                y = t.transform.translation.y
+                z = t.transform.translation.z
+                qx = t.transform.rotation.x
+                qy = t.transform.rotation.y
+                qz = t.transform.rotation.z
+                qw = t.transform.rotation.w
+                base_link_to_ref = Affine3()
+                base_link_to_ref.translation = np.array([x, y, z])
+                base_link_to_ref.quaternion = np.array([qx, qy, qz, qw])
+                # Parsing waypoints
+                for i in range(offs_translation.shape[0]):
+                    offset = Affine3()
+                    offset.translation = offs_translation[i, :]
+                    offset.quaternion = offs_rotation[i, :]
+                    point = base_link_to_ref * offset
+                    task.setPoseTarget(point, time[i, :])
+                    task.waitReachCompleted(
+                        time[i, :]
+                    )  # blocks till action is completed (or timeout has passed)
+
+            return "success"
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
+            return "fail"
 
 
 # TODO: Implementation using CartesI/O's 'setWayPoints' method, check for bugs!
