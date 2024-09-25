@@ -4,7 +4,8 @@ from cartesian_interface.pyci_all import *
 from states import (
     MoveToTargetFromCfg,
     FollowWaypointsFromCfg,
-    SetGripperCmd,
+    PalGripperGrasp,
+    PalGripperRelease,
     UpdateOdom,
 )
 import numpy as np
@@ -42,50 +43,40 @@ def main():
     sm.userdata.right_camera_look_front = "right_camera_look_front"
     sm.userdata.right_go_to_tag = "right_go_to_tag"
 
-    sm.gripper_name = "gripper_left"
-    sm.finger_max_pos = 0.044
-    sm.finger_min_pos = 0.010
-    sm.gripper_cmd_open = 1.0
-    sm.gripper_cmd_closed = 0.0
+    sm.userdata.parallel_gripper_controller = "parallel_gripper_left_controller"
 
     # Open the state machine container
     with sm:
         smach.StateMachine.add(
             "LEFT_HOME",
             MoveToTargetFromCfg(),
-            transitions={"succes": "UPDATE_ODOM", "fail": "fsm_fail"},
+            transitions={"success": "RIGHT_CAMERA_LOOK_FORWARD", "fail": "fsm_fail"},
             remapping={
                 "tag": "left_home",
             },
         )
         smach.StateMachine.add(
-            "UPDATE_ODOM",
-            UpdateOdom(),
-            transitions={"succes": "RIGHT_CAMERA_LOOK_FORWARD", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
             "RIGHT_CAMERA_LOOK_FORWARD",
             MoveToTargetFromCfg(),
-            transitions={"succes": "OPEN_GRIPPER", "fail": "fsm_fail"},
+            transitions={"success": "UPDATE_ODOM", "fail": "fsm_fail"},
             remapping={
                 "tag": "right_camera_look_front",
             },
         )
         smach.StateMachine.add(
-            "OPEN_GRIPPER",
-            SetGripperCmd(),
-            transitions={"succes": "CLOSE_GRIPPER", "fail": "fsm_fail"},
-            remapping={
-                "gripper_cmd": "gripper_cmd_open",
-            },
+            "UPDATE_ODOM",
+            UpdateOdom(),
+            transitions={"success": "GRASP_LEFT", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "CLOSE_GRIPPER",
-            SetGripperCmd(),
-            transitions={"succes": "RIGHT_GO_TO_TAG", "fsm_success": "fsm_fail"},
-            remapping={
-                "gripper_cmd": "gripper_cmd_closed",
-            },
+            "GRASP_LEFT",
+            PalGripperGrasp(),
+            transitions={"success": "RELEASE_LEFT", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "RELEASE_LEFT",
+            PalGripperRelease(),
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
         )
 
     # Execute the state machine

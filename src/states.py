@@ -5,9 +5,10 @@ from cartesian_interface.srv import SetTransform, SetTransformRequest
 import numpy as np
 import rospy
 import smach
+from std_srvs.srv import Empty
 import time
 import tf2_ros
-from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+
 import yaml
 
 
@@ -15,7 +16,7 @@ class UpdateOdom(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=["succes", "fail"],
+            outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
                 "tf_buffer",  # tf2 buffer (type: 'tf2_ros.buffer.Buffer')
@@ -65,7 +66,7 @@ class UpdateOdom(smach.State):
 
             if res.success:
                 smach.loginfo(res.message)
-                return "succes"
+                return "success"
             else:
                 smach.logerr(res.message)
                 return "fail"
@@ -90,7 +91,7 @@ class ChangeTaskBaseLink(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=["succes", "fail"],
+            outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
                 "task_name",  # Task name (type: 'str')
@@ -103,7 +104,7 @@ class ChangeTaskBaseLink(smach.State):
             userdata.client.update()
             task = userdata.client.getTask(userdata.task_name)
             task.setBaseLink(userdata.task_base_link)
-            return "succes"
+            return "success"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
             smach.logerr(error)
@@ -114,7 +115,7 @@ class MoveToTarget(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=["succes", "fail"],
+            outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
                 "task_name",  # Task name (type: 'str')
@@ -135,7 +136,7 @@ class MoveToTarget(smach.State):
                 userdata.time
             )  # blocks till action is completed (or timeout has passed)
 
-            return "succes"
+            return "success"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
             smach.logerr(error)
@@ -146,7 +147,7 @@ class FollowWaypoints(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=["succes", "fail"],
+            outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
                 "task_name",  # Task name (type: 'str')
@@ -170,7 +171,7 @@ class FollowWaypoints(smach.State):
                 timeout
             )  # blocks till action is completed (or timeout has passed)
 
-            return "succes"
+            return "success"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
             smach.logerr(error)
@@ -181,7 +182,7 @@ class FollowTrajectory(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=["succes", "fail"],
+            outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
                 "task_name",  # Task name (type: 'str')
@@ -206,7 +207,7 @@ class FollowTrajectory(smach.State):
                 task.setPoseReference(userdata.pose_traj[i])
                 task.setVelocityReference(userdata.vel_traj[i])
                 time.sleep(userdata.dt)
-            return "succes"
+            return "success"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
             smach.logerr(error)
@@ -217,7 +218,7 @@ class MoveToTargetFromCfg(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=["succes", "fail"],
+            outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
                 "tf_prefix",  # CartesI/O tf_prefix (type: 'str')
@@ -271,7 +272,7 @@ class MoveToTargetFromCfg(smach.State):
             task.waitReachCompleted(
                 time
             )  # blocks till action is completed (or timeout has passed)
-            return "succes"
+            return "success"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
             smach.logerr(error)
@@ -282,7 +283,7 @@ class FollowWaypointsFromCfg(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=["succes", "fail"],
+            outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
                 "tf_prefix",  # CartesI/O tf_prefix (type: 'str')
@@ -365,7 +366,7 @@ class FollowWaypointsFromCfg(smach.State):
             task.waitReachCompleted(
                 timeout
             )  # blocks till action is completed (or timeout has passed)
-            return "succes"
+            return "success"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
             smach.logerr(error)
@@ -376,7 +377,7 @@ class FollowTrajectoryFromCfg(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=["succes", "fail"],
+            outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
                 "tf_prefix",  # CartesI/O tf_prefix (type: 'str')
@@ -390,41 +391,44 @@ class FollowTrajectoryFromCfg(smach.State):
         pass
 
 
-class SetGripperCmd(smach.State):
-    def __init__(self):
-        smach.State.__init__(
-            self,
-            outcomes=["succes", "fail"],
-            input_keys=[
-                "gripper_name",  # Gripper name (type: 'str')
-                "gripper_cmd",  # Gripper opening in [0, 1], 0: fully closed and 1: fully open (type: 'float')
-                "finger_max_pos",  # Max position of finger joint (type: 'float')
-                "finger_min_pos",  # Min position of finger joint (type: 'float')
-            ],
-        )
-        # NOTE: ros_control naming must follow this scheme
-        self.controller_gripper = userdata.gripper_name + "_controller"
-        self.controller_gripper_joints = [
-            userdata.gripper_name + "_left_finger_joint",
-            userdata.gripper_name + "_right_finger_joint",
-        ]
-        self.gripper_cmd_pub = rospy.Publisher(
-            self.controller_gripper + "/command", JointTrajectory, queue_size=1
-        )
+class PalGripperGrasp(smach.State):
+    smach.State.__init__(
+        self,
+        outcomes=["success", "fail"],
+        input_keys=[
+            "parallel_gripper_controller",  # Gripper controller name (type: 'str')
+        ],
+    )
 
     def execute(self, userdata):
         try:
-            cmd_msg = JointTrajectory()
-            cmd_msg.joint_names = self.controller_gripper_joints
-            cmd_msg.append(JointTrajectoryPoint())
-            gripper_cmd = userdata.finger_min_pos + userdata.gripper_cmd * (
-                userdata.finger_max_pos - userdata.finger_min_pos
+            srv_proxy = rospy.ServiceProxy(userdata.gripper_ctrl_name + "/grasp", Empty)
+            req = Empty()
+            srv_proxy(req)
+            return "success"
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
+            return "fail"
+
+
+class PalGripperRelease(smach.State):
+    smach.State.__init__(
+        self,
+        outcomes=["success", "fail"],
+        input_keys=[
+            "parallel_gripper_controller",  # Gripper controller name (type: 'str')
+        ],
+    )
+
+    def execute(self, userdata):
+        try:
+            srv_proxy = rospy.ServiceProxy(
+                userdata.gripper_ctrl_name + "/release", Empty
             )
-            cmd_msg.points[0].positions = [gripper_cmd] * len(cmd_msg.joint_names)
-            cmd_msg.points[0].velocities = [0.0] * len(cmd_msg.joint_names)
-            self.gripper_cmd_pub.publish(cmd_msg)
-            # TODO: check on the real robot if it's necessary to publish a trajectory and not a single point
-            return "succes"
+            req = Empty()
+            srv_proxy(req)
+            return "success"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
             smach.logerr(error)

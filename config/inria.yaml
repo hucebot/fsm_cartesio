@@ -21,7 +21,7 @@ right_camera_look_front:
   task_base_link: "base_link"
   ref_frame: "base_link"
   offset:
-    translation: [0.45, -0.15, 0.8]
+    translation: [0.50, -0.25, 0.9]
     rotation: [0.0, 0.0, 0.0, 1.0]
     time: 10.0
 
