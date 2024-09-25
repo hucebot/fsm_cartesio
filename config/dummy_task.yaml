@@ -33,6 +33,6 @@ mobile_pose:
   task_base_link: "world"
   ref_frame: "base_link"
   offset:
-    translation: [0.0, 0, 0.0762]
+    translation: [1.0, 0, 0.0762]
     rotation: [0, 0, 0.258819, 0.9659258]
     time: 8.0

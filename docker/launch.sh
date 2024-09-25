@@ -10,6 +10,7 @@ if [ $IsRunning -eq "0" ]; then
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /tmp/docker_share:/tmp/docker_share \
         -v `pwd`/..:/home/forest_ws/src/fsm_cartesio \
+        -v `pwd`/../../tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_cartesio_config \
         --ipc host \
         --device /dev/dri \
         --device /dev/snd \

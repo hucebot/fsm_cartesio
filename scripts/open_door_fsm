@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
 from cartesian_interface.pyci_all import *
-from states import MoveToTargetFromCfg, FollowWaypointsFromCfg
+from states import (
+    MoveToTargetFromCfg,
+    FollowWaypointsFromCfg,
+    SetGripperCmd,
+    UpdateOdom,
+)
 import numpy as np
 import rospy
 import rospkg
@@ -10,7 +15,7 @@ import tf2_ros
 
 
 def main():
-    rospy.init_node("smach_example_state_machine")
+    rospy.init_node("open_door_smach_node")
     rospack = rospkg.RosPack()
 
     # Set up tf2 listener
@@ -28,7 +33,7 @@ def main():
 
     # Define userdata for the state machine
     sm.userdata.client = client
-    sm.userdata.tf_prefix = "ci"
+    sm.userdata.tf_prefix = ""
     sm.userdata.tf_buffer = tf_buffer
     sm.userdata.config_path = rospack.get_path("fsm_cartesio") + "/config/inria.yaml"
 
@@ -37,38 +42,49 @@ def main():
     sm.userdata.right_camera_look_front = "right_camera_look_front"
     sm.userdata.right_go_to_tag = "right_go_to_tag"
 
+    sm.gripper_name = "gripper_left"
+    sm.finger_max_pos = 0.044
+    sm.finger_min_pos = 0.010
+    sm.gripper_cmd_open = 1.0
+    sm.gripper_cmd_closed = 0.0
+
     # Open the state machine container
     with sm:
         smach.StateMachine.add(
             "LEFT_HOME",
             MoveToTargetFromCfg(),
-            transitions={"succes": "RIGHT_HOME", "fail": "fsm_fail"},
+            transitions={"succes": "UPDATE_ODOM", "fail": "fsm_fail"},
             remapping={
                 "tag": "left_home",
             },
         )
         smach.StateMachine.add(
-            "RIGHT_HOME",
-            MoveToTargetFromCfg(),
+            "UPDATE_ODOM",
+            UpdateOdom(),
             transitions={"succes": "RIGHT_CAMERA_LOOK_FORWARD", "fail": "fsm_fail"},
-            remapping={
-                "tag": "right_home",
-            },
         )
         smach.StateMachine.add(
             "RIGHT_CAMERA_LOOK_FORWARD",
             MoveToTargetFromCfg(),
-            transitions={"succes": "RIGHT_GO_TO_TAG", "fail": "fsm_fail"},
+            transitions={"succes": "OPEN_GRIPPER", "fail": "fsm_fail"},
             remapping={
                 "tag": "right_camera_look_front",
             },
         )
         smach.StateMachine.add(
-            "RIGHT_GO_TO_TAG",
-            MoveToTargetFromCfg(),
-            transitions={"succes": "fsm_success", "fail": "fsm_fail"},
+            "OPEN_GRIPPER",
+            SetGripperCmd(),
+            transitions={"succes": "CLOSE_GRIPPER", "fail": "fsm_fail"},
             remapping={
-                "tag": "right_go_to_tag",
+                "gripper_cmd": "gripper_cmd_open",
+            },
+        )
+        smach.StateMachine.add(
+            "CLOSE_GRIPPER",
+            SetGripperCmd(),
+            transitions={"succes": "RIGHT_GO_TO_TAG", "fsm_success": "fsm_fail"},
+            remapping={
+                "gripper_cmd": "gripper_cmd_closed",
             },
         )
 

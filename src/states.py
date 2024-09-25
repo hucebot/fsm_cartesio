@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from cartesian_interface.pyci_all import *
+from cartesian_interface.srv import SetTransform, SetTransformRequest
 import numpy as np
 import rospy
 import smach
@@ -8,6 +9,81 @@ import time
 import tf2_ros
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 import yaml
+
+
+class UpdateOdom(smach.State):
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=["succes", "fail"],
+            input_keys=[
+                "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
+                "tf_buffer",  # tf2 buffer (type: 'tf2_ros.buffer.Buffer')
+            ],
+            output_keys=["tf_buffer"],
+        )
+
+    def execute(self, userdata):
+        try:
+            userdata.client.update()
+            userdata.client.getTask("base_link").setControlMode(
+                pyci.ControlType.Velocity
+            )
+            userdata.client.getTask("gripper_left_grasping_frame").setControlMode(
+                pyci.ControlType.Velocity
+            )
+            userdata.client.getTask("gripper_right_grasping_frame").setControlMode(
+                pyci.ControlType.Velocity
+            )
+
+            srv_proxy = rospy.ServiceProxy("/cartesian/reset_base", SetTransform)
+            req = SetTransformRequest()
+
+            # Get actual 'odom' to 'base_footprint'
+            t = userdata.tf_buffer.lookup_transform(
+                "odom", "base_footprint", rospy.Time()
+            )
+            req.pose.position.x = t.transform.translation.x
+            req.pose.position.y = t.transform.translation.y
+            req.pose.position.z = t.transform.translation.z
+            req.pose.orientation.x = t.transform.rotation.x
+            req.pose.orientation.y = t.transform.rotation.y
+            req.pose.orientation.z = t.transform.rotation.z
+            req.pose.orientation.w = t.transform.rotation.w
+
+            res = srv_proxy(req)
+
+            userdata.client.getTask("base_link").setControlMode(
+                pyci.ControlType.Position
+            )
+            userdata.client.getTask("gripper_left_grasping_frame").setControlMode(
+                pyci.ControlType.Position
+            )
+            userdata.client.getTask("gripper_right_grasping_frame").setControlMode(
+                pyci.ControlType.Position
+            )
+
+            if res.success:
+                smach.loginfo(res.message)
+                return "succes"
+            else:
+                smach.logerr(res.message)
+                return "fail"
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
+
+            userdata.client.getTask("base_link").setControlMode(
+                pyci.ControlType.Position
+            )
+            userdata.client.getTask("gripper_left_grasping_frame").setControlMode(
+                pyci.ControlType.Position
+            )
+            userdata.client.getTask("gripper_right_grasping_frame").setControlMode(
+                pyci.ControlType.Position
+            )
+
+            return "fail"
 
 
 class ChangeTaskBaseLink(smach.State):
@@ -24,9 +100,9 @@ class ChangeTaskBaseLink(smach.State):
 
     def execute(self, userdata):
         try:
+            userdata.client.update()
             task = userdata.client.getTask(userdata.task_name)
             task.setBaseLink(userdata.task_base_link)
-            userdata.client.update()
             return "succes"
         except Exception as error:
             smach.logerr("An error occurred: " + type(error).__name__)
@@ -50,13 +126,13 @@ class MoveToTarget(smach.State):
 
     def execute(self, userdata):
         try:
+            userdata.client.update()
             task = userdata.client.getTask(userdata.task_name)
             task.setBaseLink(userdata.task_base_link)
-            userdata.client.update()
 
             task.setPoseTarget(userdata.target, userdata.time)
             task.waitReachCompleted(
-                userdata.time * 1.01
+                userdata.time
             )  # blocks till action is completed (or timeout has passed)
 
             return "succes"
@@ -81,9 +157,9 @@ class FollowWaypoints(smach.State):
 
     def execute(self, userdata):
         try:
+            userdata.client.update()
             task = userdata.client.getTask(userdata.task_name)
             task.setBaseLink(userdata.task_base_link)
-            userdata.client.update()
 
             timeout = 0.0
             for wp in userdata.waypoints:
@@ -91,7 +167,7 @@ class FollowWaypoints(smach.State):
 
             task.setWayPoints(userdata.waypoints)
             task.waitReachCompleted(
-                timeout * 1.01
+                timeout
             )  # blocks till action is completed (or timeout has passed)
 
             return "succes"
@@ -118,13 +194,13 @@ class FollowTrajectory(smach.State):
 
     def execute(self, userdata):
         try:
+            userdata.client.update()
             if len(userdata.pose_traj) != len(userdata.vel_traj):
                 smach.logwarn("POSE AND VELOCITY TRAJECTORIES SIZES ARE DIFFERENT")
                 return "fail"
 
             task = userdata.client.getTask(userdata.task_name)
             task.setBaseLink(userdata.task_base_link)
-            userdata.client.update()
 
             for i in range(len(userdata.pose_traj)):
                 task.setPoseReference(userdata.pose_traj[i])
@@ -154,6 +230,7 @@ class MoveToTargetFromCfg(smach.State):
 
     def execute(self, userdata):
         try:
+            userdata.client.update()
             with open(userdata.config_path, "r") as file:
                 config = yaml.safe_load(file)
             motion_def = config[userdata.tag]
@@ -162,7 +239,6 @@ class MoveToTargetFromCfg(smach.State):
             task_base_link = motion_def["task_base_link"]
             task = userdata.client.getTask(task_name)
             task.setBaseLink(task_base_link)
-            userdata.client.update()
 
             offset = Affine3()
             offset.translation = motion_def["offset"]["translation"]
@@ -175,8 +251,8 @@ class MoveToTargetFromCfg(smach.State):
             else:
                 # Express target in base_link (from ref_frame)
                 t = userdata.tf_buffer.lookup_transform(
-                    userdata.tf_prefix + "/" + task_base_link,
-                    userdata.tf_prefix + "/" + ref_frame,
+                    userdata.tf_prefix + task_base_link,
+                    userdata.tf_prefix + ref_frame,
                     rospy.Time(),
                 )
                 x = t.transform.translation.x
@@ -218,73 +294,82 @@ class FollowWaypointsFromCfg(smach.State):
         )
 
     def execute(self, userdata):
-        with open(userdata.config_path, "r") as file:
-            config = yaml.safe_load(file)
-        motion_def = config[userdata.tag]
-        ref_frame = motion_def["ref_frame"]
-        task_name = motion_def["task"]
-        task_base_link = motion_def["task_base_link"]
-        task = userdata.client.getTask(task_name)
-        task.setBaseLink(task_base_link)
-        userdata.client.update()
+        try:
+            userdata.client.update()
+            with open(userdata.config_path, "r") as file:
+                config = yaml.safe_load(file)
+            motion_def = config[userdata.tag]
+            ref_frame = motion_def["ref_frame"]
+            task_name = motion_def["task"]
+            task_base_link = motion_def["task_base_link"]
+            task = userdata.client.getTask(task_name)
+            task.setBaseLink(task_base_link)
 
-        offs_translation = np.array(motion_def["offset"]["translation"]).reshape(-1, 3)
-        offs_rotation = np.array(motion_def["offset"]["rotation"]).reshape(-1, 4)
-        time = np.array(motion_def["offset"]["time"]).reshape(-1, 1)
-
-        if not (offs_translation.shape[0] == offs_rotation.shape[0] == time.shape[0]):
-            smach.logwarn("Inconsistent number of elements while parsing target")
-            return "fail"
-
-        waypoints = []
-        timeout = 0.0
-        if ref_frame == task_base_link:
-            # No offset
-            translation = offs_translation
-            rotation = offs_rotation
-            # Parsing waypoints
-            for i in range(translation.shape[0]):
-                wp = pyci.WayPoint()
-                wp.frame.translation = translation[i, :]
-                wp.frame.quaternion = rotation[i, :]
-                wp.time = time[i, :]
-                timeout += wp.time
-                waypoints.append(wp)
-        else:
-            # Express waypoints in base_link (from ref_frame)
-            t = userdata.tf_buffer.lookup_transform(
-                userdata.tf_prefix + "/" + task_base_link,
-                userdata.tf_prefix + "/" + ref_frame,
-                rospy.Time(),
+            offs_translation = np.array(motion_def["offset"]["translation"]).reshape(
+                -1, 3
             )
-            x = t.transform.translation.x
-            y = t.transform.translation.y
-            z = t.transform.translation.z
-            qx = t.transform.rotation.x
-            qy = t.transform.rotation.y
-            qz = t.transform.rotation.z
-            qw = t.transform.rotation.w
-            base_link_to_ref = Affine3()
-            base_link_to_ref.translation = np.array([x, y, z])
-            base_link_to_ref.quaternion = np.array([qx, qy, qz, qw])
-            # Parsing waypoints
-            for i in range(offs_translation.shape[0]):
-                offset = Affine3()
-                offset.translation = offs_translation[i, :]
-                offset.quaternion = offs_rotation[i, :]
-                point = base_link_to_ref * offset
-                wp = pyci.WayPoint()
-                wp.frame.translation = point.translation
-                wp.frame.quaternion = point.quaternion
-                wp.time = time[i, :]
-                timeout += wp.time
-                waypoints.append(wp)
+            offs_rotation = np.array(motion_def["offset"]["rotation"]).reshape(-1, 4)
+            time = np.array(motion_def["offset"]["time"]).reshape(-1, 1)
 
-        task.setWayPoints(waypoints)
-        task.waitReachCompleted(
-            timeout * 1.01
-        )  # blocks till action is completed (or timeout has passed)
-        return "succes"
+            if not (
+                offs_translation.shape[0] == offs_rotation.shape[0] == time.shape[0]
+            ):
+                smach.logwarn("Inconsistent number of elements while parsing target")
+                return "fail"
+
+            waypoints = []
+            timeout = 0.0
+            if ref_frame == task_base_link:
+                # No offset
+                translation = offs_translation
+                rotation = offs_rotation
+                # Parsing waypoints
+                for i in range(translation.shape[0]):
+                    wp = pyci.WayPoint()
+                    wp.frame.translation = translation[i, :]
+                    wp.frame.quaternion = rotation[i, :]
+                    wp.time = time[i, :]
+                    timeout += wp.time
+                    waypoints.append(wp)
+            else:
+                # Express waypoints in base_link (from ref_frame)
+                t = userdata.tf_buffer.lookup_transform(
+                    userdata.tf_prefix + task_base_link,
+                    userdata.tf_prefix + ref_frame,
+                    rospy.Time(),
+                )
+                x = t.transform.translation.x
+                y = t.transform.translation.y
+                z = t.transform.translation.z
+                qx = t.transform.rotation.x
+                qy = t.transform.rotation.y
+                qz = t.transform.rotation.z
+                qw = t.transform.rotation.w
+                base_link_to_ref = Affine3()
+                base_link_to_ref.translation = np.array([x, y, z])
+                base_link_to_ref.quaternion = np.array([qx, qy, qz, qw])
+                # Parsing waypoints
+                for i in range(offs_translation.shape[0]):
+                    offset = Affine3()
+                    offset.translation = offs_translation[i, :]
+                    offset.quaternion = offs_rotation[i, :]
+                    point = base_link_to_ref * offset
+                    wp = pyci.WayPoint()
+                    wp.frame.translation = point.translation
+                    wp.frame.quaternion = point.quaternion
+                    wp.time = time[i, :]
+                    timeout += wp.time
+                    waypoints.append(wp)
+
+            task.setWayPoints(waypoints)
+            task.waitReachCompleted(
+                timeout
+            )  # blocks till action is completed (or timeout has passed)
+            return "succes"
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
+            return "fail"
 
 
 class FollowTrajectoryFromCfg(smach.State):
@@ -312,7 +397,7 @@ class SetGripperCmd(smach.State):
             outcomes=["succes", "fail"],
             input_keys=[
                 "gripper_name",  # Gripper name (type: 'str')
-                "opening_cmd",  # Gripper opening in [0, 1], 0: fully closed and 1: fully open (type: 'float')
+                "gripper_cmd",  # Gripper opening in [0, 1], 0: fully closed and 1: fully open (type: 'float')
                 "finger_max_pos",  # Max position of finger joint (type: 'float')
                 "finger_min_pos",  # Min position of finger joint (type: 'float')
             ],
@@ -332,7 +417,7 @@ class SetGripperCmd(smach.State):
             cmd_msg = JointTrajectory()
             cmd_msg.joint_names = self.controller_gripper_joints
             cmd_msg.append(JointTrajectoryPoint())
-            gripper_cmd = userdata.finger_min_pos + userdata.opening_cmd * (
+            gripper_cmd = userdata.finger_min_pos + userdata.gripper_cmd * (
                 userdata.finger_max_pos - userdata.finger_min_pos
             )
             cmd_msg.points[0].positions = [gripper_cmd] * len(cmd_msg.joint_names)

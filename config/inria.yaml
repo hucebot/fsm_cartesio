@@ -5,7 +5,7 @@ left_home:
   offset:
     translation: [0.55, 0.37, 0.65]
     rotation: [0.0, 0.0, 0.0, 1.0]
-    time: 20.0
+    time: 10.0
 
 right_home:
   task: "gripper_right_grasping_frame"
@@ -14,16 +14,16 @@ right_home:
   offset:
     translation: [0.55, -0.37, 0.65]
     rotation: [0.0, 0.0, 0.0, 1.0]
-    time: 20.0
+    time: 10.0
 
 right_camera_look_front:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   ref_frame: "base_link"
   offset:
-    translation: [0.5, -0.37, 1.0]
+    translation: [0.45, -0.15, 0.8]
     rotation: [0.0, 0.0, 0.0, 1.0]
-    time: 20.0
+    time: 10.0
 
 right_go_to_tag:
   task: "gripper_right_grasping_frame"
@@ -32,4 +32,4 @@ right_go_to_tag:
   offset:
     translation: [0.15, 0.0, 0.0]
     rotation: [0.0, 0.0, 1.0, 0.0]
-    time: 20.0
+    time: 10.0
