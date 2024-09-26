@@ -8,6 +8,7 @@ from states import (
     PalGripperRelease,
     UpdateOdom,
     ChangeTaskControlMode,
+    ChangeTaskBaseLink,
 )
 import numpy as np
 import rospy
@@ -36,19 +37,26 @@ def main():
     # Define userdata for the state machine
     sm.userdata.client = client
     sm.userdata.tf_buffer = tf_buffer
-    sm.userdata.config_path = rospack.get_path("fsm_cartesio") + "/config/inria.yaml"
+    sm.userdata.config_path = (
+        rospack.get_path("fsm_cartesio") + "/config/open_door_with_left.yaml"
+    )
 
     sm.userdata.left_home = "left_home"
     sm.userdata.right_camera_look_front = "right_camera_look_front"
     sm.userdata.base_go_to_door = "base_go_to_door"
     sm.userdata.left_go_to_handle = "left_go_to_handle"
     sm.userdata.left_turn_handle = "left_turn_handle"
+    sm.userdata.left_go_back = "left_go_back"
+    sm.userdata.base_go_back = "base_go_back"
 
     sm.userdata.parallel_gripper_controller = "parallel_gripper_left_controller"
 
     sm.userdata.base_task_name = "base_link"
     sm.userdata.ctrl_mode_velocity = "velocity"
     sm.userdata.ctrl_mode_position = "position"
+
+    sm.userdata.left_task_name = "gripper_left_grasping_frame"
+    sm.userdata.left_task_base_link = "base_link"
 
     # Open the state machine container
     with sm:
@@ -124,15 +132,32 @@ def main():
         smach.StateMachine.add(
             "LEFT_GO_BACK",
             MoveToTargetFromCfg(),
-            transitions={"success": "LEFT_RELEASE_2", "fail": "fsm_fail"},
+            transitions={"success": "LEFT_CHANGE_BASE_LINK", "fail": "fsm_fail"},
             remapping={
                 "tag": "left_go_back",
             },
         )
         smach.StateMachine.add(
+            "LEFT_CHANGE_BASE_LINK",
+            ChangeTaskBaseLink(),
+            transitions={"success": "LEFT_RELEASE_2", "fail": "fsm_fail"},
+            remapping={
+                "task_name": "left_task_name",
+                "task_base_link": "left_task_base_link",
+            },
+        )
+        smach.StateMachine.add(
             "LEFT_RELEASE_2",
             PalGripperRelease(),
+            transitions={"success": "BASE_GO_BACK", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "BASE_GO_BACK",
+            MoveToTargetFromCfg(),
             transitions={"success": "LEFT_HOME_2", "fail": "fsm_fail"},
+            remapping={
+                "tag": "base_go_back",
+            },
         )
         smach.StateMachine.add(
             "LEFT_HOME_2",

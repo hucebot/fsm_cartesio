@@ -29,9 +29,7 @@ def main():
     # Define userdata for the state machine
     sm.userdata.client = client
     sm.userdata.tf_buffer = tf_buffer
-    sm.userdata.config_path = (
-        rospack.get_path("fsm_cartesio") + "/config/dummy_task.yaml"
-    )
+    sm.userdata.config_path = rospack.get_path("fsm_cartesio") + "/config/dummy.yaml"
     sm.userdata.left_motion_tag = "left_waypoints"
     sm.userdata.right_motion_tag = "right_waypoints"
     sm.userdata.base_motion_tag = "mobile_pose"
