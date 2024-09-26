@@ -34,7 +34,7 @@ base_go_to_door:
   base_link_frame: "ci/world"
   ref_frame: "pose_tag_6"
   offset:
-    translation: [0.84, -3.0, -0.960]
+    translation: [0.84, -0.2, -0.960]
     rotation: [0.0, 0.0, 1.0, 0.0]
     time: 20.0
 
