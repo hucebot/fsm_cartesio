@@ -4,7 +4,7 @@ left_home:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.55, 0.37, 0.65]
+    translation: [0.50, 0.37, 0.65]
     rotation: [0.0, 0.0, 0.0, 1.0]
     time: 8.0
 
@@ -14,7 +14,7 @@ right_home:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.55, -0.37, 0.65]
+    translation: [0.50, -0.37, 0.65]
     rotation: [0.0, 0.0, 0.0, 1.0]
     time: 8.0
 
@@ -82,3 +82,13 @@ left_turn_handle:
       - 4.0
       - 8.0
       - 12.0
+
+left_go_back:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "world"
+  base_link_frame: "ci/world"
+  ref_frame: "ci/gripper_left_grasping_frame"
+  offset:
+    translation: [-0.15, 0.0, 0.0]
+    rotation: [0.0, 0.0, 0.0, 1.0]
+    time: 8.0

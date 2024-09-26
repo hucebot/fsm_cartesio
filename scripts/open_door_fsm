@@ -7,6 +7,7 @@ from states import (
     PalGripperGrasp,
     PalGripperRelease,
     UpdateOdom,
+    ChangeTaskControlMode,
 )
 import numpy as np
 import rospy
@@ -45,15 +46,19 @@ def main():
 
     sm.userdata.parallel_gripper_controller = "parallel_gripper_left_controller"
 
+    sm.userdata.base_task_name = "base_link"
+    sm.userdata.ctrl_mode_velocity = "velocity"
+    sm.userdata.ctrl_mode_position = "position"
+
     # Open the state machine container
     with sm:
         smach.StateMachine.add(
             "INIT_ODOM",
             UpdateOdom(),
-            transitions={"success": "LEFT_HOME", "fail": "fsm_fail"},
+            transitions={"success": "LEFT_HOME_1", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "LEFT_HOME",
+            "LEFT_HOME_1",
             MoveToTargetFromCfg(),
             transitions={"success": "RIGHT_CAMERA_LOOK_FORWARD", "fail": "fsm_fail"},
             remapping={
@@ -71,13 +76,13 @@ def main():
         smach.StateMachine.add(
             "BASE_GO_TO_DOOR",
             MoveToTargetFromCfg(),
-            transitions={"success": "UPDATE_ODOM", "fail": "fsm_fail"},
+            transitions={"success": "UPDATE_ODOM_1", "fail": "fsm_fail"},
             remapping={
                 "tag": "base_go_to_door",
             },
         )
         smach.StateMachine.add(
-            "UPDATE_ODOM",
+            "UPDATE_ODOM_1",
             UpdateOdom(),
             transitions={"success": "LEFT_RELEASE_1", "fail": "fsm_fail"},
         )
@@ -102,14 +107,53 @@ def main():
         smach.StateMachine.add(
             "LEFT_TURN_HANDLE",
             FollowWaypointsFromCfg(),
-            transitions={"success": "LEFT_RELEASE_2", "fail": "fsm_fail"},
+            transitions={"success": "BASE_VEL_CTRL_MODE", "fail": "fsm_fail"},
             remapping={
                 "tag": "left_turn_handle",
             },
         )
         smach.StateMachine.add(
+            "BASE_VEL_CTRL_MODE",
+            ChangeTaskControlMode(),
+            transitions={"success": "LEFT_GO_BACK", "fail": "fsm_fail"},
+            remapping={
+                "task_name": "base_task_name",
+                "mode": "ctrl_mode_velocity",
+            },
+        )
+        smach.StateMachine.add(
+            "LEFT_GO_BACK",
+            MoveToTargetFromCfg(),
+            transitions={"success": "LEFT_RELEASE_2", "fail": "fsm_fail"},
+            remapping={
+                "tag": "left_go_back",
+            },
+        )
+        smach.StateMachine.add(
             "LEFT_RELEASE_2",
             PalGripperRelease(),
+            transitions={"success": "LEFT_HOME_2", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "LEFT_HOME_2",
+            MoveToTargetFromCfg(),
+            transitions={"success": "BASE_POS_CTRL_MODE", "fail": "fsm_fail"},
+            remapping={
+                "tag": "left_home",
+            },
+        )
+        smach.StateMachine.add(
+            "BASE_POS_CTRL_MODE",
+            ChangeTaskControlMode(),
+            transitions={"success": "UPDATE_ODOM_2", "fail": "fsm_fail"},
+            remapping={
+                "task_name": "base_task_name",
+                "mode": "ctrl_mode_position",
+            },
+        )
+        smach.StateMachine.add(
+            "UPDATE_ODOM_2",
+            UpdateOdom(),
             transitions={"success": "fsm_success", "fail": "fsm_fail"},
         )
 
