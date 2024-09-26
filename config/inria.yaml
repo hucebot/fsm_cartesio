@@ -5,7 +5,7 @@ left_home:
   offset:
     translation: [0.55, 0.37, 0.65]
     rotation: [0.0, 0.0, 0.0, 1.0]
-    time: 10.0
+    time: 8.0
 
 right_home:
   task: "gripper_right_grasping_frame"
@@ -14,7 +14,7 @@ right_home:
   offset:
     translation: [0.55, -0.37, 0.65]
     rotation: [0.0, 0.0, 0.0, 1.0]
-    time: 10.0
+    time: 8.0
 
 right_camera_look_front:
   task: "gripper_right_grasping_frame"
@@ -24,6 +24,15 @@ right_camera_look_front:
     translation: [0.50, -0.25, 0.9]
     rotation: [0.0, 0.0, 0.0, 1.0]
     time: 10.0
+
+base_go_to_door:
+  task: "base_link"
+  task_base_link: "world"
+  ref_frame: "pose_tag_6"
+  offset:
+    translation: [0.84, -3.0, -0.960]
+    rotation: [0.0, 0.0, 1.0, 0.0]
+    time: 20.0
 
 right_go_to_tag:
   task: "gripper_right_grasping_frame"
@@ -46,8 +55,8 @@ left_go_to_handle:
       - [0.0, 0.7071068, 0.7071068, 0.0]
       - [0.0, 0.7071068, 0.7071068, 0.0]
     time:
-      - 10.0
-      - 15.0
+      - 8.0
+      - 12.0
 
 left_turn_handle:
   task: "gripper_left_grasping_frame"
@@ -63,11 +72,6 @@ left_turn_handle:
       - [0.0, 0.8660254, 0.5, 0.0]
       - [0.0, 0.7071068, 0.7071068, 0.0]
     time:
-      - 5.0
-      - 10.0
-      - 15.0
-
-
-
-
-
+      - 4.0
+      - 8.0
+      - 12.0

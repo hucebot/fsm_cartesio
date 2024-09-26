@@ -128,7 +128,7 @@ class ChangeTaskControlMode(smach.State):
             userdata.client.update()
             task = userdata.client.getTask(userdata.task_name)
             if userdata.mode.lower() == "position":
-                task.setControlMode(pyci.ControlType.Postion)
+                task.setControlMode(pyci.ControlType.Position)
                 return "success"
             elif userdata.mode.lower() == "velocity":
                 task.setControlMode(pyci.ControlType.Velocity)
@@ -185,10 +185,11 @@ class MoveToTarget(smach.State):
             userdata.client.update()
             task = userdata.client.getTask(userdata.task_name)
             task.setBaseLink(userdata.task_base_link)
+            task.setControlMode(pyci.ControlType.Position)
 
             task.setPoseTarget(userdata.target, userdata.time)
             task.waitReachCompleted(
-                userdata.time
+                userdata.time * 1.2
             )  # blocks till action is completed (or timeout has passed)
 
             return "success"
@@ -216,6 +217,7 @@ class FollowWaypoints(smach.State):
             userdata.client.update()
             task = userdata.client.getTask(userdata.task_name)
             task.setBaseLink(userdata.task_base_link)
+            task.setControlMode(pyci.ControlType.Position)
 
             timeout = 0.0
             for wp in userdata.waypoints:
@@ -223,7 +225,7 @@ class FollowWaypoints(smach.State):
 
             task.setWayPoints(userdata.waypoints)
             task.waitReachCompleted(
-                timeout
+                timeout * 1.2
             )  # blocks till action is completed (or timeout has passed)
 
             return "success"
@@ -257,6 +259,7 @@ class FollowTrajectory(smach.State):
 
             task = userdata.client.getTask(userdata.task_name)
             task.setBaseLink(userdata.task_base_link)
+            task.setControlMode(pyci.ControlType.Position)
 
             for i in range(len(userdata.pose_traj)):
                 task.setPoseReference(userdata.pose_traj[i])
@@ -295,6 +298,7 @@ class MoveToTargetFromCfg(smach.State):
             task_base_link = motion_def["task_base_link"]
             task = userdata.client.getTask(task_name)
             task.setBaseLink(task_base_link)
+            task.setControlMode(pyci.ControlType.Position)
 
             offset = Affine3()
             offset.translation = motion_def["offset"]["translation"]
@@ -325,7 +329,7 @@ class MoveToTargetFromCfg(smach.State):
 
             task.setPoseTarget(pose, time)
             task.waitReachCompleted(
-                time
+                time * 1.2
             )  # blocks till action is completed (or timeout has passed)
             return "success"
         except Exception as error:
@@ -360,6 +364,7 @@ class FollowWaypointsFromCfg(smach.State):
             task_base_link = motion_def["task_base_link"]
             task = userdata.client.getTask(task_name)
             task.setBaseLink(task_base_link)
+            task.setControlMode(pyci.ControlType.Position)
 
             offs_translation = np.array(motion_def["offset"]["translation"]).reshape(
                 -1, 3
@@ -419,7 +424,7 @@ class FollowWaypointsFromCfg(smach.State):
 
             task.setWayPoints(waypoints)
             task.waitReachCompleted(
-                timeout
+                timeout * 1.2
             )  # blocks till action is completed (or timeout has passed)
             return "success"
         except Exception as error:

@@ -39,8 +39,8 @@ def main():
     sm.userdata.config_path = rospack.get_path("fsm_cartesio") + "/config/inria.yaml"
 
     sm.userdata.left_home = "left_home"
-    sm.userdata.right_home = "right_home"
     sm.userdata.right_camera_look_front = "right_camera_look_front"
+    sm.userdata.base_go_to_door = "base_go_to_door"
     sm.userdata.left_go_to_handle = "left_go_to_handle"
     sm.userdata.left_turn_handle = "left_turn_handle"
 
@@ -59,9 +59,17 @@ def main():
         smach.StateMachine.add(
             "RIGHT_CAMERA_LOOK_FORWARD",
             MoveToTargetFromCfg(),
-            transitions={"success": "UPDATE_ODOM", "fail": "fsm_fail"},
+            transitions={"success": "BASE_GO_TO_DOOR", "fail": "fsm_fail"},
             remapping={
                 "tag": "right_camera_look_front",
+            },
+        )
+        smach.StateMachine.add(
+            "BASE_GO_TO_DOOR",
+            MoveToTargetFromCfg(),
+            transitions={"success": "UPDATE_ODOM", "fail": "fsm_fail"},
+            remapping={
+                "tag": "base_go_to_door",
             },
         )
         smach.StateMachine.add(
@@ -100,7 +108,6 @@ def main():
             PalGripperRelease(),
             transitions={"success": "fsm_success", "fail": "fsm_fail"},
         )
-
 
     # Execute the state machine
     outcome = sm.execute()
