@@ -42,6 +42,7 @@ def main():
     sm.userdata.right_home = "right_home"
     sm.userdata.right_camera_look_front = "right_camera_look_front"
     sm.userdata.left_go_to_handle = "left_go_to_handle"
+    sm.userdata.left_turn_handle = "left_turn_handle"
 
     sm.userdata.parallel_gripper_controller = "parallel_gripper_left_controller"
 
@@ -66,20 +67,38 @@ def main():
         smach.StateMachine.add(
             "UPDATE_ODOM",
             UpdateOdom(),
-            transitions={"success": "RELEASE_LEFT", "fail": "fsm_fail"},
+            transitions={"success": "LEFT_RELEASE_1", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RELEASE_LEFT",
+            "LEFT_RELEASE_1",
             PalGripperRelease(),
-            transitions={"success": "LEFT_GO_TO_HANDLE_PRE_GRASP", "fail": "fsm_fail"},
+            transitions={"success": "LEFT_GO_TO_HANDLE", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "LEFT_GO_TO_HANDLE_PRE_GRASP",
+            "LEFT_GO_TO_HANDLE",
             FollowWaypointsFromCfg(),
-            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+            transitions={"success": "LEFT_GRASP", "fail": "fsm_fail"},
             remapping={
                 "tag": "left_go_to_handle",
             },
+        )
+        smach.StateMachine.add(
+            "LEFT_GRASP",
+            PalGripperGrasp(),
+            transitions={"success": "LEFT_TURN_HANDLE", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "LEFT_TURN_HANDLE",
+            FollowWaypointsFromCfg(),
+            transitions={"success": "LEFT_RELEASE_2", "fail": "fsm_fail"},
+            remapping={
+                "tag": "left_turn_handle",
+            },
+        )
+        smach.StateMachine.add(
+            "LEFT_RELEASE_2",
+            PalGripperRelease(),
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
         )
 
 
