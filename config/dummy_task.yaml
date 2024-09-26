@@ -1,7 +1,8 @@
 left_waypoints:
   task: "gripper_left_grasping_frame"
   task_base_link: "base_link"
-  ref_frame: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
   offset:
     translation:
       - [0.6693, 0.3481, 0.4492]
@@ -16,7 +17,8 @@ left_waypoints:
 right_waypoints:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
-  ref_frame: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
   offset:
     translation:
       - [0.6663, -0.3481, 0.4492]
@@ -31,7 +33,8 @@ right_waypoints:
 mobile_pose:
   task: "base_link"
   task_base_link: "world"
-  ref_frame: "base_link"
+  base_link_frame: "ci/world"
+  ref_frame: "ci/world"
   offset:
     translation: [1.0, 0, 0]
     rotation: [0, 0, 0.258819, 0.9659258]

@@ -28,7 +28,6 @@ def main():
 
     # Define userdata for the state machine
     sm.userdata.client = client
-    sm.userdata.tf_prefix = "ci/"
     sm.userdata.tf_buffer = tf_buffer
     sm.userdata.config_path = (
         rospack.get_path("fsm_cartesio") + "/config/dummy_task.yaml"

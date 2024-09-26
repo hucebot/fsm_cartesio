@@ -1,7 +1,8 @@
 left_home:
   task: "gripper_left_grasping_frame"
   task_base_link: "base_link"
-  ref_frame: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
   offset:
     translation: [0.55, 0.37, 0.65]
     rotation: [0.0, 0.0, 0.0, 1.0]
@@ -10,7 +11,8 @@ left_home:
 right_home:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
-  ref_frame: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
   offset:
     translation: [0.55, -0.37, 0.65]
     rotation: [0.0, 0.0, 0.0, 1.0]
@@ -19,7 +21,8 @@ right_home:
 right_camera_look_front:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
-  ref_frame: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
   offset:
     translation: [0.50, -0.25, 0.9]
     rotation: [0.0, 0.0, 0.0, 1.0]
@@ -28,6 +31,7 @@ right_camera_look_front:
 base_go_to_door:
   task: "base_link"
   task_base_link: "world"
+  base_link_frame: "ci/world"
   ref_frame: "pose_tag_6"
   offset:
     translation: [0.84, -3.0, -0.960]
@@ -37,6 +41,7 @@ base_go_to_door:
 right_go_to_tag:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
+  base_link_frame: "base_link"
   ref_frame: "pose_tag_6"
   offset:
     translation: [0.15, 0.0, 0.0]
@@ -46,6 +51,7 @@ right_go_to_tag:
 left_go_to_handle:
   task: "gripper_left_grasping_frame"
   task_base_link: "base_link"
+  base_link_frame: "base_link"
   ref_frame: "pose_tag_6"
   offset:
     translation:
@@ -61,6 +67,7 @@ left_go_to_handle:
 left_turn_handle:
   task: "gripper_left_grasping_frame"
   task_base_link: "base_link"
+  base_link_frame: "base_link"
   ref_frame: "pose_tag_6"
   offset:
     translation:

@@ -279,7 +279,6 @@ class MoveToTargetFromCfg(smach.State):
             outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
-                "tf_prefix",  # CartesI/O tf_prefix (type: 'str')
                 "tf_buffer",  # tf2 buffer (type: 'tf2_ros.buffer.Buffer')
                 "config_path",  # Path to the yaml file with targets definition (type: 'str')
                 "tag",  # Tag of the desired motion in the config file (type: 'str')
@@ -294,6 +293,7 @@ class MoveToTargetFromCfg(smach.State):
                 config = yaml.safe_load(file)
             motion_def = config[userdata.tag]
             ref_frame = motion_def["ref_frame"]
+            base_link_frame = motion_def["base_link_frame"]
             task_name = motion_def["task"]
             task_base_link = motion_def["task_base_link"]
             task = userdata.client.getTask(task_name)
@@ -305,14 +305,14 @@ class MoveToTargetFromCfg(smach.State):
             offset.quaternion = motion_def["offset"]["rotation"]
             time = motion_def["offset"]["time"]
 
-            if ref_frame == task_base_link:
+            if ref_frame == base_link_frame:
                 # No offset
                 pose = offset
             else:
                 # Express target in base_link (from ref_frame)
                 t = userdata.tf_buffer.lookup_transform(
-                    userdata.tf_prefix + task_base_link,
-                    userdata.tf_prefix + ref_frame,
+                    base_link_frame,
+                    ref_frame,
                     rospy.Time(),
                 )
                 x = t.transform.translation.x
@@ -345,7 +345,6 @@ class FollowWaypointsFromCfg(smach.State):
             outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
-                "tf_prefix",  # CartesI/O tf_prefix (type: 'str')
                 "tf_buffer",  # tf2 buffer (type: 'tf2_ros.buffer.Buffer')
                 "config_path",  # Path to the yaml file with targets definition (type: 'str')
                 "tag",  # Tag of the desired motion in the config file (type: 'str')
@@ -360,6 +359,7 @@ class FollowWaypointsFromCfg(smach.State):
                 config = yaml.safe_load(file)
             motion_def = config[userdata.tag]
             ref_frame = motion_def["ref_frame"]
+            base_link_frame = motion_def["base_link_frame"]
             task_name = motion_def["task"]
             task_base_link = motion_def["task_base_link"]
             task = userdata.client.getTask(task_name)
@@ -380,7 +380,7 @@ class FollowWaypointsFromCfg(smach.State):
 
             waypoints = []
             timeout = 0.0
-            if ref_frame == task_base_link:
+            if ref_frame == base_link_frame:
                 # No offset
                 translation = offs_translation
                 rotation = offs_rotation
@@ -395,8 +395,8 @@ class FollowWaypointsFromCfg(smach.State):
             else:
                 # Express waypoints in base_link (from ref_frame)
                 t = userdata.tf_buffer.lookup_transform(
-                    userdata.tf_prefix + task_base_link,
-                    userdata.tf_prefix + ref_frame,
+                    base_link_frame,
+                    ref_frame,
                     rospy.Time(),
                 )
                 x = t.transform.translation.x
@@ -440,7 +440,6 @@ class FollowTrajectoryFromCfg(smach.State):
             outcomes=["success", "fail"],
             input_keys=[
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
-                "tf_prefix",  # CartesI/O tf_prefix (type: 'str')
                 "tf_buffer",  # tf2 buffer (type: 'tf2_ros.buffer.Buffer')
                 "config_path",  # Path to the trajectory to load (type: 'str')
             ],
