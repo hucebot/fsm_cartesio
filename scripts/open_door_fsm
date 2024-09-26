@@ -48,6 +48,11 @@ def main():
     # Open the state machine container
     with sm:
         smach.StateMachine.add(
+            "INIT_ODOM",
+            UpdateOdom(),
+            transitions={"success": "LEFT_HOME", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
             "LEFT_HOME",
             MoveToTargetFromCfg(),
             transitions={"success": "RIGHT_CAMERA_LOOK_FORWARD", "fail": "fsm_fail"},
