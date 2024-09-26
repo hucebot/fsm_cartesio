@@ -111,6 +111,61 @@ class ChangeTaskBaseLink(smach.State):
             return "fail"
 
 
+class ChangeTaskControlMode(smach.State):
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=["success", "fail"],
+            input_keys=[
+                "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
+                "task_name",  # Task name (type: 'str')
+                "mode",  # Control mode (either "Position" or "Velocity") (type: 'str')
+            ],
+        )
+
+    def execute(self, userdata):
+        try:
+            userdata.client.update()
+            task = userdata.client.getTask(userdata.task_name)
+            if userdata.mode.lower() == "position":
+                task.setControlMode(pyci.ControlType.Postion)
+                return "success"
+            elif userdata.mode.lower() == "velocity":
+                task.setControlMode(pyci.ControlType.Velocity)
+                return "success"
+            else:
+                smach.logerr("Given mode is neither 'Position' nor 'Velocity'")
+                return "fail"
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
+            return "fail"
+
+
+class ChangeTaskLambda(smach.State):
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=["success", "fail"],
+            input_keys=[
+                "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
+                "task_name",  # Task name (type: 'str')
+                "task_lambda",  # New lambda (position feedback gain) (type: 'float')
+            ],
+        )
+
+    def execute(self, userdata):
+        try:
+            userdata.client.update()
+            task = userdata.client.getTask(userdata.task_name)
+            task.setLambda(userdata.task_lambda)
+            return "success"
+        except Exception as error:
+            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(error)
+            return "fail"
+
+
 class MoveToTarget(smach.State):
     def __init__(self):
         smach.State.__init__(
