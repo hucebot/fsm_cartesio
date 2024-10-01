@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+from cartesian_interface.pyci_all import *
+from states import (
+    MoveToTargetFromCfg,
+    FollowWaypointsFromCfg,
+    PalGripperGrasp,
+    PalGripperRelease,
+    UpdateOdom,
+    ChangeTaskControlMode,
+    ChangeTaskBaseLink,
+)
+import numpy as np
+import rospy
+import rospkg
+import smach
+import tf2_ros
+
+
+def main():
+    rospy.init_node("open_door_smach_node")
+    rospack = rospkg.RosPack()
+
+    # Set up tf2 listener
+    tf_buffer = tf2_ros.Buffer()
+    tf2_ros.TransformListener(tf_buffer)
+
+    # Init CartesI/O client
+    client = pyci.CartesianInterfaceRos()
+
+    # Wait for tf listener
+    rospy.sleep(1)
+
+    # Create a SMACH state machine
+    sm = smach.StateMachine(outcomes=["fsm_success", "fsm_fail"])
+
+    # Define userdata for the state machine
+    sm.userdata.client = client
+    sm.userdata.tf_buffer = tf_buffer
+    sm.userdata.config_path = (
+        rospack.get_path("fsm_cartesio") + "/config/pick_object.yaml"
+    )
+
+    sm.userdata.right_home = "right_home"
+    sm.userdata.right_camera_look_front = "right_camera_look_front"
+    sm.userdata.parallel_gripper_controller = "parallel_gripper_right_controller"
+
+
+    # Open the state machine container
+    with sm:
+        smach.StateMachine.add(
+            "INIT_ODOM",
+            UpdateOdom(),
+            transitions={"success": "RIGHT_HOME_1", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "RIGHT_HOME_1",
+            MoveToTargetFromCfg(),
+            transitions={"success": "RIGHT_CAMERA_LOOK_FORWARD", "fail": "fsm_fail"},
+            remapping={
+                "tag": "right_home",
+            },
+        )
+        smach.StateMachine.add(
+            "RIGHT_CAMERA_LOOK_FORWARD",
+            MoveToTargetFromCfg(),
+            transitions={"success": "BASE_GO_TO_DOOR", "fail": "fsm_fail"},
+            remapping={
+                "tag": "right_camera_look_front",
+            },
+        )
+
+    # Execute the state machine
+    outcome = sm.execute()
+
+
+if __name__ == "__main__":
+    main()

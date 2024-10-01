@@ -46,6 +46,7 @@ include_directories(
 catkin_install_python(PROGRAMS 
   scripts/dummy_fsm 
   scripts/open_door_with_left_fsm 
+  scripts/pick_object 
   src/states.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
   
