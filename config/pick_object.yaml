@@ -1,4 +1,4 @@
-right_home:
+right_home_down:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
@@ -8,7 +8,7 @@ right_home:
     rotation: [0.0, 0.0, 0.0, 1.0]
     time: 8.0
 
-right_camera_look_front:
+right_home_up:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
@@ -18,3 +18,28 @@ right_camera_look_front:
     rotation: [0.0, 0.0, 0.0, 1.0]
     time: 10.0
 
+right_camera_look_table:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.318, -0.328, 0.897]
+    rotation: [-0.092, 0.305, 0.191, 0.929]
+    time: 20.0
+
+right_pick_mustard:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "pose_tag_0"
+  offset:
+    translation: 
+      - [0.023, 0.171, 0.067]
+      - [-0.021, 0.069, 0.022]
+    rotation: 
+      - [0.189, 0.054, -0.825, 0.530]
+      - [0.189, 0.054, -0.825, 0.530]
+    time: 
+      - 8.0
+      - 12.0
