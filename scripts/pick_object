@@ -2,13 +2,14 @@
 
 from cartesian_interface.pyci_all import *
 from states import (
+    ChangeTaskControlMode,
+    ChangeTaskBaseLink,
     MoveToTargetFromCfg,
     FollowWaypointsFromCfg,
     PalGripperGrasp,
     PalGripperRelease,
+    ParsePlan,
     UpdateOdom,
-    ChangeTaskControlMode,
-    ChangeTaskBaseLink,
 )
 import numpy as np
 import rospy
@@ -45,10 +46,13 @@ def main():
     sm.userdata.right_pre_manip_pose = "right_pre_manip_pose"
     sm.userdata.right_post_manip_pose = "right_post_manip_pose"
 
-    sm.userdata.right_pick_object = "right_pick_spam"
-
     # Open the state machine container
     with sm:
+        smach.StateMachine.add(
+            "PARSE_PLAN",
+            ParsePlan(),
+            transitions={"success": "INIT_ODOM", "fail": "fsm_fail"},
+        )
         smach.StateMachine.add(
             "INIT_ODOM",
             UpdateOdom(),
@@ -78,9 +82,9 @@ def main():
         smach.StateMachine.add(
             "RIGHT_PICK_OBJECT",
             FollowWaypointsFromCfg(),
-            transitions={"success": "RIGHT_GRASP", "fail": "fsm_fail"},
+            transitions={"success": "RIGHT_POST_MANIP", "fail": "fsm_fail"},
             remapping={
-                "tag": "right_pick_object",
+                "tag": "pick_tag",
             },
         )
         smach.StateMachine.add(

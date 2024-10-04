@@ -3,13 +3,51 @@
 from cartesian_interface.pyci_all import *
 from cartesian_interface.srv import SetTransform, SetTransformRequest
 import numpy as np
+import json
 import rospy
+import rospkg
 import smach
 from std_srvs.srv import Empty, EmptyRequest
 import time
 import tf2_ros
 
 import yaml
+
+
+class ParsePlan(smach.State):
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=["success", "fail"],
+            input_keys=["plan_srv_name"],
+            output_keys=["pick_tag"],
+        )
+
+    def execute(self, userdata):
+        try:
+            # srv_proxy = rospy.ServiceProxy(userdata.plan_srv_name, Empty)
+            # req = EmptyRequest()
+            # res = srv_proxy(req)
+
+            # ONLY FOR TESTING -------------------------------------------------
+            rospack = rospkg.RosPack()
+            file = rospack.get_path("fsm_cartesio") + "/config/dummy_plan.json"
+            # ONLY FOR TESTING -------------------------------------------------
+            with open(file, "r") as file:
+                res = file.read()
+                plan = json.loads(res)
+                if plan["actions"][0]["action_type"] != "pick":
+                    unexpected_action = plan["actions"][0]["action_type"]
+                    smach.logerr(
+                        f"Expected 'action_type' = 'pick', instead received: '{unexpected_action}'"
+                    )
+                    return "fail"
+                userdata.pick_tag = plan["actions"][0]["object"]
+                return "success"
+        except Exception as error:
+            smach.logerr(f"An error occurred: {type(error).__name__}")
+            smach.logerr(error)
+            return "fail"
 
 
 class UpdateOdom(smach.State):
@@ -71,7 +109,7 @@ class UpdateOdom(smach.State):
                 smach.logerr(res.message)
                 return "fail"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
 
             userdata.client.getTask("base_link").setControlMode(
@@ -106,7 +144,7 @@ class ChangeTaskBaseLink(smach.State):
             task.setBaseLink(userdata.task_base_link)
             return "success"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
 
@@ -137,7 +175,7 @@ class ChangeTaskControlMode(smach.State):
                 smach.logerr("Given mode is neither 'Position' nor 'Velocity'")
                 return "fail"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
 
@@ -161,7 +199,7 @@ class ChangeTaskLambda(smach.State):
             task.setLambda(userdata.task_lambda)
             return "success"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
 
@@ -194,7 +232,7 @@ class MoveToTarget(smach.State):
 
             return "success"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
 
@@ -230,7 +268,7 @@ class FollowWaypoints(smach.State):
 
             return "success"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
 
@@ -267,7 +305,7 @@ class FollowTrajectory(smach.State):
                 time.sleep(userdata.dt)
             return "success"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
 
@@ -333,7 +371,7 @@ class MoveToTargetFromCfg(smach.State):
             )  # blocks till action is completed (or timeout has passed)
             return "success"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
 
@@ -428,7 +466,7 @@ class FollowWaypointsFromCfg(smach.State):
             )  # blocks till action is completed (or timeout has passed)
             return "success"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
 
@@ -469,7 +507,7 @@ class PalGripperGrasp(smach.State):
             srv_proxy(req)
             return "success"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
 
@@ -493,6 +531,6 @@ class PalGripperRelease(smach.State):
             srv_proxy(req)
             return "success"
         except Exception as error:
-            smach.logerr("An error occurred: " + type(error).__name__)
+            smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
