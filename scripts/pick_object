@@ -41,38 +41,38 @@ def main():
         rospack.get_path("fsm_cartesio") + "/config/pick_object.yaml"
     )
     sm.userdata.parallel_gripper_controller = "parallel_gripper_right_controller"
-    sm.userdata.right_home_down = "right_home_down"
-    sm.userdata.right_home_up = "right_home_up"
-    sm.userdata.right_camera_look_table = "right_camera_look_table"
-    sm.userdata.right_pick_mustard = "right_pick_mustard"
+    sm.userdata.right_home = "right_home"
+    sm.userdata.right_pre_manip_pose = "right_pre_manip_pose"
+    sm.userdata.right_post_manip_pose = "right_post_manip_pose"
 
+    sm.userdata.right_pick_object = "right_pick_spam"
 
     # Open the state machine container
     with sm:
         smach.StateMachine.add(
             "INIT_ODOM",
             UpdateOdom(),
-            transitions={"success": "RIGHT_RELEASE", "fail": "fsm_fail"},
+            transitions={"success": "RIGHT_INIT_GRIPPER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RIGHT_RELEASE",
+            "RIGHT_INIT_GRIPPER",
             PalGripperRelease(),
-            transitions={"success": "RIGHT_HOME_DOWN", "fail": "fsm_fail"},
+            transitions={"success": "RIGHT_HOME_1", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RIGHT_HOME_DOWN",
+            "RIGHT_HOME_1",
             MoveToTargetFromCfg(),
-            transitions={"success": "RIGHT_CAMERA_LOOK_TABLE", "fail": "fsm_fail"},
+            transitions={"success": "RIGHT_PRE_MANIP_1", "fail": "fsm_fail"},
             remapping={
-                "tag": "right_home_down",
+                "tag": "right_home",
             },
         )
         smach.StateMachine.add(
-            "RIGHT_CAMERA_LOOK_TABLE",
+            "RIGHT_PRE_MANIP_1",
             MoveToTargetFromCfg(),
             transitions={"success": "RIGHT_PICK_OBJECT", "fail": "fsm_fail"},
             remapping={
-                "tag": "right_camera_look_table",
+                "tag": "right_pre_manip_pose",
             },
         )
         smach.StateMachine.add(
@@ -80,21 +80,34 @@ def main():
             FollowWaypointsFromCfg(),
             transitions={"success": "RIGHT_GRASP", "fail": "fsm_fail"},
             remapping={
-                "tag": "right_pick_mustard",
+                "tag": "right_pick_object",
             },
         )
         smach.StateMachine.add(
             "RIGHT_GRASP",
             PalGripperGrasp(),
-            transitions={"success": "RIGHT_HOME_UP", "fail": "fsm_fail"},
+            transitions={"success": "RIGHT_POST_MANIP", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RIGHT_HOME_UP",
+            "RIGHT_POST_MANIP",
             MoveToTargetFromCfg(),
-            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+            transitions={"success": "RIGHT_HOME_2", "fail": "fsm_fail"},
             remapping={
-                "tag": "right_home_up",
+                "tag": "right_post_manip_pose",
             },
+        )
+        smach.StateMachine.add(
+            "RIGHT_HOME_2",
+            MoveToTargetFromCfg(),
+            transitions={"success": "RIGHT_RELEASE", "fail": "fsm_fail"},
+            remapping={
+                "tag": "right_home",
+            },
+        )
+        smach.StateMachine.add(
+            "RIGHT_RELEASE",
+            PalGripperRelease(),
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
         )
 
     # Execute the state machine
