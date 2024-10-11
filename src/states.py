@@ -28,23 +28,16 @@ class ParsePlan(smach.State):
             srv_proxy = rospy.ServiceProxy(userdata.plan_srv_name, Trigger)
             req = TriggerRequest()
             res = srv_proxy(req)
-
-            # # ONLY FOR TESTING -------------------------------------------------
-            # rospack = rospkg.RosPack()
-            # file = rospack.get_path("fsm_cartesio") + "/config/dummy_plan.json"
-            # # ONLY FOR TESTING -------------------------------------------------
-
-            with open(file, "r") as file:
-                res = file.read()
-                plan = json.loads(res)
-                if plan["actions"][0]["action_type"] != "pick":
-                    unexpected_action = plan["actions"][0]["action_type"]
-                    smach.logerr(
-                        f"Expected 'action_type' = 'pick', instead received: '{unexpected_action}'"
-                    )
-                    return "fail"
-                userdata.pick_tag = plan["actions"][0]["object"]
-                return "success"
+            plan = json.loads(res.message)
+            if plan["actions"]["action_type"] != "pick":
+                unexpected_action = plan["actions"]["action_type"]
+                smach.logerr(
+                    f"Expected 'action_type' = 'pick', instead received: '{unexpected_action}'"
+                )
+                return "fail"
+            userdata.pick_tag = plan["actions"]["object"]
+            smach.loginfo(plan["actions"]["object"])
+            return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)

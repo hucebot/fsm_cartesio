@@ -46,6 +46,8 @@ def main():
     sm.userdata.right_pre_manip_pose = "right_pre_manip_pose"
     sm.userdata.right_post_manip_pose = "right_post_manip_pose"
 
+    sm.userdata.plan_srv_name = "whisper_llm"
+
     # Open the state machine container
     with sm:
         smach.StateMachine.add(
@@ -53,7 +55,6 @@ def main():
             ParsePlan(),
             transitions={"success": "INIT_ODOM", "fail": "fsm_fail"},
             remapping={
-                "plan_srv_name": "whisper_llm",
                 "pick_tag": "pick_tag",
             },
         )
@@ -65,24 +66,24 @@ def main():
         smach.StateMachine.add(
             "RIGHT_INIT_GRIPPER",
             PalGripperRelease(),
-            transitions={"success": "RIGHT_HOME_1", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "RIGHT_HOME_1",
-            MoveToTargetFromCfg(),
-            transitions={"success": "RIGHT_PRE_MANIP_1", "fail": "fsm_fail"},
-            remapping={
-                "tag": "right_home",
-            },
-        )
-        smach.StateMachine.add(
-            "RIGHT_PRE_MANIP_1",
-            MoveToTargetFromCfg(),
             transitions={"success": "RIGHT_PICK_OBJECT", "fail": "fsm_fail"},
-            remapping={
-                "tag": "right_pre_manip_pose",
-            },
         )
+        # smach.StateMachine.add(
+        #     "RIGHT_HOME_1",
+        #     MoveToTargetFromCfg(),
+        #     transitions={"success": "RIGHT_PRE_MANIP_1", "fail": "fsm_fail"},
+        #     remapping={
+        #         "tag": "right_home",
+        #     },
+        # )
+        # smach.StateMachine.add(
+        #     "RIGHT_PRE_MANIP_1",
+        #     MoveToTargetFromCfg(),
+        #     transitions={"success": "RIGHT_PICK_OBJECT", "fail": "fsm_fail"},
+        #     remapping={
+        #         "tag": "right_pre_manip_pose",
+        #     },
+        # )
         smach.StateMachine.add(
             "RIGHT_PICK_OBJECT",
             FollowWaypointsFromCfg(),
@@ -99,19 +100,19 @@ def main():
         smach.StateMachine.add(
             "RIGHT_POST_MANIP",
             MoveToTargetFromCfg(),
-            transitions={"success": "RIGHT_HOME_2", "fail": "fsm_fail"},
+            transitions={"success": "RIGHT_RELEASE", "fail": "fsm_fail"},
             remapping={
                 "tag": "right_post_manip_pose",
             },
         )
-        smach.StateMachine.add(
-            "RIGHT_HOME_2",
-            MoveToTargetFromCfg(),
-            transitions={"success": "RIGHT_RELEASE", "fail": "fsm_fail"},
-            remapping={
-                "tag": "right_home",
-            },
-        )
+        # smach.StateMachine.add(
+        #     "RIGHT_HOME_2",
+        #     MoveToTargetFromCfg(),
+        #     transitions={"success": "RIGHT_RELEASE", "fail": "fsm_fail"},
+        #     remapping={
+        #         "tag": "right_home",
+        #     },
+        # )
         smach.StateMachine.add(
             "RIGHT_RELEASE",
             PalGripperRelease(),
