@@ -7,7 +7,7 @@ import json
 import rospy
 import rospkg
 import smach
-from std_srvs.srv import Trigger, TriggerRequest
+from std_srvs.srv import Empty, EmptyRequest, Trigger, TriggerRequest
 import time
 import tf2_ros
 
