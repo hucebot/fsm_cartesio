@@ -52,6 +52,10 @@ def main():
             "PARSE_PLAN",
             ParsePlan(),
             transitions={"success": "INIT_ODOM", "fail": "fsm_fail"},
+            remapping={
+                "plan_srv_name": "whisper_llm",
+                "pick_tag": "pick_tag",
+            },
         )
         smach.StateMachine.add(
             "INIT_ODOM",

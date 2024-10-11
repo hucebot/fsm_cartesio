@@ -7,7 +7,7 @@ import json
 import rospy
 import rospkg
 import smach
-from std_srvs.srv import Empty, EmptyRequest
+from std_srvs.srv import Trigger, TriggerRequest
 import time
 import tf2_ros
 
@@ -25,14 +25,15 @@ class ParsePlan(smach.State):
 
     def execute(self, userdata):
         try:
-            # srv_proxy = rospy.ServiceProxy(userdata.plan_srv_name, Empty)
-            # req = EmptyRequest()
-            # res = srv_proxy(req)
+            srv_proxy = rospy.ServiceProxy(userdata.plan_srv_name, Trigger)
+            req = TriggerRequest()
+            res = srv_proxy(req)
 
-            # ONLY FOR TESTING -------------------------------------------------
-            rospack = rospkg.RosPack()
-            file = rospack.get_path("fsm_cartesio") + "/config/dummy_plan.json"
-            # ONLY FOR TESTING -------------------------------------------------
+            # # ONLY FOR TESTING -------------------------------------------------
+            # rospack = rospkg.RosPack()
+            # file = rospack.get_path("fsm_cartesio") + "/config/dummy_plan.json"
+            # # ONLY FOR TESTING -------------------------------------------------
+
             with open(file, "r") as file:
                 res = file.read()
                 plan = json.loads(res)
