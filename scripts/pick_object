@@ -86,7 +86,7 @@ def main():
         smach.StateMachine.add(
             "RIGHT_PICK_OBJECT",
             FollowWaypointsFromCfg(),
-            transitions={"success": "RIGHT_POST_MANIP", "fail": "fsm_fail"},
+            transitions={"success": "RIGHT_GRASP", "fail": "fsm_fail"},
             remapping={
                 "tag": "pick_tag",
             },
