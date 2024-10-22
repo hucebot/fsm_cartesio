@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
 from cartesian_interface.pyci_all import *
-from states import MoveToTargetFromCfg, FollowWaypointsFromCfg
+from states import (
+    MoveToTargetFromCfg,
+    FollowWaypointsFromCfg,
+    RunDemo,
+    SetPosturalFromCfg,
+)
 import numpy as np
 import rospy
 import rospkg
@@ -34,15 +39,46 @@ def main():
     sm.userdata.right_motion_tag = "right_waypoints"
     sm.userdata.base_motion_tag = "mobile_pose"
 
+    sm.userdata.demo_folder = rospack.get_path("fsm_cartesio") + "/config/demo"
+    sm.userdata.dummy_demo_right = "dummy_demo_right"
+    sm.userdata.dummy_demo_left = "dummy_demo_left"
+
+    sm.userdata.posture_home = "posture_home"
+    sm.userdata.go_to_posture = False
+
     # Open the state machine container
     with sm:
+        smach.StateMachine.add(
+            "DEMO_RIGHT",
+            RunDemo(),
+            transitions={"success": "DEMO_LEFT", "fail": "fsm_fail"},
+            remapping={
+                "client": "client",
+                "tf_buffer": "tf_buffer",
+                "config_path": "config_path",
+                "demo_folder": "demo_folder",
+                "tag": "dummy_demo_right",
+            },
+        )
+        smach.StateMachine.add(
+            "DEMO_LEFT",
+            RunDemo(),
+            transitions={"success": "MOVE_LEFT", "fail": "fsm_fail"},
+            remapping={
+                "client": "client",
+                "tf_buffer": "tf_buffer",
+                "config_path": "config_path",
+                "demo_folder": "demo_folder",
+                "tag": "dummy_demo_left",
+            },
+        )
+
         smach.StateMachine.add(
             "MOVE_LEFT",
             FollowWaypointsFromCfg(),
             transitions={"success": "MOVE_RIGHT", "fail": "fsm_fail"},
             remapping={
                 "client": "client",
-                "tf_prefix": "tf_prefix",
                 "tf_buffer": "tf_buffer",
                 "config_path": "config_path",
                 "tag": "left_motion_tag",
@@ -55,7 +91,6 @@ def main():
             transitions={"success": "MOVE_BASE", "fail": "fsm_fail"},
             remapping={
                 "client": "client",
-                "tf_prefix": "tf_prefix",
                 "tf_buffer": "tf_buffer",
                 "config_path": "config_path",
                 "tag": "right_motion_tag",
@@ -65,13 +100,24 @@ def main():
         smach.StateMachine.add(
             "MOVE_BASE",
             MoveToTargetFromCfg(),
-            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+            transitions={"success": "RESET_JOINTS", "fail": "fsm_fail"},
             remapping={
                 "client": "client",
-                "tf_prefix": "tf_prefix",
                 "tf_buffer": "tf_buffer",
                 "config_path": "config_path",
                 "tag": "base_motion_tag",
+            },
+        )
+
+        smach.StateMachine.add(
+            "RESET_JOINTS",
+            SetPosturalFromCfg(postural_lambda=0.005, timeout=6),
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+            remapping={
+                "client": "client",
+                "config_path": "config_path",
+                "tag": "posture_home",
+                "go_to": "go_to_posture",
             },
         )
 

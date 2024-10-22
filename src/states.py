@@ -3,6 +3,7 @@
 from cartesian_interface.pyci_all import *
 from cartesian_interface.srv import SetTransform, SetTransformRequest
 import numpy as np
+import os
 import json
 import rospy
 import rospkg
@@ -119,6 +120,56 @@ class UpdateOdom(smach.State):
             return "fail"
 
 
+class SetPosturalFromCfg(smach.State):
+    def __init__(
+        self,
+        postural_lambda=0.005,
+        timeout=6,
+    ):
+        smach.State.__init__(
+            self,
+            outcomes=["success", "fail"],
+            input_keys=[
+                "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
+                "config_path",  # Path to the yaml file with targets definition (type: 'str')
+                "tag",  # Tag of the desired posture in the config file (type: 'str')
+                "go_to",  # Flag to also move to the given posture (type: 'bool')
+            ],
+        )
+        self.postural_lambda = postural_lambda
+        self.timeout = timeout
+
+    def execute(self, userdata):
+        try:
+            userdata.client.update()
+            postural = userdata.client.getTask("Postural")
+            lambda0 = postural.getLambda()
+            ref = postural.getReferencePostureMap()
+
+            with open(userdata.config_path, "r") as file:
+                config = yaml.safe_load(file)
+            new_posture = config[userdata.tag]
+
+            for j_name, j_ref in new_posture.items():
+                ref[j_name] = j_ref
+            postural.setReferencePosture(ref)
+
+            if userdata.go_to:
+                postural.setLambda(self.postural_lambda)
+                userdata.client.getTask("gripper_left_grasping_frame").disable()
+                userdata.client.getTask("gripper_right_grasping_frame").disable()
+                time.sleep(self.timeout)
+                userdata.client.getTask("gripper_left_grasping_frame").enable()
+                userdata.client.getTask("gripper_right_grasping_frame").enable()
+                postural.setLambda(lambda0)
+
+            return "success"
+        except Exception as error:
+            smach.logerr(f"An error occurred: {type(error).__name__}")
+            smach.logerr(error)
+            return "fail"
+
+
 class ChangeTaskBaseLink(smach.State):
     def __init__(self):
         smach.State.__init__(
@@ -221,7 +272,7 @@ class MoveToTarget(smach.State):
 
             task.setPoseTarget(userdata.target, userdata.time)
             task.waitReachCompleted(
-                userdata.time * 1.2
+                userdata.time * 1.01
             )  # blocks till action is completed (or timeout has passed)
 
             return "success"
@@ -257,7 +308,7 @@ class FollowWaypoints(smach.State):
 
             task.setWayPoints(userdata.waypoints)
             task.waitReachCompleted(
-                timeout * 1.2
+                timeout * 1.01
             )  # blocks till action is completed (or timeout has passed)
 
             return "success"
@@ -335,7 +386,7 @@ class MoveToTargetFromCfg(smach.State):
             offset = Affine3()
             offset.translation = motion_def["offset"]["translation"]
             offset.quaternion = motion_def["offset"]["rotation"]
-            time = motion_def["offset"]["time"]
+            timeout = motion_def["offset"]["time"]
 
             if ref_frame == base_link_frame:
                 # No offset
@@ -359,9 +410,9 @@ class MoveToTargetFromCfg(smach.State):
                 base_link_to_ref.quaternion = np.array([qx, qy, qz, qw])
                 pose = base_link_to_ref * offset
 
-            task.setPoseTarget(pose, time)
+            task.setPoseTarget(pose, timeout)
             task.waitReachCompleted(
-                time * 1.2
+                timeout * 1.01
             )  # blocks till action is completed (or timeout has passed)
             return "success"
         except Exception as error:
@@ -402,10 +453,12 @@ class FollowWaypointsFromCfg(smach.State):
                 -1, 3
             )
             offs_rotation = np.array(motion_def["offset"]["rotation"]).reshape(-1, 4)
-            time = np.array(motion_def["offset"]["time"]).reshape(-1, 1)
+            time_steps = np.array(motion_def["offset"]["time"]).reshape(-1, 1)
 
             if not (
-                offs_translation.shape[0] == offs_rotation.shape[0] == time.shape[0]
+                offs_translation.shape[0]
+                == offs_rotation.shape[0]
+                == time_steps.shape[0]
             ):
                 smach.logwarn("Inconsistent number of elements while parsing target")
                 return "fail"
@@ -421,7 +474,7 @@ class FollowWaypointsFromCfg(smach.State):
                     wp = pyci.WayPoint()
                     wp.frame.translation = translation[i, :]
                     wp.frame.quaternion = rotation[i, :]
-                    wp.time = time[i, :]
+                    wp.time = time_steps[i, :]
                     timeout += wp.time
                     waypoints.append(wp)
             else:
@@ -450,13 +503,13 @@ class FollowWaypointsFromCfg(smach.State):
                     wp = pyci.WayPoint()
                     wp.frame.translation = point.translation
                     wp.frame.quaternion = point.quaternion
-                    wp.time = time[i, :]
+                    wp.time = time_steps[i, :]
                     timeout += wp.time
                     waypoints.append(wp)
 
             task.setWayPoints(waypoints)
             task.waitReachCompleted(
-                timeout * 1.2
+                timeout * 1.01
             )  # blocks till action is completed (or timeout has passed)
             return "success"
         except Exception as error:
@@ -465,7 +518,7 @@ class FollowWaypointsFromCfg(smach.State):
             return "fail"
 
 
-class FollowTrajectoryFromCfg(smach.State):
+class RunDemo(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
@@ -474,12 +527,84 @@ class FollowTrajectoryFromCfg(smach.State):
                 "client",  # CartesI/O client (type: 'cartesian_interface.pyci.CartesianInterfaceRos')
                 "tf_buffer",  # tf2 buffer (type: 'tf2_ros.buffer.Buffer')
                 "config_path",  # Path to the trajectory to load (type: 'str')
+                "tag",  # Tag of the desired motion in the config file (type: 'str')
+                "demo_folder",  # Path to the folder containing demos (type: 'str')
             ],
             output_keys=["tf_buffer"],
         )
 
     def execute(self, userdata):
-        pass
+        try:
+            userdata.client.update()
+            with open(userdata.config_path, "r") as file:
+                config = yaml.safe_load(file)
+            motion_def = config[userdata.tag]
+            ref_frame = motion_def["ref_frame"]
+            base_link_frame = motion_def["base_link_frame"]
+            task_name = motion_def["task"]
+            task_base_link = motion_def["task_base_link"]
+            go_to_start_time = motion_def["go_to_start_time"]
+            dt = motion_def["dt"]
+            task = userdata.client.getTask(task_name)
+            task.setBaseLink(task_base_link)
+            task.setControlMode(pyci.ControlType.Position)
+
+            demo_path = os.path.join(userdata.demo_folder, f"{userdata.tag}.npy")
+            demo = np.load(demo_path)
+
+            if demo.shape[1] != 7:
+                smach.logwarn(f"Wrong size for demo in '{demo_path}'")
+                return "fail"
+
+            references = []
+            if ref_frame == base_link_frame:
+                for i in range(demo.shape[0]):
+                    point = Affine3()
+                    point.translation = demo[i, :3]
+                    point.quaternion = demo[i, 3:]
+                    references.append(point)
+
+            else:
+                # Express waypoints in base_link (from ref_frame)
+                t = userdata.tf_buffer.lookup_transform(
+                    base_link_frame,
+                    ref_frame,
+                    rospy.Time(),
+                )
+                x = t.transform.translation.x
+                y = t.transform.translation.y
+                z = t.transform.translation.z
+                qx = t.transform.rotation.x
+                qy = t.transform.rotation.y
+                qz = t.transform.rotation.z
+                qw = t.transform.rotation.w
+                base_link_to_ref = Affine3()
+                base_link_to_ref.translation = np.array([x, y, z])
+                base_link_to_ref.quaternion = np.array([qx, qy, qz, qw])
+                # Parsing waypoints
+                for i in range(demo.shape[0]):
+                    offset = Affine3()
+                    offset.translation = demo[i, :3]
+                    offset.quaternion = demo[i, 3:]
+                    point = base_link_to_ref * offset
+                    references.append(point)
+
+            # Go to start pose
+            task.setPoseTarget(references[0], go_to_start_time)
+            task.waitReachCompleted(
+                go_to_start_time * 1.01
+            )  # blocks till action is completed (or timeout has passed)
+
+            # Send demo pose references each 'dt' secs
+            for i in range(len(references)):
+                task.setPoseReference(references[i])
+                time.sleep(dt)
+
+            return "success"
+        except Exception as error:
+            smach.logerr(f"An error occurred: {type(error).__name__}")
+            smach.logerr(error)
+            return "fail"
 
 
 class PalGripperGrasp(smach.State):
