@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-import smach
 from colorama import Fore, Style
+
+import smach
 
 
 def custom_loginfo(msg):

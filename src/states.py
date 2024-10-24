@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
-import actionlib
 from cartesian_interface.pyci_all import *
 from cartesian_interface.srv import SetTransform, SetTransformRequest
 
-from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+import actionlib
 import numpy as np
-import os
 import rospy
 import smach
-from std_srvs.srv import Empty, EmptyRequest, Trigger, TriggerRequest
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from std_srvs.srv import Empty, EmptyRequest
+
+import os
 import time
 import yaml
 

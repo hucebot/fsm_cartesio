@@ -9,7 +9,7 @@ from states import (
     PalGripperRelease,
     UpdateOdom,
 )
-import numpy as np
+
 import rospy
 import rospkg
 import smach
