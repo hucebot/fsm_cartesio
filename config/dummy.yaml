@@ -51,7 +51,7 @@ mobile_pose:
   task: "base_link"
   task_base_link: "world"
   base_link_frame: "ci/world"
-  ref_frame: "ci/world"
+  ref_frame: "ci/base_link"
   offset:
     translation: [1.0, 0, 0]
     rotation: [0, 0, 0.258819, 0.9659258]

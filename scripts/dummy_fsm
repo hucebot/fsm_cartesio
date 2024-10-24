@@ -7,11 +7,14 @@ from states import (
     RunDemo,
     SetPosturalFromCfg,
 )
-import numpy as np
 import rospy
 import rospkg
 import smach
 import tf2_ros
+
+
+def no_log(msg):
+    pass
 
 
 def main():
@@ -27,6 +30,8 @@ def main():
 
     # Wait for tf listener
     rospy.sleep(1)
+
+    smach.set_loggers(smach.loginfo, smach.logwarn, no_log, smach.logerr)
 
     # Create a SMACH state machine
     sm = smach.StateMachine(outcomes=["fsm_success", "fsm_fail"])
