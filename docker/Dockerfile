@@ -53,7 +53,8 @@ RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt
 
 RUN apt-get update && apt-get install -y ros-noetic-desktop-full ros-noetic-srdfdom \
     ros-noetic-urdf ros-noetic-geometric-shapes ros-noetic-moveit-core ros-noetic-franka-ros ros-noetic-rosmon terminator \
-    ros-noetic-moveit-ros-planning ros-noetic-moveit-ros-planning-interface ros-noetic-smach-ros python3-rosdep
+    ros-noetic-moveit-ros-planning ros-noetic-moveit-ros-planning-interface ros-noetic-smach-ros python3-rosdep \
+    ros-noetic-move-base-msgs
 
 RUN sudo rosdep init && rosdep update
 

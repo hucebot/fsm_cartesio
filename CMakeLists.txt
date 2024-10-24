@@ -48,6 +48,7 @@ catkin_install_python(PROGRAMS
   scripts/open_door_with_left_fsm 
   scripts/pick_object 
   src/states.py
+  src/utils.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
   
 install(DIRECTORY launch config

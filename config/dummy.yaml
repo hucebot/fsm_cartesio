@@ -1,19 +1,19 @@
 posture_home:
-  "arm_left_1_joint": 0.7679581224506951
-  "arm_left_2_joint": -0.02018862561759671
-  "arm_left_3_joint": 0.4505610266006477
-  "arm_left_4_joint": 0.4988415040897736
-  "arm_left_5_joint": 0.00746782236861554
-  "arm_left_6_joint": 0.005853610115284624
-  "arm_left_7_joint": -0.20287584101405454
-  "arm_right_1_joint": -0.8195536160450201
-  "arm_right_2_joint": -0.3309078500298229
-  "arm_right_3_joint": 1.543819231810627
-  "arm_right_4_joint": 1.7498059718115415
+  "arm_left_1_joint": 0.0
+  "arm_left_2_joint": 1.5
+  "arm_left_3_joint": 1.54
+  "arm_left_4_joint": 1.75
+  "arm_left_5_joint": 0.0
+  "arm_left_6_joint": 0.0
+  "arm_left_7_joint": 0.0
+  "arm_right_1_joint": 0.0
+  "arm_right_2_joint": 1.5
+  "arm_right_3_joint": 1.54
+  "arm_right_4_joint": 1.75
   "arm_right_5_joint": 0.0
-  "arm_right_6_joint": 0.0008362300164690417
+  "arm_right_6_joint": 0.0
   "arm_right_7_joint": 0.0
-  "torso_lift_joint": 0.35
+  "torso_lift_joint": 0.0
 
 left_waypoints:
   task: "gripper_left_grasping_frame"
@@ -28,8 +28,8 @@ left_waypoints:
       - [0.7296, -0.05501, 0.07221, 0.6778]
       - [0.7296, -0.05501, 0.07221, 0.6778]
     time:
+      - 2.0
       - 4.0
-      - 8.0
 
 right_waypoints:
   task: "gripper_right_grasping_frame"
@@ -44,10 +44,10 @@ right_waypoints:
       - [-0.7296, -0.05501, -0.07221, 0.6778]
       - [-0.7296, -0.05501, -0.07221, 0.6778]
     time:
+      - 2.0
       - 4.0
-      - 8.0
 
-mobile_pose:
+base_pose:
   task: "base_link"
   task_base_link: "world"
   base_link_frame: "ci/world"
@@ -55,20 +55,22 @@ mobile_pose:
   offset:
     translation: [1.0, 0, 0]
     rotation: [0, 0, 0.258819, 0.9659258]
-    time: 10.0
+    time: 4.0
 
 dummy_demo_right:
+  file: "dummy_demo_right.npy"
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
-  go_to_start_time: 5
+  go_to_start_time: 4.0
   dt: 0.05
 
 dummy_demo_left:
+  file: "dummy_demo_left.npy"
   task: "gripper_left_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
-  go_to_start_time: 5
+  go_to_start_time: 4.0
   dt: 0.05

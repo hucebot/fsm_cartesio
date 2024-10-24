@@ -32,7 +32,7 @@ mustard_bottle:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
-  ref_frame: "pose_tag_0"
+  ref_frame: "orbbec_head/pose_tag_0"
   offset:
     translation:
       - [-0.020, -0.01, 0.30]
@@ -48,7 +48,7 @@ cleanser_bottle:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
-  ref_frame: "pose_tag_1"
+  ref_frame: "orbbec_head/pose_tag_1"
   offset:
     translation:
       - [-0.020, 0.0, 0.30]
@@ -64,7 +64,7 @@ spam_can:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
-  ref_frame: "pose_tag_2"
+  ref_frame: "orbbec_head/pose_tag_2"
   offset:
     translation:
       - [-0.0, 0.01, 0.30]
@@ -80,7 +80,7 @@ sugar_box:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
-  ref_frame: "pose_tag_3"
+  ref_frame: "orbbec_head/pose_tag_3"
   offset:
     translation:
       - [-0.010, 0.0, 0.30]

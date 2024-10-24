@@ -9,6 +9,7 @@
   <license>GNUv3</license>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>move_base_msgs</exec_depend>
   <exec_depend>numpy</exec_depend>
   <exec_depend>pyyaml</exec_depend>
   <exec_depend>rospy</exec_depend>
