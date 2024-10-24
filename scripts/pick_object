@@ -94,7 +94,7 @@ def main():
         )
 
     # Execute the state machine
-    outcome = sm.execute()
+    sm.execute()
 
 
 if __name__ == "__main__":
