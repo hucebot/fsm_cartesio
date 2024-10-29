@@ -11,6 +11,7 @@ if [ $IsRunning -eq "0" ]; then
         -v /tmp/docker_share:/tmp/docker_share \
         -v `pwd`/..:/home/forest_ws/src/fsm_cartesio \
         -v `pwd`/../../tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_cartesio_config \
+        -v `pwd`/../../basic_tasks/simple_goto:/home/forest_ws/src/simple_goto \
         --ipc host \
         --device /dev/dri \
         --device /dev/snd \
