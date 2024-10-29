@@ -46,6 +46,7 @@ include_directories(
 catkin_install_python(PROGRAMS 
   scripts/dummy_fsm 
   scripts/update_odom 
+  scripts/homing 
   scripts/open_door_with_left_fsm 
   scripts/pick_object 
   src/states.py
