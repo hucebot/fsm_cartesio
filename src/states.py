@@ -151,6 +151,7 @@ class SetPosturalFromCfg(smach.State):
                 self.client.getTask("gripper_right_grasping_frame").enable()
                 if done:
                     postural.setLambda(lambda0)
+                    return "success"
                 else:
                     smach.logerr("Failed to reach the new posture")
                     return "fail"
