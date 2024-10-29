@@ -8,6 +8,7 @@ import numpy as np
 import rospy
 import smach
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from sensor_msgs.msg import JointState
 from std_srvs.srv import Empty, EmptyRequest
 
 import os
@@ -85,8 +86,10 @@ class SetPosturalFromCfg(smach.State):
         config_path,
         config_tag,
         go_to,
-        postural_lambda=0.005,
-        timeout=6,
+        postural_lambda=0.002,
+        cartesio_sol_topic="cartesian/solution",
+        eps=0.02,
+        timeout=30,
     ):
         """
         Constructs the state object.
@@ -97,7 +100,9 @@ class SetPosturalFromCfg(smach.State):
             config_tag (str): Tag of the desired motion in the config file
             go_to (bool): Flag to also move to the given posture (if True)
             postural_lambda (float): Lambda parameter for the Postural task (if go_to is True)
-            timeout (float): Time for reaching the new posture (if go_to is True)
+            cartesio_sol_topic (str): CartesI/O solution topic name (if go_to is True)
+            eps (float): Error to consider when reaching posture (if go_to is True)
+            timeout (float): General timeout for reaching posture (if go_to is True)
         """
         smach.State.__init__(self, outcomes=["success", "fail"])
         self.client = client
@@ -105,6 +110,8 @@ class SetPosturalFromCfg(smach.State):
         self.config_tag = config_tag
         self.go_to = go_to
         self.postural_lambda = postural_lambda
+        self.cartesio_sol_topic = cartesio_sol_topic
+        self.eps = eps
         self.timeout = timeout
 
     def execute(self, userdata):
@@ -120,11 +127,36 @@ class SetPosturalFromCfg(smach.State):
                 postural.setLambda(self.postural_lambda)
                 self.client.getTask("gripper_left_grasping_frame").disable()
                 self.client.getTask("gripper_right_grasping_frame").disable()
-                time.sleep(self.timeout)
+
+                done = False
+                start_time = time.time()
+                while not done:
+                    time.sleep(1)
+                    msg = rospy.wait_for_message(
+                        self.cartesio_sol_topic, JointState, timeout=1
+                    )
+                    for j in new_posture.keys():
+                        if (
+                            abs(new_posture[j] - msg.position[msg.name.index(j)])
+                            > self.eps
+                        ):
+                            done = False
+                            break
+                        else:
+                            done = True
+                    if time.time() - start_time > self.timeout:
+                        break
+
                 self.client.getTask("gripper_left_grasping_frame").enable()
                 self.client.getTask("gripper_right_grasping_frame").enable()
-                postural.setLambda(lambda0)
-            return "success"
+                if done:
+                    postural.setLambda(lambda0)
+                else:
+                    smach.logerr("Failed to reach the new posture")
+                    return "fail"
+
+            else:
+                return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
