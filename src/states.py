@@ -660,16 +660,18 @@ class PalGripperRelease(smach.State):
 
 
 class GoTo(smach.State):
-    def __init__(self, action_name, ref_frame, goal):
+    def __init__(self, client, action_name, ref_frame, goal):
         """
         Constructs the state object.
 
         Args:
+            client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
             action_name (str): Move action name
             ref_frame (str): Reference frame name
             goal (numpy.ndarray): Goal in the reference frame ([x, y, z, qx, qy, qz, qw])
         """
         smach.State.__init__(self, outcomes=["success", "fail"])
+        self.client = client
         self.action_name = action_name
         self.act_cli = actionlib.SimpleActionClient(action_name, MoveBaseAction)
         self.ref_frame = ref_frame
@@ -706,16 +708,18 @@ class GoTo(smach.State):
 
 
 class GoToFromCfg(smach.State):
-    def __init__(self, action_name, config_path, config_tag):
+    def __init__(self, client, action_name, config_path, config_tag):
         """
         Constructs the state object.
 
         Args:
+            client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
             action_name (str): Move action name
             config_path (str): Path to the yaml file with targets definition
             config_tag (str): Tag of the desired motion in the config file
         """
         smach.State.__init__(self, outcomes=["success", "fail"])
+        self.client = client
         self.action_name = action_name
         self.act_cli = actionlib.SimpleActionClient(action_name, MoveBaseAction)
         self.config_path = config_path

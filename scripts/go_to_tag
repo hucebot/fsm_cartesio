@@ -38,7 +38,7 @@ def main():
         )
         smach.StateMachine.add(
             "GO_TO",
-            GoTo("goto/reach", tag_name, tag_offset),
+            GoTo(client, "goto/reach", tag_name, tag_offset),
             transitions={"success": "fsm_success", "fail": "fsm_fail"},
         )
 
