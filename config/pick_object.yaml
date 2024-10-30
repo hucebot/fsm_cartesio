@@ -49,3 +49,9 @@ table:
   goal:
     translation: [1.34, 0.44, 0]
     rotation: [0, 0, 1, 0]
+
+mustard:
+  ref_frame: "orbbec_right/pose_tag_0"
+  goal:
+    translation: [0.71, 0.045, 0]
+    rotation: [0, 0, 1, 0]

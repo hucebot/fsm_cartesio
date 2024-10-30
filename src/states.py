@@ -616,15 +616,9 @@ class PalGripperGrasp(smach.State):
 
     def execute(self, userdata):
         try:
-            if self.srv_proxy.wait_for_service(rospy.Duration.from_sec(5.0)):
-                req = EmptyRequest()
-                self.srv_proxy(req)
-                return "success"
-            else:
-                smach.logerr(
-                    f"Failed to contact service server: {self.ctrl_name}/grasp"
-                )
-                return "fail"
+            req = EmptyRequest()
+            self.srv_proxy(req)
+            return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
@@ -645,15 +639,9 @@ class PalGripperRelease(smach.State):
 
     def execute(self, userdata):
         try:
-            if self.srv_proxy.wait_for_service(rospy.Duration.from_sec(5.0)):
-                req = EmptyRequest()
-                self.srv_proxy(req)
-                return "success"
-            else:
-                smach.logerr(
-                    f"Failed to contact service server: {self.ctrl_name}/release"
-                )
-                return "fail"
+            req = EmptyRequest()
+            self.srv_proxy(req)
+            return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
