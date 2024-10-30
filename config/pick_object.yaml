@@ -15,7 +15,7 @@ posture_home:
   "arm_right_7_joint": -1.20
   "torso_lift_joint": 0.30
 
-pre_pick_from_table:
+look_table:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
