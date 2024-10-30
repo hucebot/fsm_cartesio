@@ -23,7 +23,7 @@ look_table:
   offset:
     translation: [0.279, -0.326, 0.690]
     rotation: [-0.010, -0.012, 0.142, 0.990]
-    time: 10.0
+    time: 5.0
 
 # Demos
 
@@ -34,7 +34,7 @@ demo_pick_mustard:
   base_link_frame: "ci/base_link"
   ref_frame: "orbbec_right/pose_tag_0"
   go_to_start_time: 4.0
-  dt: 0.01
+  dt: 0.05
   gripper_controller: "gripper_right_controller"
   gripper_joints:
     - "gripper_right_left_finger_joint"

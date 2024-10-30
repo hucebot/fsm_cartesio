@@ -87,7 +87,7 @@ class SetPosturalFromCfg(smach.State):
         config_path,
         config_tag,
         go_to,
-        postural_lambda=0.001,
+        postural_lambda=0.002,
         cartesio_sol_topic="cartesian/solution",
         eps=0.02,
         timeout=30,
