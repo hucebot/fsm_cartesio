@@ -17,9 +17,12 @@ import rospkg
 import rospy
 import smach
 import tf2_ros
+from std_msgs.msg import Float32
 from std_srvs.srv import Trigger, TriggerRequest
 
 import json
+import sys
+import time
 
 
 def main():
@@ -35,6 +38,18 @@ def main():
 
     # Wait for tf listener
     rospy.sleep(1)
+
+    ctrl_bridge_time_pub = rospy.Publisher(
+        "/ros_control_bridge/time_from_start", Float32, queue_size=1
+    )
+    time_msg = Float32
+    time_msg.data = 0.8
+    wait_start = time.time()
+    while ctrl_bridge_time_pub.get_num_connections() < 1:
+        if time.time() - wait_start > 10:
+            smach.logerr(f"No connections to /ros_control_bridge/time_from_start")
+            sys.exit(0)
+    ctrl_bridge_time_pub.publish(time_msg)
 
     # Define parameters
     config_path = rospack.get_path("fsm_cartesio") + "/config/pick_object.yaml"

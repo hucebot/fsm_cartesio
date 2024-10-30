@@ -743,10 +743,10 @@ class GoToFromCfg(smach.State):
             msg.target_pose.pose.position.x = goal_transl[0]
             msg.target_pose.pose.position.y = goal_transl[1]
             msg.target_pose.pose.position.z = goal_transl[2]
-            msg.target_pose.pose.orientation.x = goal_rot[3]
-            msg.target_pose.pose.orientation.y = goal_rot[4]
-            msg.target_pose.pose.orientation.z = goal_rot[5]
-            msg.target_pose.pose.orientation.w = goal_rot[6]
+            msg.target_pose.pose.orientation.x = goal_rot[0]
+            msg.target_pose.pose.orientation.y = goal_rot[1]
+            msg.target_pose.pose.orientation.z = goal_rot[2]
+            msg.target_pose.pose.orientation.w = goal_rot[3]
             self.act_cli.send_goal(msg)
             self.act_cli.wait_for_result()
             self.act_cli.get_result()
