@@ -21,8 +21,8 @@ pre_pick_from_table:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.30, -0.26, 0.69]
-    rotation: [-0.0585, -0.0254, 0.2408, 0.9685]
+    translation: [0.279, -0.326, 0.690]
+    rotation: [-0.010, -0.012, 0.142, 0.990]
     time: 10.0
 
 # Demos
@@ -47,7 +47,7 @@ demo_pick_mustard:
 table:
   ref_frame: "orbbec_head/pose_tag_104"
   goal:
-    translation: [1.34, 0.44, 0]
+    translation: [1.54, 0.44, 0]
     rotation: [0, 0, 1, 0]
 
 mustard:

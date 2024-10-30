@@ -87,7 +87,7 @@ def main():
         )
         smach.StateMachine.add(
             "PRE_PICK",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "pre_pick_from_table"),
+            MoveToTargetFromCfg(client, tf_buffer, config_path, "look_table"),
             transitions={"success": "GO_TO_OBJECT", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
@@ -107,7 +107,7 @@ def main():
         )
         smach.StateMachine.add(
             "POST_PICK",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "pre_pick_from_table"),
+            MoveToTargetFromCfg(client, tf_buffer, config_path, "look_table"),
             transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
