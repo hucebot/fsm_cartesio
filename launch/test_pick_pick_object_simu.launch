@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="tf" type="static_transform_publisher" name="ci_world_to_tag_104" args="1.34 0.44 0.75 0 0 1 0 /ci/world /orbbec_head/pose_tag_104 500"/>   
+    <node pkg="tf" type="static_transform_publisher" name="tag_104_to_tag_0" args="0.60 0.45 0 0 0 0 1 /orbbec_head/pose_tag_104 /orbbec_right/pose_tag_0 500"/>    
+    <node pkg="fsm_cartesio" type="pick_object" name="pick_object_node" output="screen"/>
+</launch>
+

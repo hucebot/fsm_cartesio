@@ -13,7 +13,7 @@ posture_home:
   "arm_right_5_joint": 1.31
   "arm_right_6_joint": -0.11
   "arm_right_7_joint": -1.20
-  "torso_lift_joint": 0.0
+  "torso_lift_joint": 0.30
 
 left_waypoints:
   task: "gripper_left_grasping_frame"

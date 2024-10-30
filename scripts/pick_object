@@ -5,8 +5,11 @@ from utils import set_custom_loggers
 from states import (
     MoveToTargetFromCfg,
     FollowWaypointsFromCfg,
+    GoToFromCfg,
     PalGripperGrasp,
     PalGripperRelease,
+    RepeatDemo,
+    SetPosturalFromCfg,
     UpdateOdom,
 )
 
@@ -35,14 +38,15 @@ def main():
 
     # Define parameters
     config_path = rospack.get_path("fsm_cartesio") + "/config/pick_object.yaml"
-    gripper_controller = "parallel_gripper_right_controller"
+    demo_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
 
-    # Get request from LLM
-    srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
-    req = TriggerRequest()
-    res = srv_proxy(req)
-    plan = json.loads(res.message)
-    object_to_pick = plan["actions"]["object"]
+    # # Get request from LLM
+    # srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
+    # req = TriggerRequest()
+    # res = srv_proxy(req)
+    # plan = json.loads(res.message)
+    # object_to_pick = plan["actions"]["object"]
+    demo_tag = "demo_pick_mustard"
 
     # Create a SMACH state machine
     set_custom_loggers()
@@ -53,43 +57,31 @@ def main():
         smach.StateMachine.add(
             "INIT_ODOM",
             UpdateOdom(client, tf_buffer),
-            transitions={"success": "RIGHT_INIT_GRIPPER", "fail": "fsm_fail"},
+            transitions={"success": "HOMING", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RIGHT_INIT_GRIPPER",
-            PalGripperRelease(gripper_controller),
-            transitions={"success": "RIGHT_HOME", "fail": "fsm_fail"},
+            "HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RIGHT_HOME",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "right_home"),
-            transitions={"success": "RIGHT_PRE_MANIP_1", "fail": "fsm_fail"},
+            "GO_TO_TABLE",
+            GoToFromCfg(client, "goto/reach", config_path, "table"),
+            transitions={"success": "PRE_PICK", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RIGHT_PRE_MANIP",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "right_pre_manip_pose"),
-            transitions={"success": "RIGHT_PICK_OBJECT", "fail": "fsm_fail"},
+            "PRE_PICK",
+            MoveToTargetFromCfg(client, tf_buffer, config_path, "pre_pick_from_table"),
+            transitions={"success": "RUN_DEMO", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RIGHT_PICK_OBJECT",
-            FollowWaypointsFromCfg(client, tf_buffer, config_path, object_to_pick),
-            transitions={"success": "RIGHT_GRASP", "fail": "fsm_fail"},
+            "RUN_DEMO",
+            RepeatDemo(client, tf_buffer, config_path, demo_tag, demo_folder_path),
+            transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RIGHT_GRASP",
-            PalGripperGrasp(gripper_controller),
-            transitions={"success": "RIGHT_POST_MANIP", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "RIGHT_POST_MANIP",
-            MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "right_post_manip_pose"
-            ),
-            transitions={"success": "RIGHT_RELEASE", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "RIGHT_RELEASE",
-            PalGripperRelease(gripper_controller),
+            "RELEASE_GRIPPER",
+            PalGripperRelease("parallel_gripper_right_controller"),
             transitions={"success": "fsm_success", "fail": "fsm_fail"},
         )
 

@@ -1,93 +1,51 @@
-right_home:
+posture_home:
+  "arm_left_1_joint": -0.87
+  "arm_left_2_joint": 1.29
+  "arm_left_3_joint": 2.34
+  "arm_left_4_joint": 1.84
+  "arm_left_5_joint": 1.31
+  "arm_left_6_joint": -0.11
+  "arm_left_7_joint": -1.20
+  "arm_right_1_joint": -0.87
+  "arm_right_2_joint": 1.29
+  "arm_right_3_joint": 2.34
+  "arm_right_4_joint": 1.84
+  "arm_right_5_joint": 1.31
+  "arm_right_6_joint": -0.11
+  "arm_right_7_joint": -1.20
+  "torso_lift_joint": 0.30
+
+pre_pick_from_table:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.50, -0.25, 0.9]
-    rotation: [0.0, 0.0, 0.0, 1.0]
-    time: 20.0
+    translation: [0.30, -0.26, 0.69]
+    rotation: [-0.0585, -0.0254, 0.2408, 0.9685]
+    time: 10.0
 
-right_pre_manip_pose:
+# Demos
+
+demo_pick_mustard:
+  file: "pick_mustard_right.npy"
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
-  ref_frame: "ci/base_link"
-  offset:
-    translation: [0.60, -0.20, 0.95]
-    rotation: [0.5, 0.5, -0.5, 0.5]
-    time: 15.0
+  ref_frame: "orbbec_right/pose_tag_0"
+  go_to_start_time: 4.0
+  dt: 0.01
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.001
+  gripper_min: 0.044
 
-right_post_manip_pose:
-  task: "gripper_right_grasping_frame"
-  task_base_link: "base_link"
-  base_link_frame: "ci/base_link"
-  ref_frame: "ci/base_link"
-  offset:
-    translation: [0.60, -0.20, 0.95]
-    rotation: [0.5, 0.5, -0.5, 0.5]
-    time: 6.0
+# GoTo offsets
 
-mustard_bottle:
-  task: "gripper_right_grasping_frame"
-  task_base_link: "base_link"
-  base_link_frame: "ci/base_link"
-  ref_frame: "orbbec_head/pose_tag_0"
+table:
+  ref_frame: "orbbec_head/pose_tag_104"
   offset:
-    translation:
-      - [-0.020, -0.01, 0.30]
-      - [-0.015, -0.01, 0.15]
-    rotation:
-      - [-0.5, 0.5, 0.5, 0.5]
-      - [-0.5, 0.5, 0.5, 0.5]
-    time:
-      - 4.0
-      - 8.0
-
-cleanser_bottle:
-  task: "gripper_right_grasping_frame"
-  task_base_link: "base_link"
-  base_link_frame: "ci/base_link"
-  ref_frame: "orbbec_head/pose_tag_1"
-  offset:
-    translation:
-      - [-0.020, 0.0, 0.30]
-      - [-0.015, 0.0, 0.18]
-    rotation:
-      - [-0.5, 0.5, 0.5, 0.5]
-      - [-0.5, 0.5, 0.5, 0.5]
-    time:
-      - 4.0
-      - 8.0
-
-spam_can:
-  task: "gripper_right_grasping_frame"
-  task_base_link: "base_link"
-  base_link_frame: "ci/base_link"
-  ref_frame: "orbbec_head/pose_tag_2"
-  offset:
-    translation:
-      - [-0.0, 0.01, 0.30]
-      - [-0.0, 0.01, 0.15]
-    rotation:
-      - [-0.5, 0.5, 0.5, 0.5]
-      - [-0.5, 0.5, 0.5, 0.5]
-    time:
-      - 4.0
-      - 8.0
-
-sugar_box:
-  task: "gripper_right_grasping_frame"
-  task_base_link: "base_link"
-  base_link_frame: "ci/base_link"
-  ref_frame: "orbbec_head/pose_tag_3"
-  offset:
-    translation:
-      - [-0.010, 0.0, 0.30]
-      - [-0.005, 0.0, 0.15]
-    rotation:
-      - [-0.5, 0.5, 0.5, 0.5]
-      - [-0.5, 0.5, 0.5, 0.5]
-    time:
-      - 4.0
-      - 8.0
+    translation: [1.34, 0.44, 0]
+    rotation: [0, 0, 1, 0]

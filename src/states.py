@@ -10,6 +10,7 @@ import smach
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from sensor_msgs.msg import JointState
 from std_srvs.srv import Empty, EmptyRequest
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 import os
 import time
@@ -550,7 +551,7 @@ class FollowTrajectoryFromCfg(smach.State):
             task.setControlMode(pyci.ControlType.Position)
             file_path = os.path.join(self.file_folder_path, motion_def["file"])
             traj = np.load(file_path)
-            if traj.shape[1] != 7:
+            if traj.shape[1] != 7:  # [x, y, z, qx, qy, qz, qw]
                 smach.logwarn(f"Wrong size for demo in '{file_path}'")
                 return "fail"
             references = []
@@ -578,10 +579,10 @@ class FollowTrajectoryFromCfg(smach.State):
                 base_link_to_ref.translation = np.array([x, y, z])
                 base_link_to_ref.quaternion = np.array([qx, qy, qz, qw])
                 # Parsing waypoints
-                for i in range(demo.shape[0]):
+                for i in range(traj.shape[0]):
                     offset = Affine3()
-                    offset.translation = demo[i, :3]
-                    offset.quaternion = demo[i, 3:]
+                    offset.translation = traj[i, :3]
+                    offset.quaternion = traj[i, 3:]
                     point = base_link_to_ref * offset
                     references.append(point)
             # Go to start pose
@@ -759,3 +760,132 @@ class GoToFromCfg(smach.State):
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
             return "fail"
+
+
+class RepeatDemo(smach.State):
+    def __init__(self, client, tf_buffer, config_path, config_tag, file_folder_path):
+        """
+        Constructs the state object.
+
+        Args:
+            client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+            tf2_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+            config_path (str): Path to the yaml file with targets definition
+            config_tag (str): Tag of the desired motion in the config file
+            file_folder_path (str): Path to the folder containing the demo
+        """
+        smach.State.__init__(self, outcomes=["success", "fail"])
+        self.client = client
+        self.tf_buffer = tf_buffer
+        self.config_path = config_path
+        self.config_tag = config_tag
+        self.file_folder_path = file_folder_path
+
+    def execute(self, userdata):
+        try:
+            self.client.update()
+
+            with open(self.config_path, "r") as file:
+                config = yaml.safe_load(file)
+            motion_def = config[self.config_tag]
+            ref_frame = motion_def["ref_frame"]
+            base_link_frame = motion_def["base_link_frame"]
+            task_name = motion_def["task"]
+            task_base_link = motion_def["task_base_link"]
+            go_to_start_time = motion_def["go_to_start_time"]
+            dt = motion_def["dt"]
+            gripper_controller = motion_def["gripper_controller"]
+            gripper_cmd_pub = rospy.Publisher(
+                gripper_controller + "/command", JointTrajectory, queue_size=1
+            )
+            gripper_cmd_msg = JointTrajectory()
+            gripper_cmd_msg.joint_names = motion_def["gripper_joints"]
+            gripper_cmd_msg.points.append(JointTrajectoryPoint())
+            gripper_cmd_msg.points[0].positions = [0.0] * len(
+                gripper_cmd_msg.joint_names
+            )
+            gripper_cmd_msg.points[0].velocities = [0.0] * len(
+                gripper_cmd_msg.joint_names
+            )
+            wait_start = time.time()
+            while gripper_cmd_pub.get_num_connections() < 1:
+                if time.time() - wait_start > 10:
+                    smach.logerr(f"No connections to {gripper_controller}/command")
+                    return "fail"
+            gripper_min = motion_def["gripper_min"]
+            gripper_max = motion_def["gripper_max"]
+
+            task = self.client.getTask(task_name)
+            task.setBaseLink(task_base_link)
+            task.setControlMode(pyci.ControlType.Position)
+            file_path = os.path.join(self.file_folder_path, motion_def["file"])
+            demo = np.load(file_path)
+            if demo.shape[1] != 8:  # [x, y, z, qx, qy, qz, qw, gripper]
+                smach.logwarn(f"Wrong size for demo in '{file_path}'")
+                return "fail"
+            references = []
+            if ref_frame == base_link_frame:
+                for i in range(demo.shape[0]):
+                    point = Affine3()
+                    point.translation = demo[i, :3]
+                    point.quaternion = demo[i, 3:7]
+                    references.append(demo)
+            else:
+                # Express waypoints in base_link (from ref_frame)
+                t = self.tf_buffer.lookup_transform(
+                    base_link_frame,
+                    ref_frame,
+                    rospy.Time(),
+                )
+                x = t.transform.translation.x
+                y = t.transform.translation.y
+                z = t.transform.translation.z
+                qx = t.transform.rotation.x
+                qy = t.transform.rotation.y
+                qz = t.transform.rotation.z
+                qw = t.transform.rotation.w
+                base_link_to_ref = Affine3()
+                base_link_to_ref.translation = np.array([x, y, z])
+                base_link_to_ref.quaternion = np.array([qx, qy, qz, qw])
+                # Parsing waypoints
+                for i in range(demo.shape[0]):
+                    offset = Affine3()
+                    offset.translation = demo[i, :3]
+                    offset.quaternion = demo[i, 3:7]
+                    point = base_link_to_ref * offset
+                    references.append(point)
+            # Go to start pose
+            task.setPoseTarget(references[0], go_to_start_time)
+            task.waitReachCompleted(go_to_start_time * 1.01)
+            # Send demo pose references each 'dt' secs
+            for i in range(len(references)):
+                gripper_cmd_msg = set_gripper_msg(
+                    demo[i, -1], gripper_cmd_msg, gripper_min, gripper_max
+                )
+                task.setPoseReference(references[i])
+                gripper_cmd_pub.publish(gripper_cmd_msg)
+                time.sleep(dt)
+            return "success"
+        except Exception as error:
+            smach.logerr(f"An error occurred: {type(error).__name__}")
+            smach.logerr(error)
+            return "fail"
+
+
+def set_gripper_msg(
+    value,
+    gripper_cmd_msg,
+    gripper_min=0.001,
+    gripper_max=0.044,
+    teleop_min=1.0,
+    teleop_max=0.0,
+    time_duration=0.2,
+):
+    a = (gripper_max - gripper_min) / (teleop_max - teleop_min)
+    gripper = a * value * (value - teleop_max) + gripper_max
+    for joint_name in gripper_cmd_msg.joint_names:
+        gripper_cmd_msg.points[0].positions[
+            gripper_cmd_msg.joint_names.index(joint_name)
+        ] = gripper
+    gripper_cmd_msg.points[0].time_from_start = rospy.Duration(time_duration)
+    return gripper_cmd_msg
