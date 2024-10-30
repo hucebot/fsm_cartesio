@@ -680,6 +680,7 @@ class GoTo(smach.State):
             smach.logerr(f"Failed to contact action server: {self.action_name}")
             return "fail"
         try:
+            self.client.getTask("base_link").setControlMode(pyci.ControlType.Velocity)
             msg = MoveBaseGoal()
             msg.target_pose.header.frame_id = self.ref_frame
             msg.target_pose.pose.position.x = self.goal[0]
@@ -692,6 +693,7 @@ class GoTo(smach.State):
             self.act_cli.send_goal(msg)
             self.act_cli.wait_for_result()
             self.act_cli.get_result()
+            self.client.getTask("base_link").setControlMode(pyci.ControlType.Position)
             if self.act_cli.get_goal_status_text() == "Success":
                 return "success"
             else:
@@ -730,6 +732,7 @@ class GoToFromCfg(smach.State):
             ref_frame = motion_def["ref_frame"]
             goal_transl = motion_def["goal"]["translation"]
             goal_rot = motion_def["goal"]["rotation"]
+            self.client.getTask("base_link").setControlMode(pyci.ControlType.Velocity)
             msg = MoveBaseGoal()
             msg.target_pose.header.frame_id = ref_frame
             msg.target_pose.pose.position.x = goal_transl[0]
@@ -742,6 +745,7 @@ class GoToFromCfg(smach.State):
             self.act_cli.send_goal(msg)
             self.act_cli.wait_for_result()
             self.act_cli.get_result()
+            self.client.getTask("base_link").setControlMode(pyci.ControlType.Position)
             if self.act_cli.get_goal_status_text() == "Success":
                 return "success"
             else:
