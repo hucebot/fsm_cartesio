@@ -1,18 +1,18 @@
 posture_home:
-  "arm_left_1_joint": 0.0
-  "arm_left_2_joint": 1.5
-  "arm_left_3_joint": 1.54
-  "arm_left_4_joint": 1.75
-  "arm_left_5_joint": 0.0
-  "arm_left_6_joint": 0.0
-  "arm_left_7_joint": 0.0
-  "arm_right_1_joint": 0.0
-  "arm_right_2_joint": 1.5
-  "arm_right_3_joint": 1.54
-  "arm_right_4_joint": 1.75
-  "arm_right_5_joint": 0.0
-  "arm_right_6_joint": 0.0
-  "arm_right_7_joint": 0.0
+  "arm_left_1_joint": -0.87
+  "arm_left_2_joint": 1.29
+  "arm_left_3_joint": 2.34
+  "arm_left_4_joint": 1.84
+  "arm_left_5_joint": 1.31
+  "arm_left_6_joint": -0.11
+  "arm_left_7_joint": -1.20
+  "arm_right_1_joint": -0.87
+  "arm_right_2_joint": 1.29
+  "arm_right_3_joint": 2.34
+  "arm_right_4_joint": 1.84
+  "arm_right_5_joint": 1.31
+  "arm_right_6_joint": -0.11
+  "arm_right_7_joint": -1.20
   "torso_lift_joint": 0.0
 
 left_waypoints:
