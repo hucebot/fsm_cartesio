@@ -80,16 +80,16 @@ def main():
         smach.StateMachine.add(
             "HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "GO_TO_TABLE",
-            GoToFromCfg(client, "goto/reach", config_path, "table"),
             transitions={"success": "PRE_PICK", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
             "PRE_PICK",
             MoveToTargetFromCfg(client, tf_buffer, config_path, "look_table_right"),
+            transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "GO_TO_TABLE",
+            GoToFromCfg(client, "goto/reach", config_path, "table"),
             transitions={"success": "GO_TO_OBJECT", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
