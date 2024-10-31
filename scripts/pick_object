@@ -109,7 +109,7 @@ def main():
         )
         smach.StateMachine.add(
             "POST_PICK",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "look_table"),
+            MoveToTargetFromCfg(client, tf_buffer, config_path, "post_pick_right"),
             transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(

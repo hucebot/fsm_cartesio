@@ -21,9 +21,19 @@ look_table_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.244, -0.316, 0.683]
-    rotation: [0.014, -0.076, 0.064, 0.995]
+    translation: [0.279, -0.326, 0.690]
+    rotation: [-0.010, -0.012, 0.142, 0.990]
     time: 5.0
+
+post_pick_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.279, -0.326, 0.690]
+    rotation: [-0.010, -0.012, 0.142, 0.990]
+    time: 10.0
 
 # Demos
 
@@ -77,7 +87,7 @@ pick_bleacher_right:
 table:
   ref_frame: "orbbec_head/pose_tag_104"
   goal:
-    translation: [1.66, 0.332, 0]
+    translation: [1.54, 0.44, 0]
     rotation: [0, 0, 1, 0]
 
 mustard:
