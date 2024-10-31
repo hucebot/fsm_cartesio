@@ -15,19 +15,19 @@ posture_home:
   "arm_right_7_joint": -1.20
   "torso_lift_joint": 0.30
 
-look_table:
+look_table_right:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.279, -0.326, 0.690]
-    rotation: [-0.010, -0.012, 0.142, 0.990]
+    translation: [0.244, -0.316, 0.683]
+    rotation: [0.014, -0.076, 0.064, 0.995]
     time: 5.0
 
 # Demos
 
-demo_pick_mustard:
+pick_mustard_right:
   file: "pick_mustard_right.npy"
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
@@ -42,16 +42,58 @@ demo_pick_mustard:
   gripper_max: 0.044
   gripper_min: 0.001
 
+pick_sugar_right:
+  file: "pick_sugar_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_1"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_bleacher_right:
+  file: "pick_bleacher_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_2"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
 # GoTo offsets
 
 table:
   ref_frame: "orbbec_head/pose_tag_104"
   goal:
-    translation: [1.54, 0.44, 0]
+    translation: [1.66, 0.332, 0]
     rotation: [0, 0, 1, 0]
 
 mustard:
   ref_frame: "orbbec_right/pose_tag_0"
   goal:
-    translation: [0.71, 0.045, 0]
+    translation: [0.665, 0.107, -0.665]
+    rotation: [0, 0, 1, 0]
+
+sugar:
+  ref_frame: "orbbec_right/pose_tag_1"
+  goal:
+    translation: [0.732, 0.065, -0.546]
+    rotation: [0, 0, 1, 0]
+
+bleacher:
+  ref_frame: "orbbec_right/pose_tag_2"
+  goal:
+    translation: [0.820, 0.027, -0.460]
     rotation: [0, 0, 1, 0]

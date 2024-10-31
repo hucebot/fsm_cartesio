@@ -58,7 +58,9 @@ def main():
     # res = srv_proxy(req)
     # plan = json.loads(res.message)
     # object_to_pick = plan["actions"]["object"]
-    demo_tag = "demo_pick_mustard"
+
+    object_to_pick = "mustard"
+    demo_tag = f"pick_{object_to_pick}_right"
 
     # Define SM parameters
     config_path = rospack.get_path("fsm_cartesio") + "/config/pick_object.yaml"
@@ -87,12 +89,12 @@ def main():
         )
         smach.StateMachine.add(
             "PRE_PICK",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "look_table"),
+            MoveToTargetFromCfg(client, tf_buffer, config_path, "look_table_right"),
             transitions={"success": "GO_TO_OBJECT", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
             "GO_TO_OBJECT",
-            GoToFromCfg(client, "goto/reach", config_path, "mustard"),
+            GoToFromCfg(client, "goto/reach", config_path, object_to_pick),
             transitions={"success": "RESET_ODOM", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
