@@ -59,7 +59,7 @@ def main():
     # plan = json.loads(res.message)
     # object_to_pick = plan["actions"]["object"]
 
-    object_to_pick = "mustard"
+    object_to_pick = "sugar"
     demo_tag = f"pick_{object_to_pick}_right"
 
     # Define SM parameters
