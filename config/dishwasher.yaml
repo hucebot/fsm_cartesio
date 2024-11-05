@@ -25,7 +25,7 @@ pre_open_dishwasher_right:
   offset:
     translation: [0.2605, -0.6667, 0.7366]
     rotation: [0.7247, -0.01393, 0.01238, -0.6889]
-    time: 10.0
+    time: 8.0
 
 pre_pull_dishwasher_drawer_right:
   task: "gripper_right_grasping_frame"
@@ -35,7 +35,7 @@ pre_pull_dishwasher_drawer_right:
   offset:
     translation: [0.05821, -0.6540, 0.7187]
     rotation: [-0.7166, 0.00178, 0.0336, 0.6967]
-    time: 10.0
+    time: 1.0
 
 pre_pick_bowl_right:
   task: "gripper_right_grasping_frame"
@@ -45,7 +45,7 @@ pre_pick_bowl_right:
   offset:
     translation: [0.2173, -0.8442, 0.8346]
     rotation: [0.7294, -0.1777, -0.2184, -0.6235]
-    time: 10.0
+    time: 4.0
 
 pre_close_dishwasher_drawer_right:
   task: "gripper_right_grasping_frame"
