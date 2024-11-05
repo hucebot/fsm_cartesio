@@ -50,6 +50,7 @@ catkin_install_python(PROGRAMS
   scripts/homing 
   scripts/open_door_with_left_fsm 
   scripts/pick_object 
+  scripts/pick_bowl_from_dishwasher
   src/states.py
   src/utils.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
