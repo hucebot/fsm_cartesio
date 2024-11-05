@@ -124,3 +124,15 @@ dishwasher:
   goal:
     translation: [1.169, -0.517, 0]
     rotation: [0, 0, 1, 0]
+
+back_and_turn:
+  ref_frame: "base_link"
+  goal:
+    translation: [-1, 0, 0]
+    rotation: [0, 0, 0.7071068, 0.7071068]
+
+table:
+  ref_frame: "orbbec_head/pose_tag_104"
+  goal:
+    translation: [1.35, 0.40, 0]
+    rotation: [0, 0, 1, 0]
