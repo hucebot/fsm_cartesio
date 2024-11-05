@@ -169,10 +169,10 @@ def main():
         smach.StateMachine.add(
             "GO_TO_TABLE",
             GoToFromCfg(client, "goto/reach", config_path, "table"),
-            transitions={"success": "RESET_ODOM_1", "fail": "fsm_fail"},
+            transitions={"success": "RESET_ODOM_2", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RESET_ODOM_1",
+            "RESET_ODOM_2",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
         )
