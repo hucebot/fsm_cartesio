@@ -185,6 +185,12 @@ back_and_turn:
     translation: [-1, 0, 0]
     rotation: [0, 0, -0.7071068, 0.7071068]
 
+back:
+  ref_frame: "base_link"
+  goal:
+    translation: [-0.3, 0, 0]
+    rotation: [0, 0, 0, 1]
+
 table_far:
   ref_frame: "orbbec_head/pose_tag_104"
   goal:

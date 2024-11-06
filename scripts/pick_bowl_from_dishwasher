@@ -219,6 +219,11 @@ def main():
         smach.StateMachine.add(
             "RELEASE_GRIPPER",
             PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "GO_BACK", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "GO_BACK",
+            GoToFromCfg(client, "goto/reach", config_path, "back"),
             transitions={"success": "HOMING_3", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
