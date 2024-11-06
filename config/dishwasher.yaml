@@ -63,9 +63,9 @@ pull_drawer_backward:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/gripper_right_grasping_frame"
   offset:
-    translation: [-0.25, 0, 0]
+    translation: [-0.36, 0, 0]
     rotation: [0, 0, 0, 0]
-    time: 8.0
+    time: 10.0
 
 move_ee_backward:
   task: "gripper_right_grasping_frame"
@@ -75,7 +75,7 @@ move_ee_backward:
   offset:
     translation: [-0.05, 0, 0]
     rotation: [0, 0, 0, 0]
-    time: 8.0
+    time: 2.0
 
 place_bowl_right:
   task: "gripper_right_grasping_frame"
