@@ -69,91 +69,96 @@ def main():
 
     # Open the state machine container
     with sm:
-        # Go to dishwasher -----------------------------------------------------------
+        # # Go to dishwasher -----------------------------------------------------------
+        # smach.StateMachine.add(
+        #     "INIT_ODOM",
+        #     UpdateOdom(client, tf_buffer),
+        #     transitions={"success": "HOMING_0", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "HOMING_0",
+        #     SetPosturalFromCfg(client, config_path, "posture_home", True),
+        #     transitions={"success": "GO_TO_DISHWASHER", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "GO_TO_DISHWASHER",
+        #     GoToFromCfg(client, "goto/reach", config_path, "dishwasher"),
+        #     transitions={"success": "RESET_ODOM_0", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "RESET_ODOM_0",
+        #     UpdateOdom(client, tf_buffer),
+        #     transitions={"success": "DOCK_LOCALLY", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "DOCK_LOCALLY",
+        #     GoToFromCfg(client, "goto/reach", config_path, "dishwasher"),
+        #     transitions={"success": "RESET_ODOM_1", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "RESET_ODOM_1",
+        #     UpdateOdom(client, tf_buffer),
+        #     transitions={"success": "PRE_OPEN_DISHWASHER", "fail": "fsm_fail"},
+        # )
+        # # Open dishwasher ------------------------------------------------------------
+        # smach.StateMachine.add(
+        #     "PRE_OPEN_DISHWASHER",
+        #     MoveToTargetFromCfg(
+        #         client, tf_buffer, config_path, "pre_open_dishwasher_right"
+        #     ),
+        #     transitions={"success": "RUN_DEMO_OPEN_DISHWASHER", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "RUN_DEMO_OPEN_DISHWASHER",
+        #     RepeatDemo(
+        #         client,
+        #         tf_buffer,
+        #         config_path,
+        #         "open_dishwasher_right",
+        #         demo_folder_path,
+        #     ),
+        #     transitions={"success": "PRE_PULL_DRAWER", "fail": "fsm_fail"},
+        # )
+        # # Pull dishwasher drawer -----------------------------------------------------
+        # smach.StateMachine.add(
+        #     "PRE_PULL_DRAWER",
+        #     MoveToTargetFromCfg(
+        #         client, tf_buffer, config_path, "pre_pull_dishwasher_drawer_right"
+        #     ),
+        #     transitions={"success": "RUN_DEMO_PULL_DISHWASHER", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "RUN_DEMO_PULL_DISHWASHER",
+        #     RepeatDemo(
+        #         client,
+        #         tf_buffer,
+        #         config_path,
+        #         "pull_dishwasher_drawer_right",
+        #         demo_folder_path,
+        #     ),
+        #     transitions={"success": "PRE_PICK_BOWL", "fail": "fsm_fail"},
+        # )
+        # # Pick bowl ------------------------------------------------------------------
+        # smach.StateMachine.add(
+        #     "PRE_PICK_BOWL",
+        #     MoveToTargetFromCfg(client, tf_buffer, config_path, "pre_pick_bowl_right"),
+        #     transitions={"success": "RUN_DEMO_PICK_BOWL", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "RUN_DEMO_PICK_BOWL",
+        #     RepeatDemo(
+        #         client,
+        #         tf_buffer,
+        #         config_path,
+        #         "pick_bowl_right",
+        #         demo_folder_path,
+        #     ),
+        #     transitions={"success": "CLOSE_GRIPPER", "fail": "fsm_fail"},
+        # )
         smach.StateMachine.add(
-            "INIT_ODOM",
-            UpdateOdom(client, tf_buffer),
-            transitions={"success": "HOMING_0", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "HOMING_0",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "GO_TO_DISHWASHER", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "GO_TO_DISHWASHER",
-            GoToFromCfg(client, "goto/reach", config_path, "dishwasher"),
-            transitions={"success": "RESET_ODOM_0", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "RESET_ODOM_0",
-            UpdateOdom(client, tf_buffer),
-            transitions={"success": "DOCK_LOCALLY", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "DOCK_LOCALLY",
-            GoToFromCfg(client, "goto/reach", config_path, "dishwasher"),
-            transitions={"success": "RESET_ODOM_1", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "RESET_ODOM_1",
-            UpdateOdom(client, tf_buffer),
-            transitions={"success": "PRE_OPEN_DISHWASHER", "fail": "fsm_fail"},
-        )
-        # Open dishwasher ------------------------------------------------------------
-        smach.StateMachine.add(
-            "PRE_OPEN_DISHWASHER",
-            MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "pre_open_dishwasher_right"
-            ),
-            transitions={"success": "RUN_DEMO_OPEN_DISHWASHER", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "RUN_DEMO_OPEN_DISHWASHER",
-            RepeatDemo(
-                client,
-                tf_buffer,
-                config_path,
-                "open_dishwasher_right",
-                demo_folder_path,
-            ),
-            transitions={"success": "PRE_PULL_DRAWER", "fail": "fsm_fail"},
-        )
-        # Pull dishwasher drawer -----------------------------------------------------
-        smach.StateMachine.add(
-            "PRE_PULL_DRAWER",
-            MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "pre_pull_dishwasher_drawer_right"
-            ),
-            transitions={"success": "RUN_DEMO_PULL_DISHWASHER", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "RUN_DEMO_PULL_DISHWASHER",
-            RepeatDemo(
-                client,
-                tf_buffer,
-                config_path,
-                "pull_dishwasher_drawer_right",
-                demo_folder_path,
-            ),
-            transitions={"success": "PRE_PICK_BOWL", "fail": "fsm_fail"},
-        )
-        # Pick bowl ------------------------------------------------------------------
-        smach.StateMachine.add(
-            "PRE_PICK_BOWL",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "pre_pick_bowl_right"),
-            transitions={"success": "RUN_DEMO_PICK_BOWL", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "RUN_DEMO_PICK_BOWL",
-            RepeatDemo(
-                client,
-                tf_buffer,
-                config_path,
-                "pick_bowl_right",
-                demo_folder_path,
-            ),
-            transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
+            "CLOSE_GRIPPER",
+            PalGripperGrasp("parallel_gripper_right_controller"),
+            transitions={"success": "GO_BACK_AND_TURN", "fail": "fsm_fail"},
         )
         # Go to table ----------------------------------------------------------------
         smach.StateMachine.add(
