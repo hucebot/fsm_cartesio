@@ -164,7 +164,7 @@ def main():
         smach.StateMachine.add(
             "GO_BACK_AND_TURN",
             GoToFromCfg(client, "goto/reach", config_path, "back_and_turn"),
-            transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
+            transitions={"success": "GO_TO_TABLE_FAR", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
             "GO_TO_TABLE_FAR",
