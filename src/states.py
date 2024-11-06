@@ -279,7 +279,7 @@ class MoveToTarget(smach.State):
             task.setBaseLink(self.task_base_link)
             task.setControlMode(pyci.ControlType.Position)
             task.setPoseTarget(self.target, self.duration)
-            task.waitReachCompleted(self.duration * 1.01)
+            task.waitReachCompleted(self.duration + 1)
             return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
@@ -314,7 +314,7 @@ class FollowWaypoints(smach.State):
             for wp in self.waypoints:
                 timeout += wp.time
             task.setWayPoints(self.waypoints)
-            task.waitReachCompleted(timeout * 1.01)
+            task.waitReachCompleted(timeout + 1)
             return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
@@ -413,7 +413,7 @@ class MoveToTargetFromCfg(smach.State):
                 base_link_to_ref.quaternion = np.array([qx, qy, qz, qw])
                 pose = base_link_to_ref * offset
             task.setPoseTarget(pose, timeout)
-            task.waitReachCompleted(timeout * 1.01)
+            task.waitReachCompleted(timeout + 1)
             return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
@@ -507,7 +507,7 @@ class FollowWaypointsFromCfg(smach.State):
                     timeout += wp.time
                     waypoints.append(wp)
             task.setWayPoints(waypoints)
-            task.waitReachCompleted(timeout * 1.01)
+            task.waitReachCompleted(timeout + 1)
             return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
@@ -587,7 +587,7 @@ class FollowTrajectoryFromCfg(smach.State):
                     references.append(point)
             # Go to start pose
             task.setPoseTarget(references[0], go_to_start_time)
-            task.waitReachCompleted(go_to_start_time * 1.01)
+            task.waitReachCompleted(go_to_start_time + 1)
             # Send demo pose references each 'dt' secs
             for i in range(len(references)):
                 task.setPoseReference(references[i])
@@ -844,7 +844,7 @@ class RepeatDemo(smach.State):
                     references.append(point)
             # Go to start pose
             task.setPoseTarget(references[0], go_to_start_time)
-            task.waitReachCompleted(go_to_start_time * 1.01)
+            task.waitReachCompleted(go_to_start_time + 1)
             # Send demo pose references each 'dt' secs
             for i in range(len(references)):
                 gripper_cmd_msg = set_gripper_msg(
