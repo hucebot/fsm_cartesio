@@ -157,13 +157,13 @@ def main():
         )
         # Go to table ----------------------------------------------------------------
         smach.StateMachine.add(
-            "HOMING_1",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "GO_BACK_AND_TURN", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
             "GO_BACK_AND_TURN",
             GoToFromCfg(client, "goto/reach", config_path, "back_and_turn"),
+            transitions={"success": "HOMING_1", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "HOMING_1",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": "GO_TO_TABLE_FAR", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
