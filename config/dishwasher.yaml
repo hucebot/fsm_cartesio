@@ -142,7 +142,7 @@ close_dishwasher_drawer_right:
 dishwasher:
   ref_frame: "orbbec_head/pose_tag_103"
   goal:
-    translation: [1.04, -0.45, 0]
+    translation: [1.169, -0.517, 0]
     rotation: [0, 0, 1, 0]
 
 back_and_turn:
