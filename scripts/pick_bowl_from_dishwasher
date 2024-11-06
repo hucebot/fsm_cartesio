@@ -173,16 +173,21 @@ def main():
         smach.StateMachine.add(
             "CLOSE_GRIPPER",
             PalGripperGrasp("parallel_gripper_right_controller"),
+            transitions={"success": "HOMING_1", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "HOMING_1",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": "GO_BACK_AND_TURN", "fail": "fsm_fail"},
         )
         # Go to table ----------------------------------------------------------------
         smach.StateMachine.add(
             "GO_BACK_AND_TURN",
             GoToFromCfg(client, "goto/reach", config_path, "back_and_turn"),
-            transitions={"success": "HOMING_1", "fail": "fsm_fail"},
+            transitions={"success": "HOMING_2", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "HOMING_1",
+            "HOMING_2",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": "RESET_ODOM_2", "fail": "fsm_fail"},
         )
@@ -214,6 +219,11 @@ def main():
         smach.StateMachine.add(
             "RELEASE_GRIPPER",
             PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "HOMING_3", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "HOMING_3",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": "fsm_success", "fail": "fsm_fail"},
         )
 
