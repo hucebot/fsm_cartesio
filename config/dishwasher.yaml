@@ -33,9 +33,9 @@ pre_pull_dishwasher_drawer_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.1543, -0.5830, 0.7472]
-    rotation: [-0.7211, 0.05071, 0.03940, 0.6898]
-    time: 1.0
+    translation: [0.05820966, -0.65393234, 0.71868815]
+    rotation: [-0.71659718, 0.00176917, 0.03358229, 0.6966761]
+    time: 4.0
 
 pre_pick_bowl_right:
   task: "gripper_right_grasping_frame"
@@ -129,7 +129,7 @@ back_and_turn:
   ref_frame: "base_link"
   goal:
     translation: [-1, 0, 0]
-    rotation: [0, 0, 0.7071068, 0.7071068]
+    rotation: [0, 0, -0.7071068, 0.7071068]
 
 table:
   ref_frame: "orbbec_head/pose_tag_104"
