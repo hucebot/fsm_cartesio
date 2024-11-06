@@ -125,17 +125,27 @@ def main():
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "pre_pull_dishwasher_drawer_right"
             ),
-            transitions={"success": "RUN_DEMO_PULL_DISHWASHER", "fail": "fsm_fail"},
+            transitions={"success": "RUN_DEMO_GRASP_DISHWASHER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RUN_DEMO_PULL_DISHWASHER",
+            "RUN_DEMO_GRASP_DISHWASHER",
             RepeatDemo(
                 client,
                 tf_buffer,
                 config_path,
-                "pull_dishwasher_drawer_right",
+                "grasp_dishwasher_drawer_right",
                 demo_folder_path,
             ),
+            transitions={"success": "PULL_DRAWER", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "PULL_DRAWER",
+            MoveToTargetFromCfg(client, tf_buffer, config_path, "pull_drawer_backward"),
+            transitions={"success": "OPEN_GRIPPER", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "OPEN_GRIPPER",
+            PalGripperRelease("parallel_gripper_right_controller"),
             transitions={"success": "PRE_PICK_BOWL", "fail": "fsm_fail"},
         )
         # Pick bowl ------------------------------------------------------------------

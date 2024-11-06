@@ -57,6 +57,16 @@ pre_close_dishwasher_drawer_right:
     rotation: [-0.7273, 0.0150, 0.0210, 0.6858]
     time: 8.0
 
+pull_drawer_backward:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/gripper_right_grasping_frame"
+  offset:
+    translation: [-0.25, 0, 0]
+    rotation: [0, 0, 0, 0]
+    time: 8.0
+
 place_bowl_right:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
@@ -113,6 +123,21 @@ pick_bowl_right:
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
   ref_frame: "orbbec_right/pose_tag_11"
+  go_to_start_time: 2.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+grasp_dishwasher_drawer_right:
+  file: "grasp_dishwasher_drawer_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_38"
   go_to_start_time: 2.0
   dt: 0.05
   gripper_controller: "gripper_right_controller"
