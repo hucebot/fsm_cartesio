@@ -156,26 +156,31 @@ def main():
             transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
         )
         # Go to table ----------------------------------------------------------------
-        # smach.StateMachine.add(
-        #     "HOMING_1",
-        #     SetPosturalFromCfg(client, config_path, "posture_home", True),
-        #     transitions={"success": "GO_BACK_AND_TURN", "fail": "fsm_fail"},
-        # )
-        # smach.StateMachine.add(
-        #     "GO_BACK_AND_TURN",
-        #     GoToFromCfg(client, "goto/reach", config_path, "back_and_turn"),
-        #     transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
-        # )
-        # smach.StateMachine.add(
-        #     "GO_TO_TABLE",
-        #     GoToFromCfg(client, "goto/reach", config_path, "table"),
-        #     transitions={"success": "RESET_ODOM_2", "fail": "fsm_fail"},
-        # )
-        # smach.StateMachine.add(
-        #     "RESET_ODOM_2",
-        #     UpdateOdom(client, tf_buffer),
-        #     transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
-        # )
+        smach.StateMachine.add(
+            "HOMING_1",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "GO_BACK_AND_TURN", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "GO_BACK_AND_TURN",
+            GoToFromCfg(client, "goto/reach", config_path, "back_and_turn"),
+            transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "GO_TO_TABLE_FAR",
+            GoToFromCfg(client, "goto/reach", config_path, "table_far"),
+            transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "GO_TO_TABLE",
+            GoToFromCfg(client, "goto/reach", config_path, "table_far"),
+            transitions={"success": "RESET_ODOM_2", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "RESET_ODOM_2",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
+        )
         smach.StateMachine.add(
             "RELEASE_GRIPPER",
             PalGripperRelease("parallel_gripper_right_controller"),
