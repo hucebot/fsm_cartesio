@@ -146,6 +146,11 @@ def main():
         smach.StateMachine.add(
             "OPEN_GRIPPER",
             PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "MOVE_EE_BACK", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "MOVE_EE_BACK",
+            MoveToTargetFromCfg(client, tf_buffer, config_path, "move_ee_backward"),
             transitions={"success": "PRE_PICK_BOWL", "fail": "fsm_fail"},
         )
         # Pick bowl ------------------------------------------------------------------
