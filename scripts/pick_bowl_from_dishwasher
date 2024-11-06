@@ -169,10 +169,10 @@ def main():
         smach.StateMachine.add(
             "HOMING_1",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "RESET_ODOM_3", "fail": "fsm_fail"},
+            transitions={"success": "RESET_ODOM_2", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RESET_ODOM_3",
+            "RESET_ODOM_2",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "GO_TO_TABLE_FAR", "fail": "fsm_fail"},
         )
@@ -183,7 +183,7 @@ def main():
         )
         smach.StateMachine.add(
             "GO_TO_TABLE",
-            GoToFromCfg(client, "goto/reach", config_path, "table_far"),
+            GoToFromCfg(client, "goto/reach", config_path, "table"),
             transitions={"success": "RESET_ODOM_3", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
