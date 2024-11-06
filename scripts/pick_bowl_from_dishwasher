@@ -52,12 +52,13 @@ def main():
     #         sys.exit(0)
     # ctrl_bridge_time_pub.publish(time_msg)
 
-    # # Get request from LLM
-    # srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
-    # req = TriggerRequest()
-    # res = srv_proxy(req)
-    # plan = json.loads(res.message)
-    # object_to_pick = plan["actions"]["object"]
+    # Get request from LLM
+    srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
+    req = TriggerRequest()
+    res = srv_proxy(req)
+    print("Response received")
+    plan = json.loads(res.message)
+    object_to_pick = plan["actions"]["object"]
 
     # Define SM parameters
     config_path = rospack.get_path("fsm_cartesio") + "/config/dishwasher.yaml"
