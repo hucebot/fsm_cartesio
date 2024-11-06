@@ -63,7 +63,7 @@ pull_drawer_backward:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/gripper_right_grasping_frame"
   offset:
-    translation: [-0.36, 0, 0]
+    translation: [-0.36, 0.03, 0]
     rotation: [0, 0, 0, 0]
     time: 10.0
 
@@ -73,7 +73,7 @@ move_ee_backward:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/gripper_right_grasping_frame"
   offset:
-    translation: [-0.05, 0.01, 0]
+    translation: [-0.10, 0.05, 0]
     rotation: [0, 0, 0, 0]
     time: 2.0
 
@@ -103,7 +103,7 @@ open_dishwasher_right:
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
   ref_frame: "orbbec_right/pose_tag_34"
-  go_to_start_time: 2.0
+  go_to_start_time: 4.0
   dt: 0.05
   gripper_controller: "gripper_right_controller"
   gripper_joints:
