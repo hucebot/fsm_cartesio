@@ -95,12 +95,12 @@ def main():
             GoToFromCfg(client, "goto/reach", config_path, "dishwasher"),
             transitions={"success": "RESET_ODOM_1", "fail": "fsm_fail"},
         )
+        # Open dishwasher ------------------------------------------------------------
         smach.StateMachine.add(
             "RESET_ODOM_1",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "PRE_OPEN_DISHWASHER", "fail": "fsm_fail"},
         )
-        # Open dishwasher ------------------------------------------------------------
         smach.StateMachine.add(
             "PRE_OPEN_DISHWASHER",
             MoveToTargetFromCfg(
@@ -125,6 +125,11 @@ def main():
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "pre_pull_dishwasher_drawer_right"
             ),
+            transitions={"success": "RESET_ODOM_2", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "RESET_ODOM_2",
+            UpdateOdom(client, tf_buffer),
             transitions={"success": "OPEN_GRIPPER_1", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
@@ -163,36 +168,15 @@ def main():
             ),
             transitions={"success": "PRE_PICK_BOWL", "fail": "fsm_fail"},
         )
-        # smach.StateMachine.add(
-        #     "RUN_DEMO_GRASP_DISHWASHER",
-        #     RepeatDemo(
-        #         client,
-        #         tf_buffer,
-        #         config_path,
-        #         "grasp_dishwasher_drawer_right",
-        #         demo_folder_path,
-        #     ),
-        #     transitions={"success": "PULL_DRAWER", "fail": "fsm_fail"},
-        # )
-        # smach.StateMachine.add(
-        #     "PULL_DRAWER",
-        #     MoveToTargetFromCfg(client, tf_buffer, config_path, "pull_drawer_backward"),
-        #     transitions={"success": "OPEN_GRIPPER", "fail": "fsm_fail"},
-        # )
-        # smach.StateMachine.add(
-        #     "OPEN_GRIPPER",
-        #     PalGripperRelease("parallel_gripper_right_controller"),
-        #     transitions={"success": "MOVE_EE_BACK", "fail": "fsm_fail"},
-        # )
-        # smach.StateMachine.add(
-        #     "MOVE_EE_BACK",
-        #     MoveToTargetFromCfg(client, tf_buffer, config_path, "move_ee_backward"),
-        #     transitions={"success": "PRE_PICK_BOWL", "fail": "fsm_fail"},
-        # )
         # Pick bowl ------------------------------------------------------------------
         smach.StateMachine.add(
             "PRE_PICK_BOWL",
             MoveToTargetFromCfg(client, tf_buffer, config_path, "pre_pick_bowl_right"),
+            transitions={"success": "RESET_ODOM_3", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "RESET_ODOM_3",
+            UpdateOdom(client, tf_buffer),
             transitions={"success": "RUN_DEMO_PICK_BOWL", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
@@ -209,21 +193,21 @@ def main():
         smach.StateMachine.add(
             "CLOSE_GRIPPER_2",
             PalGripperGrasp("parallel_gripper_right_controller"),
-            transitions={"success": "GO_BACK_AND_TURN", "fail": "fsm_fail"},
+            transitions={"success": "GO_BACK_AND_TURN_RIGHT", "fail": "fsm_fail"},
         )
         # Go to table ----------------------------------------------------------------
         smach.StateMachine.add(
-            "GO_BACK_AND_TURN",
-            GoToFromCfg(client, "goto/reach", config_path, "back_and_turn"),
+            "GO_BACK_AND_TURN_RIGHT",
+            GoToFromCfg(client, "goto/reach", config_path, "back_and_turn_right"),
             transitions={"success": "HOMING_1", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
             "HOMING_1",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "RESET_ODOM_2", "fail": "fsm_fail"},
+            transitions={"success": "RESET_ODOM_4", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RESET_ODOM_2",
+            "RESET_ODOM_4",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
         )
@@ -235,10 +219,10 @@ def main():
         smach.StateMachine.add(
             "DOCK_TO_TABLE",
             GoToFromCfg(client, "goto/reach", config_path, "table"),
-            transitions={"success": "RESET_ODOM_3", "fail": "fsm_fail"},
+            transitions={"success": "RESET_ODOM_5", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RESET_ODOM_3",
+            "RESET_ODOM_5",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "PLACE_BOWL", "fail": "fsm_fail"},
         )
