@@ -52,13 +52,12 @@ def main():
     #         sys.exit(0)
     # ctrl_bridge_time_pub.publish(time_msg)
 
-    # Get request from LLM
-    srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
-    req = TriggerRequest()
-    res = srv_proxy(req)
-    print("Response received")
-    plan = json.loads(res.message)
-    object_to_pick = plan["actions"]["object"]
+    # # Get request from LLM
+    # srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
+    # req = TriggerRequest()
+    # res = srv_proxy(req)
+    # print("Response received")
+    # plan = json.loads(res.message)
 
     # Define SM parameters
     config_path = rospack.get_path("fsm_cartesio") + "/config/dishwasher.yaml"
@@ -89,10 +88,10 @@ def main():
         smach.StateMachine.add(
             "RESET_ODOM_0",
             UpdateOdom(client, tf_buffer),
-            transitions={"success": "DOCK_LOCALLY", "fail": "fsm_fail"},
+            transitions={"success": "DOCK_TO_DISHWASHER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "DOCK_LOCALLY",
+            "DOCK_TO_DISHWASHER",
             GoToFromCfg(client, "goto/reach", config_path, "dishwasher"),
             transitions={"success": "RESET_ODOM_1", "fail": "fsm_fail"},
         )
@@ -126,34 +125,70 @@ def main():
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "pre_pull_dishwasher_drawer_right"
             ),
-            transitions={"success": "RUN_DEMO_GRASP_DISHWASHER", "fail": "fsm_fail"},
+            transitions={"success": "OPEN_GRIPPER_1", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RUN_DEMO_GRASP_DISHWASHER",
-            RepeatDemo(
-                client,
-                tf_buffer,
-                config_path,
-                "grasp_dishwasher_drawer_right",
-                demo_folder_path,
+            "OPEN_GRIPPER_1",
+            PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "GRASP_DRAWER", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "GRASP_DRAWER",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "grasp_dishwasher_drawer"
             ),
+            transitions={"success": "CLOSE_GRIPPER_1", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "CLOSE_GRIPPER_1",
+            PalGripperGrasp("parallel_gripper_right_controller"),
             transitions={"success": "PULL_DRAWER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
             "PULL_DRAWER",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "pull_drawer_backward"),
-            transitions={"success": "OPEN_GRIPPER", "fail": "fsm_fail"},
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "pull_dishwasher_drawer_backward"
+            ),
+            transitions={"success": "OPEN_GRIPPER_2", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "OPEN_GRIPPER",
+            "OPEN_GRIPPER_2",
             PalGripperRelease("parallel_gripper_right_controller"),
-            transitions={"success": "MOVE_EE_BACK", "fail": "fsm_fail"},
+            transitions={"success": "RELEASE_DRAWER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "MOVE_EE_BACK",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "move_ee_backward"),
+            "RELEASE_DRAWER",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "release_dishwasher_drawer"
+            ),
             transitions={"success": "PRE_PICK_BOWL", "fail": "fsm_fail"},
         )
+        # smach.StateMachine.add(
+        #     "RUN_DEMO_GRASP_DISHWASHER",
+        #     RepeatDemo(
+        #         client,
+        #         tf_buffer,
+        #         config_path,
+        #         "grasp_dishwasher_drawer_right",
+        #         demo_folder_path,
+        #     ),
+        #     transitions={"success": "PULL_DRAWER", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "PULL_DRAWER",
+        #     MoveToTargetFromCfg(client, tf_buffer, config_path, "pull_drawer_backward"),
+        #     transitions={"success": "OPEN_GRIPPER", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "OPEN_GRIPPER",
+        #     PalGripperRelease("parallel_gripper_right_controller"),
+        #     transitions={"success": "MOVE_EE_BACK", "fail": "fsm_fail"},
+        # )
+        # smach.StateMachine.add(
+        #     "MOVE_EE_BACK",
+        #     MoveToTargetFromCfg(client, tf_buffer, config_path, "move_ee_backward"),
+        #     transitions={"success": "PRE_PICK_BOWL", "fail": "fsm_fail"},
+        # )
         # Pick bowl ------------------------------------------------------------------
         smach.StateMachine.add(
             "PRE_PICK_BOWL",
@@ -169,10 +204,10 @@ def main():
                 "pick_bowl_right",
                 demo_folder_path,
             ),
-            transitions={"success": "CLOSE_GRIPPER", "fail": "fsm_fail"},
+            transitions={"success": "CLOSE_GRIPPER_2", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "CLOSE_GRIPPER",
+            "CLOSE_GRIPPER_2",
             PalGripperGrasp("parallel_gripper_right_controller"),
             transitions={"success": "GO_BACK_AND_TURN", "fail": "fsm_fail"},
         )
@@ -190,15 +225,15 @@ def main():
         smach.StateMachine.add(
             "RESET_ODOM_2",
             UpdateOdom(client, tf_buffer),
-            transitions={"success": "GO_TO_TABLE_FAR", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "GO_TO_TABLE_FAR",
-            GoToFromCfg(client, "goto/reach", config_path, "table_far"),
             transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
             "GO_TO_TABLE",
+            GoToFromCfg(client, "goto/reach", config_path, "table_far"),
+            transitions={"success": "DOCK_TO_TABLE", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "DOCK_TO_TABLE",
             GoToFromCfg(client, "goto/reach", config_path, "table"),
             transitions={"success": "RESET_ODOM_3", "fail": "fsm_fail"},
         )
@@ -210,10 +245,10 @@ def main():
         smach.StateMachine.add(
             "PLACE_BOWL",
             FollowWaypointsFromCfg(client, tf_buffer, config_path, "place_bowl_right"),
-            transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
+            transitions={"success": "OPEN_GRIPPER_3", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "RELEASE_GRIPPER",
+            "OPEN_GRIPPER_3",
             PalGripperRelease("parallel_gripper_right_controller"),
             transitions={"success": "GO_BACK", "fail": "fsm_fail"},
         )
