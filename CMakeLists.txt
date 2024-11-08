@@ -47,11 +47,12 @@ catkin_install_python(PROGRAMS
   scripts/dummy_fsm 
   scripts/go_to_tag 
   scripts/go_to_human
-  scripts/update_odom 
   scripts/homing 
   scripts/open_door_with_left_fsm 
-  scripts/pick_object 
   scripts/pick_bowl_from_dishwasher
+  scripts/pick_object 
+  scripts/update_odom 
+  src/sm_factory.py
   src/states.py
   src/utils.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

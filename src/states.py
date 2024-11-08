@@ -27,7 +27,7 @@ class UpdateOdom(smach.State):
 
         Args:
             client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
-            tf2_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+            tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
         """
         smach.State.__init__(self, outcomes=["success", "fail"])
         self.client = client
@@ -364,7 +364,7 @@ class MoveToTargetFromCfg(smach.State):
 
         Args:
             client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
-            tf2_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+            tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
             config_path (str): Path to the yaml file with targets definition
             config_tag (str): Tag of the desired motion in the config file
         """
@@ -428,7 +428,7 @@ class FollowWaypointsFromCfg(smach.State):
 
         Args:
             client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
-            tf2_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+            tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
             config_path (str): Path to the yaml file with targets definition
             config_tag (str): Tag of the desired motion in the config file
         """
@@ -522,7 +522,7 @@ class FollowTrajectoryFromCfg(smach.State):
 
         Args:
             client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
-            tf2_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+            tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
             config_path (str): Path to the yaml file with targets definition
             config_tag (str): Tag of the desired motion in the config file
             file_folder_path (str): Path to the folder containing the trajectory
@@ -757,7 +757,7 @@ class RepeatDemo(smach.State):
 
         Args:
             client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
-            tf2_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+            tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
             config_path (str): Path to the yaml file with targets definition
             config_tag (str): Tag of the desired motion in the config file
             file_folder_path (str): Path to the folder containing the demo

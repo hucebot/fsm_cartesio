@@ -123,7 +123,7 @@ def main():
         smach.StateMachine.add(
             "PRE_PULL_DRAWER",
             MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "pre_pull_dishwasher_drawer_right"
+                client, tf_buffer, config_path, "pre_pull_dishwasher_top_drawer_right"
             ),
             transitions={"success": "RESET_ODOM_2", "fail": "fsm_fail"},
         )
@@ -140,7 +140,7 @@ def main():
         smach.StateMachine.add(
             "GRASP_DRAWER",
             MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "grasp_dishwasher_drawer"
+                client, tf_buffer, config_path, "grasp_dishwasher_top_drawer"
             ),
             transitions={"success": "CLOSE_GRIPPER_1", "fail": "fsm_fail"},
         )
@@ -152,7 +152,7 @@ def main():
         smach.StateMachine.add(
             "PULL_DRAWER",
             MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "pull_dishwasher_drawer_backward"
+                client, tf_buffer, config_path, "pull_dishwasher_top_drawer"
             ),
             transitions={"success": "OPEN_GRIPPER_2", "fail": "fsm_fail"},
         )
@@ -171,7 +171,9 @@ def main():
         # Pick bowl ------------------------------------------------------------------
         smach.StateMachine.add(
             "PRE_PICK_BOWL",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "pre_pick_bowl_right"),
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "pre_pick_bowl_from_dishwasher_right"
+            ),
             transitions={"success": "RESET_ODOM_3", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
@@ -185,7 +187,7 @@ def main():
                 client,
                 tf_buffer,
                 config_path,
-                "pick_bowl_right",
+                "pick_bowl_from_dishwasher_right",
                 demo_folder_path,
             ),
             transitions={"success": "CLOSE_GRIPPER_2", "fail": "fsm_fail"},
@@ -228,7 +230,9 @@ def main():
         )
         smach.StateMachine.add(
             "PLACE_BOWL",
-            FollowWaypointsFromCfg(client, tf_buffer, config_path, "place_bowl_right"),
+            FollowWaypointsFromCfg(
+                client, tf_buffer, config_path, "place_bowl_on_table_right"
+            ),
             transitions={"success": "OPEN_GRIPPER_3", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
