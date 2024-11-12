@@ -51,27 +51,47 @@ def main():
     # print("Response received")
     # plan = json.loads(res.message)
 
+    pick_location = "dishwasher"
     obj_to_pick = "plate"
 
     # Define SM parameters
-    config_path = rospack.get_path("fsm_cartesio") + "/config/dishwasher.yaml"
+    dishwasher_config_path = (
+        rospack.get_path("fsm_cartesio") + "/config/dishwasher.yaml"
+    )
     demo_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
 
     # Create a SMACH state machine
     set_custom_loggers()
     sm_top = smach.StateMachine(outcomes=["top_success", "top_fail"])
+    sm_go_to_dishwasher = go_to_location(
+        "sm_go_to_dishwasher_success",
+        "sm_go_to_dishwasher_failure",
+        client,
+        tf_buffer,
+        dishwasher_config_path,
+        "goto/reach",
+        pick_location,
+    )
     sm_pick_from_dishwasher = pick_object_from_dishwasher(
         "sm_pick_from_dishwasher_success",
         "sm_pick_from_dishwasher_failure",
         client,
         tf_buffer,
-        config_path,
+        dishwasher_config_path,
         demo_folder_path,
         obj_to_pick,
     )
     with sm_top:
         smach.StateMachine.add(
-            "PFD",
+            "SM:GO_TO_DISHWASHER",
+            sm_go_to_dishwasher,
+            transitions={
+                "sm_go_to_dishwasher_success": "SM:PICK_FROM_DISHWASHER",
+                "sm_go_to_dishwasher_failure": "top_fail",
+            },
+        )
+        smach.StateMachine.add(
+            "SM:PICK_FROM_DISHWASHER",
             sm_pick_from_dishwasher,
             transitions={
                 "sm_pick_from_dishwasher_success": "top_success",

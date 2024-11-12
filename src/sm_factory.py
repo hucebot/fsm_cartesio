@@ -87,6 +87,48 @@ def build_sm_dummy_right(
     return sm
 
 
+def go_to_location(
+    success_out, failure_out, client, tf_buffer, config_path, action_name, location
+):
+    """
+    Builds the SM for going to 'location'.
+
+    Args:
+        success_out (str): desired success outcome
+        failure_out (str): desired failure outcome
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+        config_path (str): Path to the yaml file with targets definition
+        action_name (str): Move action name
+        location (str): name of the location to reach
+    Returns:
+        smach.state_machine.StateMachine: Smach state machine
+    """
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=[success_out, failure_out])
+
+    # Open the state machine container
+    with sm:
+        # Dock to dishwasher --------------------------------------------------------------
+        smach.StateMachine.add(
+            "GTL:INIT_ODOM",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "GTL:GO_TO_LOCATION", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTL:GO_TO_LOCATION",
+            GoToFromCfg(client, action_name, config_path, location),
+            transitions={"success": "GTL:RESET_ODOM", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTL:RESET_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": success_out, "fail": failure_out},
+        )
+
+
 def pick_object_from_dishwasher(
     success_out, failure_out, client, tf_buffer, config_path, file_folder_path, object
 ):
@@ -109,7 +151,7 @@ def pick_object_from_dishwasher(
     set_custom_loggers()
     sm = smach.StateMachine(outcomes=[success_out, failure_out])
 
-    if object == "bowl" or object == "cup":
+    if object == "bowl" or object == "mug":
         drawer = "top_drawer"
     elif object == "plate":
         drawer = "bottom_drawer"
@@ -199,7 +241,7 @@ def pick_object_from_dishwasher(
             PalGripperRelease("parallel_gripper_right_controller"),
             transitions={"success": "PFD:RELEASE_DRAWER", "fail": failure_out},
         )
-        smach.StateMachine.add(  # TODO: check if works with both 'top' and 'bottom'
+        smach.StateMachine.add(
             "PFD:RELEASE_DRAWER",
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "release_dishwasher_drawer"
@@ -253,11 +295,11 @@ def pick_object_from_dishwasher(
     return sm
 
 
-def go_to_location(
-    success_out, failure_out, client, tf_buffer, config_path, action_name, location
+def pick_object_from_table(
+    success_out, failure_out, client, tf_buffer, config_path, file_folder_path, object
 ):
     """
-    Builds the SM for going to 'location'.
+    Builds the SM for picking 'object' from the table.
 
     Args:
         success_out (str): desired success outcome
@@ -265,8 +307,8 @@ def go_to_location(
         client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
         tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
         config_path (str): Path to the yaml file with targets definition
-        action_name (str): Move action name
-        location (str): name of the location to reach
+        file_folder_path (str): Path to the folder containing the demo
+        object (str): name of the object to pick
     Returns:
         smach.state_machine.StateMachine: Smach state machine
     """
@@ -277,22 +319,78 @@ def go_to_location(
 
     # Open the state machine container
     with sm:
-        # Dock to dishwasher --------------------------------------------------------------
+        # Dock to table -------------------------------------------------------------------
         smach.StateMachine.add(
-            "GTL:INIT_ODOM",
+            "PFT:HOMING_1",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "GTL:GO_TO_LOCATION", "fail": failure_out},
+            transitions={"success": "PFD:DOCK_TO_TABLE", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "GTL:GO_TO_LOCATION",
-            GoToFromCfg(client, action_name, config_path, location),
-            transitions={"success": "GTL:RESET_ODOM", "fail": failure_out},
+            "PFT:DOCK_TO_TABLE",
+            GoToFromCfg(client, "goto/reach", config_path, "table"),
+            transitions={"success": "PFT:RESET_ODOM_1", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "GTL:RESET_ODOM",
+            "PFT:RESET_ODOM_1",
             UpdateOdom(client, tf_buffer),
+            transitions={"success": "PFT:PRE_PICK_OBJECT", "fail": failure_out},
+        )
+        # Pick object -----------------------------------------------------------------------
+        smach.StateMachine.add(
+            "PFT:PRE_PICK_OBJECT",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "pre_pick_from_table_right",
+            ),
+            transitions={"success": "PFT:GO_TO_OBJECT", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFT:GO_TO_OBJECT",
+            GoToFromCfg(client, "goto/reach", config_path, object),
+            transitions={"success": "PFT:RESET_ODOM_2", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFT:RESET_ODOM_2",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PFT:RUN_DEMO_PICK_OBJECT", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFT:RUN_DEMO_PICK_OBJECT",
+            RepeatDemo(
+                client,
+                tf_buffer,
+                config_path,
+                f"pick_{object}_from_table_right",
+                file_folder_path,
+            ),
+            transitions={"success": "PFT:CLOSE_GRIPPER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFT:CLOSE_GRIPPER",
+            PalGripperGrasp("parallel_gripper_right_controller"),
+            transitions={"success": "PFT:POST_PICK", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFT:POST_PICK",
+            FollowWaypointsFromCfg(
+                client, tf_buffer, config_path, "post_pick_from_table_right"
+            ),
+            transitions={"success": "PFT:GO_BACK", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFT:GO_BACK",
+            GoToFromCfg(client, "goto/reach", config_path, "back"),
+            transitions={"success": "POT:HOMING_2", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFT:HOMING_2",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": success_out, "fail": failure_out},
         )
+
+    return sm
 
 
 def place_on_table(success_out, failure_out, client, tf_buffer, config_path, object):

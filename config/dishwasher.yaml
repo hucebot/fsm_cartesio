@@ -144,7 +144,7 @@ open_dishwasher_right:
   gripper_min: 0.001
 
 pick_bowl_from_dishwasher_right:
-  file: "pick_bowl_right.npy"
+  file: "pick_bowl_from_dishwasher_right.npy"
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"

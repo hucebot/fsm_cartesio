@@ -60,10 +60,10 @@ def main():
     # object_to_pick = plan["actions"]["object"]
 
     object_to_pick = "sugar"
-    demo_tag = f"pick_{object_to_pick}_right"
+    demo_tag = f"pick_{object_to_pick}_from_table_right"
 
     # Define SM parameters
-    config_path = rospack.get_path("fsm_cartesio") + "/config/pick_object.yaml"
+    config_path = rospack.get_path("fsm_cartesio") + "/config/table.yaml"
     demo_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
 
     # Create a SMACH state machine
@@ -84,7 +84,9 @@ def main():
         )
         smach.StateMachine.add(
             "PRE_PICK",
-            MoveToTargetFromCfg(client, tf_buffer, config_path, "look_table_right"),
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "pre_pick_from_table_right"
+            ),
             transitions={"success": "GO_TO_TABLE", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
@@ -109,7 +111,9 @@ def main():
         )
         smach.StateMachine.add(
             "POST_PICK",
-            FollowWaypointsFromCfg(client, tf_buffer, config_path, "post_pick_right"),
+            FollowWaypointsFromCfg(
+                client, tf_buffer, config_path, "post_pick_from_table_right"
+            ),
             transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
