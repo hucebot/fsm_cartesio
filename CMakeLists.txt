@@ -48,6 +48,7 @@ catkin_install_python(PROGRAMS
   scripts/go_to_tag 
   scripts/go_to_human
   scripts/homing 
+  scripts/execute_cmd 
   scripts/open_door_with_left_fsm 
   scripts/pick_bowl_from_dishwasher
   scripts/pick_object 
