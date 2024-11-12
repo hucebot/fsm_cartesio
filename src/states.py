@@ -395,6 +395,7 @@ class MoveToTargetFromCfg(smach.State):
                 # No offset
                 pose = offset
             else:
+                time.sleep(1)
                 # Express target in base_link (from ref_frame)
                 t = self.tf_buffer.lookup_transform(
                     base_link_frame,
@@ -478,6 +479,7 @@ class FollowWaypointsFromCfg(smach.State):
                     timeout += wp.time
                     waypoints.append(wp)
             else:
+                time.sleep(1)
                 # Express waypoints in base_link (from ref_frame)
                 t = self.tf_buffer.lookup_transform(
                     base_link_frame,
@@ -562,6 +564,7 @@ class FollowTrajectoryFromCfg(smach.State):
                     point.quaternion = traj[i, 3:]
                     references.append(point)
             else:
+                time.sleep(1)
                 # Express waypoints in base_link (from ref_frame)
                 t = self.tf_buffer.lookup_transform(
                     base_link_frame,
@@ -819,6 +822,7 @@ class RepeatDemo(smach.State):
                     point.quaternion = demo[i, 3:7]
                     references.append(demo)
             else:
+                time.sleep(1)
                 # Express waypoints in base_link (from ref_frame)
                 t = self.tf_buffer.lookup_transform(
                     base_link_frame,

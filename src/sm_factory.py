@@ -236,7 +236,7 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:CLOSE_GRIPPER_2",
             PalGripperGrasp("parallel_gripper_right_controller"),
-            transitions={"success": "PFD:GO_BACK_AND_TURN_RIGHT", "fail": failure_out},
+            transitions={"success": success_out, "fail": failure_out},
         )
         # Go to table ---------------------------------------------------------------------
         smach.StateMachine.add(
@@ -247,7 +247,7 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:HOMING_2",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "PFD:RESET_ODOM_4", "fail": failure_out},
+            transitions={"success": success_out, "fail": failure_out},
         )
 
     return sm

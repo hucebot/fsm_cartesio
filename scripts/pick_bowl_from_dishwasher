@@ -99,7 +99,7 @@ def main():
         smach.StateMachine.add(
             "RESET_ODOM_1",
             UpdateOdom(client, tf_buffer),
-            transitions={"success": "PRE_OPEN_DISHWASHER", "fail": "fsm_fail"},
+            transitions={"success": "PRE_PULL_DRAWER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
             "PRE_OPEN_DISHWASHER",
@@ -123,7 +123,7 @@ def main():
         smach.StateMachine.add(
             "PRE_PULL_DRAWER",
             MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "pre_pull_dishwasher_top_drawer_right"
+                client, tf_buffer, config_path, "pre_pull_dishwasher_bottom_drawer_right"
             ),
             transitions={"success": "RESET_ODOM_2", "fail": "fsm_fail"},
         )
@@ -140,7 +140,7 @@ def main():
         smach.StateMachine.add(
             "GRASP_DRAWER",
             MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "grasp_dishwasher_top_drawer"
+                client, tf_buffer, config_path, "grasp_dishwasher_bottom_drawer"
             ),
             transitions={"success": "CLOSE_GRIPPER_1", "fail": "fsm_fail"},
         )
@@ -152,7 +152,7 @@ def main():
         smach.StateMachine.add(
             "PULL_DRAWER",
             MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "pull_dishwasher_top_drawer"
+                client, tf_buffer, config_path, "pull_dishwasher_bottom_drawer"
             ),
             transitions={"success": "OPEN_GRIPPER_2", "fail": "fsm_fail"},
         )
@@ -195,7 +195,7 @@ def main():
         smach.StateMachine.add(
             "CLOSE_GRIPPER_2",
             PalGripperGrasp("parallel_gripper_right_controller"),
-            transitions={"success": "GO_BACK_AND_TURN_RIGHT", "fail": "fsm_fail"},
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
         )
         # Go to table ----------------------------------------------------------------
         smach.StateMachine.add(

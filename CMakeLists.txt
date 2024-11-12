@@ -46,6 +46,7 @@ include_directories(
 catkin_install_python(PROGRAMS 
   scripts/dummy_fsm 
   scripts/go_to_tag 
+  scripts/back_to_human
   scripts/go_to_human
   scripts/homing 
   scripts/execute_cmd 

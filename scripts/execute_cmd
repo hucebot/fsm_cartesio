@@ -51,7 +51,7 @@ def main():
     # print("Response received")
     # plan = json.loads(res.message)
 
-    obj_to_pick = "bowl"
+    obj_to_pick = "plate"
 
     # Define SM parameters
     config_path = rospack.get_path("fsm_cartesio") + "/config/dishwasher.yaml"
