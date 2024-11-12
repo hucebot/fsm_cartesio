@@ -128,6 +128,8 @@ def go_to_location(
             transitions={"success": success_out, "fail": failure_out},
         )
 
+    return sm
+
 
 def pick_object_from_dishwasher(
     success_out, failure_out, client, tf_buffer, config_path, file_folder_path, object
@@ -468,4 +470,12 @@ def handover_to_person(success_out, failure_out, client, tf_buffer, config_path)
     Returns:
         smach.state_machine.StateMachine: Smach state machine
     """
-    pass
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=[success_out, failure_out])
+
+    # Open the state machine container
+    with sm:
+        pass  # TODO
+
+    return sm
