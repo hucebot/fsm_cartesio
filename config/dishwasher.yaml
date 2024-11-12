@@ -171,7 +171,7 @@ table_far:
     translation: [1.8, 0.3, 0]
     rotation: [0, 0, 1, 0]
 
-table:
+table_for_placing:
   ref_frame: "orbbec_head/pose_tag_104"
   goal:
     translation: [1.35, 0.3, 0]

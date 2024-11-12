@@ -97,6 +97,18 @@ table:
     translation: [1.54, 0.44, 0]
     rotation: [0, 0, 1, 0]
 
+table_for_placing:
+  ref_frame: "orbbec_head/pose_tag_104"
+  goal:
+    translation: [1.35, 0.3, 0]
+    rotation: [0, 0, 1, 0]
+
+table_far:
+  ref_frame: "orbbec_head/pose_tag_104"
+  goal:
+    translation: [1.8, 0.3, 0]
+    rotation: [0, 0, 1, 0]
+
 mustard:
   ref_frame: "orbbec_right/pose_tag_0"
   goal:

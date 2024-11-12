@@ -220,7 +220,7 @@ def main():
         )
         smach.StateMachine.add(
             "DOCK_TO_TABLE",
-            GoToFromCfg(client, "goto/reach", config_path, "table"),
+            GoToFromCfg(client, "goto/reach", config_path, "table_for_placing"),
             transitions={"success": "RESET_ODOM_5", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
