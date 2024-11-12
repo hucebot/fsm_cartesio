@@ -52,7 +52,7 @@ catkin_install_python(PROGRAMS
   scripts/execute_cmd 
   scripts/open_door_with_left_fsm 
   scripts/pick_bowl_from_dishwasher
-  scripts/pick_object 
+  scripts/pick_object_from_table
   scripts/update_odom 
   src/sm_factory.py
   src/states.py
