@@ -280,7 +280,7 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:CLOSE_GRIPPER_2",
             PalGripperGrasp("parallel_gripper_right_controller"),
-            transitions={"success": success_out, "fail": failure_out},
+            transitions={"success": "PFD:GO_BACK_AND_TURN_RIGHT", "fail": failure_out},
         )
         # Go to table ---------------------------------------------------------------------
         smach.StateMachine.add(
