@@ -86,7 +86,12 @@ class UpdateOdom(smach.State):
 
 
 class UpdateJoints(smach.State):
-    def __init__(self, client, joint_states_topic="joint_states", cartesio_sol_topic="cartesian/solution"):
+    def __init__(
+        self,
+        client,
+        joint_states_topic="joint_states",
+        cartesio_sol_topic="cartesian/solution",
+    ):
         """
         Constructs the state object.
 
@@ -142,10 +147,7 @@ class UpdateJoints(smach.State):
             self.client.getTask("gripper_right_grasping_frame").setControlMode(
                 pyci.ControlType.Position
             )
-            if res.success:
-                return "success"
-            else:
-                return "fail"
+            return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
