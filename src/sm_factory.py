@@ -186,6 +186,14 @@ def pick_object_from_dishwasher(
                 client, tf_buffer, config_path, "pre_open_dishwasher_right"
             ),
             transitions={
+                "success": "PFD:RESET_ODOM_2",
+                "fail": failure_out,
+            },
+        )
+        smach.StateMachine.add(
+            "PFD:RESET_ODOM_2",
+            UpdateOdom(client, tf_buffer),
+            transitions={
                 "success": "PFD:RUN_DEMO_OPEN_DISHWASHER",
                 "fail": failure_out,
             },
@@ -207,10 +215,10 @@ def pick_object_from_dishwasher(
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, f"pre_pull_dishwasher_{drawer}_right"
             ),
-            transitions={"success": "PFD:RESET_ODOM_2", "fail": failure_out},
+            transitions={"success": "PFD:RESET_ODOM_3", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "PFD:RESET_ODOM_2",
+            "PFD:RESET_ODOM_3",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "PFD:OPEN_GRIPPER_1", "fail": failure_out},
         )
@@ -259,10 +267,10 @@ def pick_object_from_dishwasher(
                 config_path,
                 f"pre_pick_{object}_from_dishwasher_right",
             ),
-            transitions={"success": "PFD:RESET_ODOM_3", "fail": failure_out},
+            transitions={"success": "PFD:RESET_ODOM_4", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "PFD:RESET_ODOM_3",
+            "PFD:RESET_ODOM_4",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "PFD:RUN_DEMO_PICK_OBJECT", "fail": failure_out},
         )
