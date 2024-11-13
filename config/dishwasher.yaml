@@ -123,7 +123,7 @@ pre_pick_plate_from_dishwasher_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.245, -0.563, 0.746]
+    translation: [0.155, -0.560, 0.730]
     rotation: [-0.716, 0.215, 0.128, 0.652]
     time: 8.0
 
