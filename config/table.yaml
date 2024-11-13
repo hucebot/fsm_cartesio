@@ -90,6 +90,36 @@ pick_bleach_cleanser_from_table_right:
   gripper_max: 0.044
   gripper_min: 0.001
 
+pick_spam_from_table_right:
+  file: "pick_spam_from_table_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_3"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_tomato_soup_from_table_right:
+  file: "pick_tomato_soup_from_table_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_4"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
 # Navigation goals
 table:
   ref_frame: "orbbec_head/pose_tag_104"
@@ -123,6 +153,18 @@ sugar:
 
 bleach_cleanser:
   ref_frame: "orbbec_right/pose_tag_2"
+  goal:
+    translation: [0.84, -0.12, 0]
+    rotation: [0, 0, 1, 0]
+
+spam:
+  ref_frame: "orbbec_right/pose_tag_3"
+  goal:
+    translation: [0.84, -0.12, 0]
+    rotation: [0, 0, 1, 0]
+
+tomato_soup:
+  ref_frame: "orbbec_right/pose_tag_4"
   goal:
     translation: [0.84, -0.12, 0]
     rotation: [0, 0, 1, 0]
