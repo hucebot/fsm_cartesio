@@ -113,8 +113,8 @@ pre_pick_mug_from_dishwasher_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.100, -0.6250, 0.8222]
-    rotation: [0.0863, -0.2580, -0.1264, -0.9540]
+    translation: [-0.0934, -0.6573, 0.7044]
+    rotation: [-0.6539, 0.2295, 0.2299, 0.6833]
     time: 8.0
 
 pre_pick_plate_from_dishwasher_right:
@@ -199,7 +199,7 @@ pick_plate_from_dishwasher_right:
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
   ref_frame: "orbbec_right/pose_tag_12"
-  go_to_start_time: 4.0
+  go_to_start_time: 2.0
   dt: 0.05
   gripper_controller: "gripper_right_controller"
   gripper_joints:
