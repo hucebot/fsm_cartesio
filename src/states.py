@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
 from cartesian_interface.pyci_all import *
-from cartesian_interface.srv import SetTransform, SetTransformRequest
+from cartesian_interface.srv import (
+    ResetJoints,
+    ResetJointsRequest,
+    SetTransform,
+    SetTransformRequest,
+)
 
 import actionlib
 import numpy as np
@@ -53,6 +58,81 @@ class UpdateOdom(smach.State):
             req.pose.orientation.y = t.transform.rotation.y
             req.pose.orientation.z = t.transform.rotation.z
             req.pose.orientation.w = t.transform.rotation.w
+            res = self.srv_proxy(req)
+            self.client.getTask("base_link").setControlMode(pyci.ControlType.Position)
+            self.client.getTask("gripper_left_grasping_frame").setControlMode(
+                pyci.ControlType.Position
+            )
+            self.client.getTask("gripper_right_grasping_frame").setControlMode(
+                pyci.ControlType.Position
+            )
+            if res.success:
+                smach.loginfo(res.message)
+                return "success"
+            else:
+                smach.logerr(res.message)
+                return "fail"
+        except Exception as error:
+            smach.logerr(f"An error occurred: {type(error).__name__}")
+            smach.logerr(error)
+            self.client.getTask("base_link").setControlMode(pyci.ControlType.Position)
+            self.client.getTask("gripper_left_grasping_frame").setControlMode(
+                pyci.ControlType.Position
+            )
+            self.client.getTask("gripper_right_grasping_frame").setControlMode(
+                pyci.ControlType.Position
+            )
+            return "fail"
+
+
+class ResetJoints(smach.State):
+    def __init__(self, client, joint_states_topic="joint_states"):
+        """
+        Constructs the state object.
+
+        Args:
+            client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+            joint_states_topic (str): JointState topic name
+        """
+        smach.State.__init__(self, outcomes=["success", "fail"])
+        self.client = client
+        self.joint_states_topic = joint_states_topic
+        self.srv_proxy = rospy.ServiceProxy("/cartesian/reset_joints", ResetJoints)
+
+    def execute(self, userdata):
+        try:
+            self.client.update()
+            self.client.getTask("base_link").setControlMode(pyci.ControlType.Velocity)
+            self.client.getTask("gripper_left_grasping_frame").setControlMode(
+                pyci.ControlType.Velocity
+            )
+            self.client.getTask("gripper_right_grasping_frame").setControlMode(
+                pyci.ControlType.Velocity
+            )
+            req = ResetJointsRequest()
+            msg = rospy.wait_for_message(
+                self.cartesio_sol_topic, JointState, timeout=30
+            )
+            joint_names = [
+                "torso_lift_joint",
+                "arm_left_1_joint",
+                "arm_left_2_joint",
+                "arm_left_3_joint",
+                "arm_left_4_joint",
+                "arm_left_5_joint",
+                "arm_left_6_joint",
+                "arm_left_7_joint",
+                "arm_right_1_joint",
+                "arm_right_2_joint",
+                "arm_right_3_joint",
+                "arm_right_4_joint",
+                "arm_right_5_joint",
+                "arm_right_6_joint",
+                "arm_right_7_joint",
+            ]
+            for j in joint_names:
+                req.joint_names.append(j)
+                req.joint_values.append(msg.position[msg.name.index(j)])
             res = self.srv_proxy(req)
             self.client.getTask("base_link").setControlMode(pyci.ControlType.Position)
             self.client.getTask("gripper_left_grasping_frame").setControlMode(
