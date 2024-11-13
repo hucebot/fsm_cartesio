@@ -165,8 +165,8 @@ def pick_object_from_dishwasher(
     with sm:
         # Dock to dishwasher --------------------------------------------------------------
         smach.StateMachine.add(
-            "PFD:HOMING_1",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            "PFD:INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
             transitions={"success": "PFD:DOCK_TO_DISHWASHER", "fail": failure_out},
         )
         smach.StateMachine.add(
@@ -294,10 +294,10 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:GO_BACK_AND_TURN_RIGHT",
             GoToFromCfg(client, "goto/reach", config_path, "back_and_turn_right"),
-            transitions={"success": "PFD:HOMING_2", "fail": failure_out},
+            transitions={"success": "PFD:HOMING", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "PFD:HOMING_2",
+            "PFD:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": success_out, "fail": failure_out},
         )
@@ -329,23 +329,12 @@ def pick_object_from_table(
 
     # Open the state machine container
     with sm:
-        # Dock to table -------------------------------------------------------------------
+        # Dock to object -------------------------------------------------------------------
         smach.StateMachine.add(
-            "PFT:HOMING_1",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "PFD:DOCK_TO_TABLE", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "PFT:DOCK_TO_TABLE",
-            GoToFromCfg(client, "goto/reach", config_path, "table"),
-            transitions={"success": "PFT:RESET_ODOM_1", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "PFT:RESET_ODOM_1",
+            "PFT:INIT_ODOM",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "PFT:PRE_PICK_OBJECT", "fail": failure_out},
         )
-        # Pick object -----------------------------------------------------------------------
         smach.StateMachine.add(
             "PFT:PRE_PICK_OBJECT",
             MoveToTargetFromCfg(
@@ -366,6 +355,7 @@ def pick_object_from_table(
             UpdateOdom(client, tf_buffer),
             transitions={"success": "PFT:RUN_DEMO_PICK_OBJECT", "fail": failure_out},
         )
+        # Pick object -----------------------------------------------------------------------
         smach.StateMachine.add(
             "PFT:RUN_DEMO_PICK_OBJECT",
             RepeatDemo(
@@ -384,7 +374,7 @@ def pick_object_from_table(
         )
         smach.StateMachine.add(
             "PFT:POST_PICK",
-            FollowWaypointsFromCfg(
+            MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "post_pick_from_table_right"
             ),
             transitions={"success": "PFT:GO_BACK", "fail": failure_out},
@@ -392,10 +382,10 @@ def pick_object_from_table(
         smach.StateMachine.add(
             "PFT:GO_BACK",
             GoToFromCfg(client, "goto/reach", config_path, "back"),
-            transitions={"success": "POT:HOMING_2", "fail": failure_out},
+            transitions={"success": "PFT:HOMING", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "PFT:HOMING_2",
+            "PFT:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": success_out, "fail": failure_out},
         )
@@ -424,6 +414,11 @@ def place_on_table(success_out, failure_out, client, tf_buffer, config_path, obj
 
     # Open the state machine container
     with sm:
+        smach.StateMachine.add(
+            "POT:INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "POT:HOMING_1", "fail": failure_out},
+        )
         smach.StateMachine.add(
             "POT:HOMING_1",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
@@ -484,6 +479,10 @@ def handover_to_person(success_out, failure_out, client, tf_buffer, config_path)
 
     # Open the state machine container
     with sm:
-        pass  # TODO
+        smach.StateMachine.add(
+            "HTP:INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": success_out, "fail": failure_out},
+        )
 
     return sm

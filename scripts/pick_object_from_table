@@ -75,11 +75,6 @@ def main():
         smach.StateMachine.add(
             "INIT_ODOM",
             UpdateOdom(client, tf_buffer),
-            transitions={"success": "HOMING", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "HOMING",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": "PRE_PICK", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
@@ -111,7 +106,7 @@ def main():
         )
         smach.StateMachine.add(
             "POST_PICK",
-            FollowWaypointsFromCfg(
+            MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "post_pick_from_table_right"
             ),
             transitions={"success": "RELEASE_GRIPPER", "fail": "fsm_fail"},
