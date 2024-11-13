@@ -395,14 +395,16 @@ class MoveToTargetFromCfg(smach.State):
                 # No offset
                 pose = offset
             else:
-                # time.sleep(1)
+                if ref_frame[:3] == "ci/":
+                    time.sleep(0.1)
+                else:
+                    time.sleep(1)
                 # Express target in base_link (from ref_frame)
-                # t = self.tf_buffer.lookup_transform(
-                #     base_link_frame,
-                #     ref_frame,
-                #     rospy.Time(),
-                # )
-                t = get_tf_transform(self.tf_buffer, base_link_frame, ref_frame)
+                t = self.tf_buffer.lookup_transform(
+                    base_link_frame,
+                    ref_frame,
+                    rospy.Time(),
+                )
                 x = t.transform.translation.x
                 y = t.transform.translation.y
                 z = t.transform.translation.z
@@ -480,14 +482,16 @@ class FollowWaypointsFromCfg(smach.State):
                     timeout += wp.time
                     waypoints.append(wp)
             else:
-                # time.sleep(1)
+                if ref_frame[:3] == "ci/":
+                    time.sleep(0.1)
+                else:
+                    time.sleep(1)
                 # Express waypoints in base_link (from ref_frame)
-                # t = self.tf_buffer.lookup_transform(
-                #     base_link_frame,
-                #     ref_frame,
-                #     rospy.Time(),
-                # )
-                t = get_tf_transform(self.tf_buffer, base_link_frame, ref_frame)
+                t = self.tf_buffer.lookup_transform(
+                    base_link_frame,
+                    ref_frame,
+                    rospy.Time(),
+                )
                 x = t.transform.translation.x
                 y = t.transform.translation.y
                 z = t.transform.translation.z
@@ -566,14 +570,16 @@ class FollowTrajectoryFromCfg(smach.State):
                     point.quaternion = traj[i, 3:]
                     references.append(point)
             else:
-                # time.sleep(1)
+                if ref_frame[:3] == "ci/":
+                    time.sleep(0.1)
+                else:
+                    time.sleep(1)
                 # Express waypoints in base_link (from ref_frame)
-                # t = self.tf_buffer.lookup_transform(
-                #     base_link_frame,
-                #     ref_frame,
-                #     rospy.Time(),
-                # )
-                t = get_tf_transform(self.tf_buffer, base_link_frame, ref_frame)
+                t = self.tf_buffer.lookup_transform(
+                    base_link_frame,
+                    ref_frame,
+                    rospy.Time(),
+                )
                 x = t.transform.translation.x
                 y = t.transform.translation.y
                 z = t.transform.translation.z
@@ -825,14 +831,16 @@ class RepeatDemo(smach.State):
                     point.quaternion = demo[i, 3:7]
                     references.append(demo)
             else:
-                # time.sleep(1)
+                if ref_frame[:3] == "ci/":
+                    time.sleep(0.1)
+                else:
+                    time.sleep(1)
                 # Express waypoints in base_link (from ref_frame)
-                # t = self.tf_buffer.lookup_transform(
-                #     base_link_frame,
-                #     ref_frame,
-                #     rospy.Time(),
-                # )
-                t = get_tf_transform(self.tf_buffer, base_link_frame, ref_frame)
+                t = self.tf_buffer.lookup_transform(
+                    base_link_frame,
+                    ref_frame,
+                    rospy.Time(),
+                )
                 x = t.transform.translation.x
                 y = t.transform.translation.y
                 z = t.transform.translation.z
@@ -885,27 +893,3 @@ def set_gripper_msg(
         ] = gripper
     gripper_cmd_msg.points[0].time_from_start = rospy.Duration(time_duration)
     return gripper_cmd_msg
-
-
-def get_tf_transform(tf_buffer, parent, child, max_delay=0.2, max_attempts=10):
-    time.sleep(max_delay)
-    done = False
-    attempts = 0
-    while not done and attempts <= max_attempts:
-        now_time = rospy.get_time()
-        try:
-            t = tf_buffer.lookup_transform(parent, child, rospy.Time())
-            tf_time = rospy.Time(t.header.stamp.secs, t.header.stamp.nsecs)
-            delay = now_time - tf_time
-            if delay.to_sec() <= max_delay:
-                return t
-            else:
-                attempts += 1
-                time.sleep(0.1)
-        except Exception as error:
-            smach.logwarn(f"tf2_ros error: {type(error).__name__}")
-            smach.logwarn("Trying again")
-            attempts += 1
-            time.sleep(0.1)
-    smach.logerr(f"Unable to get recent transform from {parent} to {child}")
-    return None
