@@ -85,8 +85,8 @@ class UpdateOdom(smach.State):
             return "fail"
 
 
-class ResetJoints(smach.State):
-    def __init__(self, client, joint_states_topic="joint_states"):
+class UpdateJoints(smach.State):
+    def __init__(self, client, joint_states_topic="joint_states", cartesio_sol_topic="cartesian/solution"):
         """
         Constructs the state object.
 
@@ -97,6 +97,7 @@ class ResetJoints(smach.State):
         smach.State.__init__(self, outcomes=["success", "fail"])
         self.client = client
         self.joint_states_topic = joint_states_topic
+        self.cartesio_sol_topic = cartesio_sol_topic
         self.srv_proxy = rospy.ServiceProxy("/cartesian/reset_joints", ResetJoints)
 
     def execute(self, userdata):
@@ -142,10 +143,8 @@ class ResetJoints(smach.State):
                 pyci.ControlType.Position
             )
             if res.success:
-                smach.loginfo(res.message)
                 return "success"
             else:
-                smach.logerr(res.message)
                 return "fail"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
