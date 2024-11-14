@@ -549,6 +549,16 @@ def place_object_on_table(
         smach.StateMachine.add(
             "POT:OPEN_GRIPPER",
             PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "POT:POST_PLACE", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "POT:POST_PLACE",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "post_place_on_table_right",
+            ),
             transitions={"success": "POT:GO_BACK", "fail": failure_out},
         )
         smach.StateMachine.add(
