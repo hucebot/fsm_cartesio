@@ -14,7 +14,7 @@ import rospy
 import smach
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from sensor_msgs.msg import JointState
-from std_srvs.srv import Empty, EmptyRequest
+from std_srvs.srv import Empty, EmptyRequest, Trigger, TriggerRequest
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 import os
@@ -839,6 +839,53 @@ class GoToFromCfg(smach.State):
             else:
                 smach.logerr(f"Goal not reached: {self.act_cli.get_goal_status_text()}")
                 return "fail"
+        except Exception as error:
+            smach.logerr(f"An error occurred: {type(error).__name__}")
+            smach.logerr(error)
+            return "fail"
+
+
+class TriggerHumanTracking(smach.State):
+    def __init__(self, camera_name):
+        """
+        Constructs the state object.
+
+        Args:
+            camera_name (str): Name of the camera to trigger
+        """
+        smach.State.__init__(self, outcomes=["success", "fail"])
+        self.camera_name = camera_name
+        self.srv_proxy = rospy.ServiceProxy(f"{camera_name}/trigger_pub", Trigger)
+
+    def execute(self, userdata):
+        try:
+            req = TriggerRequest()
+            self.srv_proxy(req)
+            time.sleep(2)  # wait to be sure the human tracking processing has started
+            return "success"
+        except Exception as error:
+            smach.logerr(f"An error occurred: {type(error).__name__}")
+            smach.logerr(error)
+            return "fail"
+
+
+class PalGripperRelease(smach.State):
+    def __init__(self, ctrl_name):
+        """
+        Constructs the state object.
+
+        Args:
+            ctrl_name (str): Gripper controller name
+        """
+        smach.State.__init__(self, outcomes=["success", "fail"])
+        self.ctrl_name = ctrl_name
+        self.srv_proxy = rospy.ServiceProxy(f"{ctrl_name}/release", Empty)
+
+    def execute(self, userdata):
+        try:
+            req = EmptyRequest()
+            self.srv_proxy(req)
+            return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)

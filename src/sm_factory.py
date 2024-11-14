@@ -28,9 +28,9 @@ def assemble_pick_and_place_sm(
     Args:
         object (str): object to pick
         initial_kitchen (str): kitchen where to pick the object
-        initial_location (str): location within the initial kitchen
+        initial_location (str): pick location within the initial kitchen
         target_kitchen (str): kitchen where to place the object
-        target_location (str): location within the initial kitchen
+        target_location (str): place location within the target kitchen
         client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
         tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
         config_path (str): Path to the yaml file with targets definition
@@ -118,6 +118,94 @@ def assemble_pick_and_place_sm(
             transitions={
                 "sm_place_obj_success": "top_success",
                 "sm_place_obj_failure": "top_failure",
+            },
+        )
+
+    return sm_top
+
+
+def assemble_pick_and_handover_sm(
+    object,
+    initial_kitchen,
+    initial_location,
+    target_kitchen,
+    client,
+    tf_buffer,
+    config_path,
+    file_folder_path,
+):
+    """
+    Assemble a hierarchical SM for solving the euRobin pick & place task.
+
+    Args:
+        object (str): object to pick
+        initial_kitchen (str): kitchen where to pick the object
+        initial_location (str): location within the initial kitchen
+        target_kitchen (str): kitchen where to hand over the object
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+        config_path (str): Path to the yaml file with targets definition
+        file_folder_path (str): Path to the folder containing the demo
+    Returns:
+        smach.state_machine.StateMachine: Smach state machine
+    """
+
+    pick_location = initial_location  # NOTE: kitchens not considered yet
+    handover_location = target_kitchen
+
+    # Dynamically import sm_factory methods based on request
+    module = importlib.import_module("sm_factory")
+    sm_pick_obj = getattr(module, f"pick_object_from_{pick_location}")
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm_top = smach.StateMachine(outcomes=["top_success", "top_failure"])
+
+    sm_go_to_pick_loc = go_to_location(
+        "sm_go_to_pick_loc_success",
+        "sm_go_to_pick_loc_failure",
+        client,
+        tf_buffer,
+        config_path,
+        "goto/reach",
+        pick_location,
+    )
+    sm_pick_obj = sm_pick_obj(
+        "sm_pick_obj_success",
+        "sm_pick_obj_failure",
+        client,
+        tf_buffer,
+        config_path,
+        file_folder_path,
+        object,
+    )
+    sm_handover = handover_to_person(
+        "sm_handover_success", "sm_handover_failure", client, tf_buffer, config_path
+    )
+
+    with sm_top:
+        smach.StateMachine.add(
+            "SM:GO_TO_PICK_LOC",
+            sm_go_to_pick_loc,
+            transitions={
+                "sm_go_to_pick_loc_success": "SM:PICK_OBJ",
+                "sm_go_to_pick_loc_failure": "top_failure",
+            },
+        )
+        smach.StateMachine.add(
+            "SM:PICK_OBJ",
+            sm_pick_obj,
+            transitions={
+                "sm_pick_obj_success": "SM:HANDOVER",
+                "sm_pick_obj_failure": "top_failure",
+            },
+        )
+        smach.StateMachine.add(
+            "SM:HANDOVER",
+            sm_handover,
+            transitions={
+                "sm_handover_success": "top_success",
+                "sm_handover_failure": "top_failure",
             },
         )
 
@@ -607,6 +695,37 @@ def handover_to_person(success_out, failure_out, client, tf_buffer, config_path)
         smach.StateMachine.add(
             "HTP:INIT_ODOM",
             UpdateOdom(client, tf_buffer),
+            transitions={"success": "HTP:GO_TO_PERSON", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:GO_TO_PERSON",
+            GoToFromCfg(client, "goto/search_and_go", config_path, "person"),
+            transitions={"success": "HTP:HANDOVER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:HANDOVER",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "handover",
+            ),
+            transitions={"success": "HTP:OPEN_GRIPPER", "fail": failure_out},
+        )
+        # TODO: Possibly make the robot say somethig like: "Please, take the object."
+        smach.StateMachine.add(
+            "HTP:OPEN_GRIPPER",
+            PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "HTP:GO_BACK", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:GO_BACK",
+            GoToFromCfg(client, "goto/reach", config_path, "back"),
+            transitions={"success": "HTP:HOMING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": success_out, "fail": failure_out},
         )
 

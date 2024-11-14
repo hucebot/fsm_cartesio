@@ -504,3 +504,25 @@ tomato_soup:
   goal:
     translation: [0.60, -0.65, 0]
     rotation: [0, 0, 1, 0]
+
+##################################################################
+####################### HANDOVER MOTIONS #########################
+##################################################################
+
+# EE targets
+handover:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.38, -0.40, 0.82]
+    rotation: [0, 0, 0, 1]
+    time: 4.0
+
+# Navigation goals
+person:
+  ref_frame: "orbbec_head/human"
+  goal:
+    translation: [1.2, -0.4, 0]
+    rotation: [0, 0, 1, 0]
