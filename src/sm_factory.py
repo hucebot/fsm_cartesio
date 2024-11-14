@@ -534,11 +534,6 @@ def place_object_on_table(
         smach.StateMachine.add(
             "POT:INIT_ODOM",
             UpdateOdom(client, tf_buffer),
-            transitions={"success": "POT:HOMING_1", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "POT:HOMING_1",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": "POT:DOCK_TO_TABLE", "fail": failure_out},
         )
         smach.StateMachine.add(
@@ -566,10 +561,10 @@ def place_object_on_table(
         smach.StateMachine.add(
             "POT:GO_BACK",
             GoToFromCfg(client, "goto/reach", config_path, "back"),
-            transitions={"success": "POT:HOMING_2", "fail": failure_out},
+            transitions={"success": "POT:HOMING", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "POT:HOMING_2",
+            "POT:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": success_out, "fail": failure_out},
         )
