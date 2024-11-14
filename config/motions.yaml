@@ -344,6 +344,38 @@ place_bowl_on_table_right:
       - 4.0
       - 8.0
 
+place_mug_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.40, 0.812]
+      - [0.750, -0.40, 0.700]
+    rotation:
+      - [0, 0, 0, 1]
+      - [-0.016, 0.518, -0.030, 0.855]
+    time:
+      - 4.0
+      - 8.0
+
+place_plate_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.332, 0.812]
+      - [0.750, -0.352, 0.710]
+    rotation:
+      - [-0.740, -0.010, -0.025, 0.672]
+      - [-0.708, 0.215, 0.179, 0.648]
+    time:
+      - 4.0
+      - 8.0
+
 # Demos
 pick_mustard_from_table_right:
   file: "pick_mustard_from_table_right.npy"
