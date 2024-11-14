@@ -11,8 +11,8 @@ from std_srvs.srv import Trigger, TriggerRequest
 
 import json
 
+if __name__ == "__main__":
 
-def main():
     rospy.init_node("open_door_smach_node")
     rospack = rospkg.RosPack()
 
@@ -36,9 +36,9 @@ def main():
     # print("Response received")
     # plan = json.loads(res.message)
 
-    object = "plate"
+    object = "mustard"
     initial_kitchen = "INRIA"
-    initial_location = "dishwasher"
+    initial_location = "table"
     target_kitchen = "INRIA"
     target_location = "table"
 
@@ -55,7 +55,3 @@ def main():
     )
 
     sm_top.execute()
-
-
-if __name__ == "__main__":
-    main()

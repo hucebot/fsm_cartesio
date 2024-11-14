@@ -248,6 +248,101 @@ post_pick_from_table_right:
     time: 4.0
 
 # EE way-points
+place_mustard_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.332, 0.812]
+      - [0.610, -0.340, 0.823]
+      - [0.750, -0.352, 0.760]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 4.0
+      - 8.0
+      - 12.0
+
+place_sugar_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.332, 0.812]
+      - [0.610, -0.340, 0.823]
+      - [0.750, -0.352, 0.760]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 4.0
+      - 8.0
+      - 12.0
+
+place_bleach_cleanser_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.332, 0.812]
+      - [0.610, -0.340, 0.823]
+      - [0.750, -0.352, 0.760]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 4.0
+      - 8.0
+      - 12.0
+
+place_spam_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.332, 0.812]
+      - [0.610, -0.340, 0.823]
+      - [0.750, -0.352, 0.760]
+    rotation:
+      - [-0.740, -0.010, -0.025, 0.672]
+      - [-0.740, -0.010, -0.025, 0.672]
+      - [-0.708, 0.215, 0.179, 0.648]
+    time:
+      - 4.0
+      - 8.0
+      - 12.0
+
+place_tomato_soup_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.332, 0.812]
+      - [0.610, -0.340, 0.823]
+      - [0.750, -0.352, 0.760]
+    rotation:
+      - [-0.740, -0.010, -0.025, 0.672]
+      - [-0.740, -0.010, -0.025, 0.672]
+      - [-0.708, 0.215, 0.179, 0.648]
+    time:
+      - 4.0
+      - 8.0
+      - 12.0
+
 place_bowl_on_table_right:
   task: "gripper_right_grasping_frame"
   task_base_link: "base_link"
