@@ -171,7 +171,7 @@ class SetPosturalFromCfg(smach.State):
         postural_lambda=0.002,
         cartesio_sol_topic="cartesian/solution",
         eps=0.02,
-        timeout=30,
+        timeout=10,
     ):
         """
         Constructs the state object.
@@ -213,7 +213,7 @@ class SetPosturalFromCfg(smach.State):
                 done = False
                 start_time = time.time()
                 while not done:
-                    time.sleep(1)
+                    time.sleep(0.5)
                     msg = rospy.wait_for_message(
                         self.cartesio_sol_topic, JointState, timeout=1
                     )
