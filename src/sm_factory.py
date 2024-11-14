@@ -485,13 +485,6 @@ def pick_object_from_table(
         smach.StateMachine.add(
             "PFT:CLOSE_GRIPPER",
             PalGripperGrasp("parallel_gripper_right_controller"),
-            transitions={"success": "PFT:POST_PICK", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "PFT:POST_PICK",
-            MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "post_pick_from_table_right"
-            ),
             transitions={"success": "PFT:GO_BACK", "fail": failure_out},
         )
         smach.StateMachine.add(
