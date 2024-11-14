@@ -233,7 +233,7 @@ pre_pick_from_table_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.28, -0.40, 0.54]
+    translation: [0.28, -0.42, 0.54]
     rotation: [0, 0, 0, 1]
     time: 4.0
 
@@ -264,8 +264,8 @@ place_mustard_on_table_right:
       - [0, 0, 0, 1]
     time:
       - 4.0
-      - 8.0
-      - 12.0
+      - 7.0
+      - 10.0
 
 place_sugar_on_table_right:
   task: "gripper_right_grasping_frame"
@@ -283,8 +283,8 @@ place_sugar_on_table_right:
       - [0, 0, 0, 1]
     time:
       - 4.0
-      - 8.0
-      - 12.0
+      - 7.0
+      - 10.0
 
 place_bleach_cleanser_on_table_right:
   task: "gripper_right_grasping_frame"
@@ -302,8 +302,8 @@ place_bleach_cleanser_on_table_right:
       - [0, 0, 0, 1]
     time:
       - 4.0
-      - 8.0
-      - 12.0
+      - 7.0
+      - 10.0
 
 place_spam_on_table_right:
   task: "gripper_right_grasping_frame"
@@ -321,8 +321,8 @@ place_spam_on_table_right:
       - [-0.708, 0.215, 0.179, 0.648]
     time:
       - 4.0
-      - 8.0
-      - 12.0
+      - 7.0
+      - 10.0
 
 place_tomato_soup_on_table_right:
   task: "gripper_right_grasping_frame"
@@ -340,8 +340,8 @@ place_tomato_soup_on_table_right:
       - [-0.708, 0.215, 0.179, 0.648]
     time:
       - 4.0
-      - 8.0
-      - 12.0
+      - 7.0
+      - 10.0
 
 place_bowl_on_table_right:
   task: "gripper_right_grasping_frame"
@@ -359,8 +359,8 @@ place_bowl_on_table_right:
       - [-0.708, 0.215, 0.179, 0.648]
     time:
       - 4.0
-      - 8.0
-      - 12.0
+      - 7.0
+      - 10.0
 
 # Demos
 pick_mustard_from_table_right:
@@ -460,29 +460,29 @@ table_far:
 mustard:
   ref_frame: "orbbec_right/pose_tag_0"
   goal:
-    translation: [0.55, -0.50, 0]
+    translation: [0.55, -0.48, 0]
     rotation: [0, 0, 1, 0]
 
 sugar:
   ref_frame: "orbbec_right/pose_tag_1"
   goal:
-    translation: [0.55, -0.50, 0]
+    translation: [0.55, -0.48, 0]
     rotation: [0, 0, 1, 0]
 
 bleach_cleanser:
   ref_frame: "orbbec_right/pose_tag_2"
   goal:
-    translation: [0.55, -0.50, 0]
+    translation: [0.55, -0.48, 0]
     rotation: [0, 0, 1, 0]
 
 spam:
   ref_frame: "orbbec_right/pose_tag_3"
   goal:
-    translation: [0.55, -0.50, 0]
+    translation: [0.55, -0.48, 0]
     rotation: [0, 0, 1, 0]
 
 tomato_soup:
   ref_frame: "orbbec_right/pose_tag_4"
   goal:
-    translation: [0.55, -0.50, 0]
+    translation: [0.55, -0.48, 0]
     rotation: [0, 0, 1, 0]
