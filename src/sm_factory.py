@@ -409,6 +409,16 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:GO_BACK_AND_TURN_RIGHT",
             GoToFromCfg(client, "goto/reach", config_path, "back_and_turn_right"),
+            transitions={"success": "PFD:POST_PICK", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFD:POST_PICK",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "post_pick_from_dishwasher_right",
+            ),
             transitions={"success": "PFD:HOMING", "fail": failure_out},
         )
         smach.StateMachine.add(

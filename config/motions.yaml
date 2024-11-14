@@ -154,6 +154,16 @@ pre_pick_plate_from_dishwasher_right:
     rotation: [-0.716, 0.215, 0.128, 0.652]
     time: 8.0
 
+post_pick_from_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.30, -0.30, 0.82]
+    rotation: [0, 0, 0, 1]
+    time: 5.0
+
 # Demos
 open_dishwasher_right:
   file: "open_dishwasher_right.npy"
