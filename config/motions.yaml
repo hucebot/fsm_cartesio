@@ -160,7 +160,7 @@ post_pick_from_dishwasher_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.30, -0.30, 0.82]
+    translation: [0.2605, -0.6667, 0.7366]
     rotation: [0, 0, 0, 1]
     time: 5.0
 
