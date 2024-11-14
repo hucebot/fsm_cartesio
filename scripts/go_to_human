@@ -12,8 +12,6 @@ import rospkg
 import rospy
 import smach
 import tf2_ros
-from std_msgs.msg import Float32
-from std_srvs.srv import Trigger, TriggerRequest
 
 
 def main():

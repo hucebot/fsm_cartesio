@@ -20,10 +20,6 @@ import tf2_ros
 from std_msgs.msg import Float32
 from std_srvs.srv import Trigger, TriggerRequest
 
-import json
-import sys
-import time
-
 
 def main():
     rospy.init_node("open_door_smach_node")
@@ -63,7 +59,7 @@ def main():
     demo_tag = f"pick_{object_to_pick}_from_table_right"
 
     # Define SM parameters
-    config_path = rospack.get_path("fsm_cartesio") + "/config/table.yaml"
+    config_path = rospack.get_path("fsm_cartesio") + "/config/motions.yaml"
     demo_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
 
     # Create a SMACH state machine

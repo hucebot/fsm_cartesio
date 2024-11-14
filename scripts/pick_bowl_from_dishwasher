@@ -18,11 +18,6 @@ import rospy
 import smach
 import tf2_ros
 from std_msgs.msg import Float32
-from std_srvs.srv import Trigger, TriggerRequest
-
-import json
-import sys
-import time
 
 
 def main():
@@ -52,15 +47,8 @@ def main():
     #         sys.exit(0)
     # ctrl_bridge_time_pub.publish(time_msg)
 
-    # # Get request from LLM
-    # srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
-    # req = TriggerRequest()
-    # res = srv_proxy(req)
-    # print("Response received")
-    # plan = json.loads(res.message)
-
     # Define SM parameters
-    config_path = rospack.get_path("fsm_cartesio") + "/config/dishwasher.yaml"
+    config_path = rospack.get_path("fsm_cartesio") + "/config/motions.yaml"
     demo_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
 
     # Create a SMACH state machine

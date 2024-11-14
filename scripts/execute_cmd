@@ -2,19 +2,14 @@
 
 from cartesian_interface.pyci_all import *
 from utils import set_custom_loggers
-from sm_factory import pick_object_from_dishwasher, go_to_location, place_on_table
-
+from sm_factory import assemble_pick_and_place_sm
 
 import rospkg
 import rospy
-import smach
 import tf2_ros
-from std_msgs.msg import Float32
 from std_srvs.srv import Trigger, TriggerRequest
 
 import json
-import sys
-import time
 
 
 def main():
@@ -28,76 +23,37 @@ def main():
     # Init CartesI/O client
     client = pyci.CartesianInterfaceRos()
 
+    file_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
+    config_path = rospack.get_path("fsm_cartesio") + f"/config/motions.yaml"
+
     # Wait for tf listener
     rospy.sleep(1)
 
-    # # Set 'time_from_start' param in the ros_control_bridge
-    # ctrl_bridge_time_pub = rospy.Publisher(
-    #     "/ros_control_bridge/time_from_start", Float32, queue_size=1
-    # )
-    # time_msg = Float32()
-    # time_msg.data = 0.2
-    # wait_start = time.time()
-    # while ctrl_bridge_time_pub.get_num_connections() < 1:
-    #     if time.time() - wait_start > 10:
-    #         smach.logerr(f"No connections to /ros_control_bridge/time_from_start")
-    #         sys.exit(0)
-    # ctrl_bridge_time_pub.publish(time_msg)
-
-    # # Get request from LLM
-    # srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
-    # req = TriggerRequest()
+    # Get request from LLM
+    srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
+    req = TriggerRequest()
     # res = srv_proxy(req)
     # print("Response received")
     # plan = json.loads(res.message)
 
-    pick_location = "dishwasher"
-    obj_to_pick = "plate"
+    object = "plate"
+    initial_kitchen = "INRIA"
+    initial_location = "dishwasher"
+    target_kitchen = "INRIA"
+    target_location = "table"
 
-    # Define SM parameters
-    dishwasher_config_path = (
-        rospack.get_path("fsm_cartesio") + "/config/dishwasher.yaml"
-    )
-    demo_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
-
-    # Create a SMACH state machine
-    set_custom_loggers()
-    sm_top = smach.StateMachine(outcomes=["top_success", "top_fail"])
-    sm_go_to_dishwasher = go_to_location(
-        "sm_go_to_dishwasher_success",
-        "sm_go_to_dishwasher_failure",
+    sm_top = assemble_pick_and_place_sm(
+        object,
+        initial_kitchen,
+        initial_location,
+        target_kitchen,
+        target_location,
         client,
         tf_buffer,
-        dishwasher_config_path,
-        "goto/reach",
-        pick_location,
+        config_path,
+        file_folder_path,
     )
-    sm_pick_from_dishwasher = pick_object_from_dishwasher(
-        "sm_pick_from_dishwasher_success",
-        "sm_pick_from_dishwasher_failure",
-        client,
-        tf_buffer,
-        dishwasher_config_path,
-        demo_folder_path,
-        obj_to_pick,
-    )
-    with sm_top:
-        smach.StateMachine.add(
-            "SM:GO_TO_DISHWASHER",
-            sm_go_to_dishwasher,
-            transitions={
-                "sm_go_to_dishwasher_success": "SM:PICK_FROM_DISHWASHER",
-                "sm_go_to_dishwasher_failure": "top_fail",
-            },
-        )
-        smach.StateMachine.add(
-            "SM:PICK_FROM_DISHWASHER",
-            sm_pick_from_dishwasher,
-            transitions={
-                "sm_pick_from_dishwasher_success": "top_success",
-                "sm_pick_from_dishwasher_failure": "top_fail",
-            },
-        )
+
     sm_top.execute()
 
 

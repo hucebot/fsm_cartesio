@@ -8,6 +8,121 @@ from states import *
 
 import smach
 
+import importlib
+
+
+def assemble_pick_and_place_sm(
+    object,
+    initial_kitchen,
+    initial_location,
+    target_kitchen,
+    target_location,
+    client,
+    tf_buffer,
+    config_path,
+    file_folder_path,
+):
+    """
+    Assemble a hierarchical SM for solving the euRobin pick & place task.
+
+    Args:
+        object (str): object to pick
+        initial_kitchen (str): kitchen where to pick the object
+        initial_location (str): location within the initial kitchen
+        target_kitchen (str): kitchen where to place the object
+        target_location (str): location within the initial kitchen
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+        config_path (str): Path to the yaml file with targets definition
+        file_folder_path (str): Path to the folder containing the demo
+    Returns:
+        smach.state_machine.StateMachine: Smach state machine
+    """
+
+    pick_location = initial_location  # NOTE: kitchens not considered yet
+    place_location = target_location
+
+    # Dynamically import sm_factory methods based on request
+    module = importlib.import_module("sm_factory")
+    sm_pick_obj = getattr(module, f"pick_object_from_{pick_location}")
+    sm_place_obj = getattr(module, f"place_object_on_{place_location}")
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm_top = smach.StateMachine(outcomes=["top_success", "top_failure"])
+
+    sm_go_to_pick_loc = go_to_location(
+        "sm_go_to_pick_loc_success",
+        "sm_go_to_pick_loc_failure",
+        client,
+        tf_buffer,
+        config_path,
+        "goto/reach",
+        pick_location,
+    )
+    sm_pick_obj = sm_pick_obj(
+        "sm_pick_obj_success",
+        "sm_pick_obj_failure",
+        client,
+        tf_buffer,
+        config_path,
+        file_folder_path,
+        object,
+    )
+    sm_go_to_place_loc = go_to_location(
+        "sm_go_to_place_loc_success",
+        "sm_go_to_place_loc_failure",
+        client,
+        tf_buffer,
+        config_path,
+        "goto/reach",
+        place_location,
+    )
+    sm_place_obj = sm_place_obj(
+        "sm_place_obj_success",
+        "sm_place_obj_failure",
+        client,
+        tf_buffer,
+        config_path,
+        object,
+    )
+
+    with sm_top:
+        smach.StateMachine.add(
+            "SM:GO_TO_PICK_LOC",
+            sm_go_to_pick_loc,
+            transitions={
+                "sm_go_to_pick_loc_success": "SM:PICK_OBJ",
+                "sm_go_to_pick_loc_failure": "top_failure",
+            },
+        )
+        smach.StateMachine.add(
+            "SM:PICK_OBJ",
+            sm_pick_obj,
+            transitions={
+                "sm_pick_obj_success": "SM:GO_TO_PLACE_LOC",
+                "sm_pick_obj_failure": "top_failure",
+            },
+        )
+        smach.StateMachine.add(
+            "SM:GO_TO_PLACE_LOC",
+            sm_go_to_place_loc,
+            transitions={
+                "sm_go_to_place_loc_success": "SM:PLACE_OBJ",
+                "sm_go_to_place_loc_failure": "top_failure",
+            },
+        )
+        smach.StateMachine.add(
+            "SM:PLACE_OBJ",
+            sm_place_obj,
+            transitions={
+                "sm_place_obj_success": "top_success",
+                "sm_place_obj_failure": "top_failure",
+            },
+        )
+
+    return sm_top
+
 
 def build_sm_dummy_left(
     success_out, failure_out, client, tf_buffer, config_path, file_folder_path
@@ -393,7 +508,9 @@ def pick_object_from_table(
     return sm
 
 
-def place_on_table(success_out, failure_out, client, tf_buffer, config_path, object):
+def place_object_on_table(
+    success_out, failure_out, client, tf_buffer, config_path, object
+):
     """
     Builds the SM for placing 'object' on the table.
 
