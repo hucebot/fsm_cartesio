@@ -543,7 +543,7 @@ def place_object_on_table(
         )
         smach.StateMachine.add(
             "POT:DOCK_TO_TABLE",
-            GoToFromCfg(client, "goto/reach", config_path, "table"),
+            GoToFromCfg(client, "goto/reach", config_path, "table_for_placing"),
             transitions={"success": "POT:RESET_ODOM", "fail": failure_out},
         )
         smach.StateMachine.add(
