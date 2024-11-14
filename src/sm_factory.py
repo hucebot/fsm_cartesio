@@ -57,7 +57,7 @@ def assemble_pick_and_place_sm(
         client,
         tf_buffer,
         config_path,
-        "goto/search_and_go",
+        "goto/reach",
         pick_location,
     )
     sm_pick_obj = sm_pick_obj(
@@ -75,7 +75,7 @@ def assemble_pick_and_place_sm(
         client,
         tf_buffer,
         config_path,
-        "goto/search_and_go",
+        "goto/reach",
         place_location,
     )
     sm_place_obj = sm_place_obj(

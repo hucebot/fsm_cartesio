@@ -36,9 +36,9 @@ if __name__ == "__main__":
     # print("Response received")
     # plan = json.loads(res.message)
 
-    object = "mustard"
+    object = "plate"
     initial_kitchen = "INRIA"
-    initial_location = "table"
+    initial_location = "dishwasher"
     target_kitchen = "INRIA"
     target_location = "table"
 
