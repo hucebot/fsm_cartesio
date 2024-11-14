@@ -460,29 +460,29 @@ table_far:
 mustard:
   ref_frame: "orbbec_right/pose_tag_0"
   goal:
-    translation: [0.55, -0.35, 0]
+    translation: [0.55, -0.50, 0]
     rotation: [0, 0, 1, 0]
 
 sugar:
   ref_frame: "orbbec_right/pose_tag_1"
   goal:
-    translation: [0.55, -0.35, 0]
+    translation: [0.55, -0.50, 0]
     rotation: [0, 0, 1, 0]
 
 bleach_cleanser:
   ref_frame: "orbbec_right/pose_tag_2"
   goal:
-    translation: [0.55, -0.35, 0]
+    translation: [0.55, -0.50, 0]
     rotation: [0, 0, 1, 0]
 
 spam:
   ref_frame: "orbbec_right/pose_tag_3"
   goal:
-    translation: [0.55, -0.35, 0]
+    translation: [0.55, -0.50, 0]
     rotation: [0, 0, 1, 0]
 
 tomato_soup:
   ref_frame: "orbbec_right/pose_tag_4"
   goal:
-    translation: [0.55, -0.35, 0]
+    translation: [0.55, -0.50, 0]
     rotation: [0, 0, 1, 0]
