@@ -245,7 +245,7 @@ post_place_on_table_right:
   offset:
     translation: [0.70, -0.40, 0.82]
     rotation: [0, 0, 0, 1]
-    time: 6.0
+    time: 5.0
 
 # EE way-points
 place_mustard_on_table_right:
@@ -256,7 +256,7 @@ place_mustard_on_table_right:
   offset:
     translation:
       - [0.385, -0.40, 0.820]
-      - [0.750, -0.40, 0.690]
+      - [0.750, -0.40, 0.670]
     rotation:
       - [0, 0, 0, 1]
       - [0, 0, 0, 1]
@@ -272,7 +272,7 @@ place_sugar_on_table_right:
   offset:
     translation:
       - [0.385, -0.40, 0.820]
-      - [0.750, -0.40, 0.690]
+      - [0.750, -0.40, 0.670]
     rotation:
       - [0, 0, 0, 1]
       - [0, 0, 0, 1]
@@ -288,7 +288,7 @@ place_bleach_cleanser_on_table_right:
   offset:
     translation:
       - [0.385, -0.40, 0.820]
-      - [0.750, -0.40, 0.720]
+      - [0.750, -0.40, 0.670]
     rotation:
       - [0, 0, 0, 1]
       - [0, 0, 0, 1]
