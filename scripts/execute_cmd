@@ -35,11 +35,11 @@ if __name__ == "__main__":
     # print("Response received")
     # plan = json.loads(res.message)
 
-    pattern_type = "A"
-    object = "plate"
+    pattern_type = "B"
     initial_kitchen = "INRIA"
-    initial_location = "dishwasher"
     target_kitchen = "INRIA"
+    object = "mustard"
+    initial_location = "table"
     target_location = "table"
 
     if pattern_type == "A":  # "A": pick-&-place

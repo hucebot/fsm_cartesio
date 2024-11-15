@@ -184,22 +184,22 @@ def assemble_pick_and_handover_sm(
     )
 
     with sm_top:
-        smach.StateMachine.add(
-            "SM:GO_TO_PICK_LOC",
-            sm_go_to_pick_loc,
-            transitions={
-                "sm_go_to_pick_loc_success": "SM:PICK_OBJ",
-                "sm_go_to_pick_loc_failure": "top_failure",
-            },
-        )
-        smach.StateMachine.add(
-            "SM:PICK_OBJ",
-            sm_pick_obj,
-            transitions={
-                "sm_pick_obj_success": "SM:HANDOVER",
-                "sm_pick_obj_failure": "top_failure",
-            },
-        )
+        # smach.StateMachine.add(
+        #     "SM:GO_TO_PICK_LOC",
+        #     sm_go_to_pick_loc,
+        #     transitions={
+        #         "sm_go_to_pick_loc_success": "SM:PICK_OBJ",
+        #         "sm_go_to_pick_loc_failure": "top_failure",
+        #     },
+        # )
+        # smach.StateMachine.add(
+        #     "SM:PICK_OBJ",
+        #     sm_pick_obj,
+        #     transitions={
+        #         "sm_pick_obj_success": "SM:HANDOVER",
+        #         "sm_pick_obj_failure": "top_failure",
+        #     },
+        # )
         smach.StateMachine.add(
             "SM:HANDOVER",
             sm_handover,
@@ -587,7 +587,7 @@ def pick_object_from_table(
         )
         smach.StateMachine.add(
             "PFT:GO_BACK",
-            GoToFromCfg(client, "goto/reach", config_path, "back"),
+            GoToFromCfg(client, "goto/reach", config_path, "back_and_turn_left"),
             transitions={"success": "PFT:HOMING", "fail": failure_out},
         )
         smach.StateMachine.add(
@@ -693,13 +693,18 @@ def handover_to_person(success_out, failure_out, client, tf_buffer, config_path)
     # Open the state machine container
     with sm:
         smach.StateMachine.add(
+            "HTP:START_TRACKING",
+            SetHumanTracking("orbbec_head", True),
+            transitions={"success": "HTP:INIT_ODOM", "fail": failure_out},
+        )
+        smach.StateMachine.add(
             "HTP:INIT_ODOM",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "HTP:GO_TO_PERSON", "fail": failure_out},
         )
         smach.StateMachine.add(
             "HTP:GO_TO_PERSON",
-            GoToFromCfg(client, "goto/search_and_go", config_path, "person"),
+            GoToFromCfg(client, "goto/reach", config_path, "person"),
             transitions={"success": "HTP:HANDOVER", "fail": failure_out},
         )
         smach.StateMachine.add(
@@ -726,6 +731,11 @@ def handover_to_person(success_out, failure_out, client, tf_buffer, config_path)
         smach.StateMachine.add(
             "HTP:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "HTP:CLOSE_TRACKING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:CLOSE_TRACKING",
+            SetHumanTracking("orbbec_head", False),
             transitions={"success": success_out, "fail": failure_out},
         )
 

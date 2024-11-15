@@ -14,7 +14,7 @@ import rospy
 import smach
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from sensor_msgs.msg import JointState
-from std_srvs.srv import Empty, EmptyRequest, Trigger, TriggerRequest
+from std_srvs.srv import Empty, EmptyRequest, SetBool, SetBoolRequest
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 import os
@@ -764,7 +764,7 @@ class GoTo(smach.State):
             smach.logerr(f"Failed to contact action server: {self.action_name}")
             return "fail"
         try:
-            time.sleep(0.3)
+            time.sleep(1)
             self.client.getTask("base_link").setControlMode(pyci.ControlType.Velocity)
             msg = MoveBaseGoal()
             msg.target_pose.header.frame_id = self.ref_frame
@@ -813,7 +813,7 @@ class GoToFromCfg(smach.State):
             smach.logerr(f"Failed to contact action server: {self.action_name}")
             return "fail"
         try:
-            time.sleep(0.3)
+            time.sleep(1)
             with open(self.config_path, "r") as file:
                 config = yaml.safe_load(file)
             motion_def = config[self.config_tag]
@@ -845,23 +845,24 @@ class GoToFromCfg(smach.State):
             return "fail"
 
 
-class TriggerHumanTracking(smach.State):
-    def __init__(self, camera_name):
+class SetHumanTracking(smach.State):
+    def __init__(self, camera_name, flag):
         """
         Constructs the state object.
 
         Args:
             camera_name (str): Name of the camera to trigger
+            flag (bool): True (enable) or False (disable)
         """
         smach.State.__init__(self, outcomes=["success", "fail"])
         self.camera_name = camera_name
-        self.srv_proxy = rospy.ServiceProxy(f"{camera_name}/trigger_pub", Trigger)
+        self.srv_proxy = rospy.ServiceProxy(f"{camera_name}/set_pub", SetBool)
+        self.req = SetBoolRequest(flag)
 
     def execute(self, userdata):
         try:
-            req = TriggerRequest()
-            self.srv_proxy(req)
-            time.sleep(2)  # wait to be sure the human tracking processing has started
+            self.srv_proxy(self.req)
+            time.sleep(6)  # wait to be sure the human tracking processing has started
             return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
