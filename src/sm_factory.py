@@ -91,6 +91,11 @@ def assemble_pick_and_place_sm(
 
     with sm_top:
         smach.StateMachine.add(
+            "SM:START",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "SM:GO_TO_PICK_LOC", "fail": "top_failure"},
+        )
+        smach.StateMachine.add(
             "SM:GO_TO_PICK_LOC",
             sm_go_to_pick_loc,
             transitions={
@@ -186,6 +191,11 @@ def assemble_pick_and_handover_sm(
     )
 
     with sm_top:
+        smach.StateMachine.add(
+            "SM:START",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "SM:GO_TO_PICK_LOC", "fail": "top_failure"},
+        )
         smach.StateMachine.add(
             "SM:GO_TO_PICK_LOC",
             sm_go_to_pick_loc,

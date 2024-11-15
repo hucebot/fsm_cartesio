@@ -548,7 +548,7 @@ pre_pick_from_cabinet_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.28, -0.52, 0.24]
+    translation: [0.28, -0.55, 0.28]
     rotation: [0, 0, 0, 1]
     time: 6.0
 
