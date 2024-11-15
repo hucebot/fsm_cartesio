@@ -170,7 +170,7 @@ class SetPosturalFromCfg(smach.State):
         go_to,
         postural_lambda=0.002,
         cartesio_sol_topic="cartesian/solution",
-        eps=0.02,
+        eps=0.03,
         timeout=10,
     ):
         """
@@ -862,7 +862,7 @@ class SetHumanTracking(smach.State):
     def execute(self, userdata):
         try:
             self.srv_proxy(self.req)
-            time.sleep(6)  # wait to be sure the human tracking processing has started
+            time.sleep(3)  # wait to be sure the human tracking processing has started
             return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")

@@ -57,7 +57,7 @@ def assemble_pick_and_place_sm(
         client,
         tf_buffer,
         config_path,
-        "goto/reach",
+        "goto/search_and_go",
         pick_location,
     )
     sm_pick_obj = sm_pick_obj(
@@ -75,7 +75,7 @@ def assemble_pick_and_place_sm(
         client,
         tf_buffer,
         config_path,
-        "goto/reach",
+        "goto/search_and_go",
         place_location,
     )
     sm_place_obj = sm_place_obj(
@@ -167,7 +167,7 @@ def assemble_pick_and_handover_sm(
         client,
         tf_buffer,
         config_path,
-        "goto/reach",
+        "goto/search_and_go",
         pick_location,
     )
     sm_pick_obj = sm_pick_obj(
@@ -184,22 +184,22 @@ def assemble_pick_and_handover_sm(
     )
 
     with sm_top:
-        # smach.StateMachine.add(
-        #     "SM:GO_TO_PICK_LOC",
-        #     sm_go_to_pick_loc,
-        #     transitions={
-        #         "sm_go_to_pick_loc_success": "SM:PICK_OBJ",
-        #         "sm_go_to_pick_loc_failure": "top_failure",
-        #     },
-        # )
-        # smach.StateMachine.add(
-        #     "SM:PICK_OBJ",
-        #     sm_pick_obj,
-        #     transitions={
-        #         "sm_pick_obj_success": "SM:HANDOVER",
-        #         "sm_pick_obj_failure": "top_failure",
-        #     },
-        # )
+        smach.StateMachine.add(
+            "SM:GO_TO_PICK_LOC",
+            sm_go_to_pick_loc,
+            transitions={
+                "sm_go_to_pick_loc_success": "SM:PICK_OBJ",
+                "sm_go_to_pick_loc_failure": "top_failure",
+            },
+        )
+        smach.StateMachine.add(
+            "SM:PICK_OBJ",
+            sm_pick_obj,
+            transitions={
+                "sm_pick_obj_success": "SM:HANDOVER",
+                "sm_pick_obj_failure": "top_failure",
+            },
+        )
         smach.StateMachine.add(
             "SM:HANDOVER",
             sm_handover,
@@ -704,7 +704,7 @@ def handover_to_person(success_out, failure_out, client, tf_buffer, config_path)
         )
         smach.StateMachine.add(
             "HTP:GO_TO_PERSON",
-            GoToFromCfg(client, "goto/reach", config_path, "person"),
+            GoToFromCfg(client, "goto/search_and_go", config_path, "person"),
             transitions={"success": "HTP:HANDOVER", "fail": failure_out},
         )
         smach.StateMachine.add(

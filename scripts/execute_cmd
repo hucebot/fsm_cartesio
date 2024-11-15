@@ -38,7 +38,7 @@ if __name__ == "__main__":
     pattern_type = "B"
     initial_kitchen = "INRIA"
     target_kitchen = "INRIA"
-    object = "mustard"
+    object = "sugar"
     initial_location = "table"
     target_location = "table"
 
