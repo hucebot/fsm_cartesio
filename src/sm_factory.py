@@ -10,6 +10,8 @@ import smach
 
 import importlib
 
+""" SM Assemblers """
+
 
 def assemble_pick_and_place_sm(
     object,
@@ -23,7 +25,7 @@ def assemble_pick_and_place_sm(
     file_folder_path,
 ):
     """
-    Assemble a hierarchical SM for solving the euRobin pick & place task.
+    Assemble SM for solving the euRobin pick & place task.
 
     Args:
         object (str): object to pick
@@ -45,7 +47,7 @@ def assemble_pick_and_place_sm(
     # Dynamically import sm_factory methods based on request
     module = importlib.import_module("sm_factory")
     sm_pick_obj = getattr(module, f"pick_object_from_{pick_location}")
-    sm_place_obj = getattr(module, f"place_object_on_{place_location}")
+    sm_place_obj = getattr(module, f"place_object_at_{place_location}")
 
     # Create a SMACH state machine
     set_custom_loggers()
@@ -135,7 +137,7 @@ def assemble_pick_and_handover_sm(
     file_folder_path,
 ):
     """
-    Assemble a hierarchical SM for solving the euRobin pick & place task.
+    Assemble SM for solving the euRobin pick & place task.
 
     Args:
         object (str): object to pick
@@ -210,6 +212,9 @@ def assemble_pick_and_handover_sm(
         )
 
     return sm_top
+
+
+""" SM Builders """
 
 
 def build_sm_dummy_left(
@@ -317,7 +322,7 @@ def go_to_location(
         # Dock to dishwasher --------------------------------------------------------------
         smach.StateMachine.add(
             "GTL:INIT_ODOM",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            UpdateOdom(client, tf_buffer),
             transitions={"success": "GTL:GO_TO_LOCATION", "fail": failure_out},
         )
         smach.StateMachine.add(
@@ -493,7 +498,7 @@ def pick_object_from_dishwasher(
             PalGripperGrasp("parallel_gripper_right_controller"),
             transitions={"success": "PFD:GO_BACK_AND_TURN_RIGHT", "fail": failure_out},
         )
-        # Go to table ---------------------------------------------------------------------
+        # Go back -------------------------------------------------------------------------
         smach.StateMachine.add(
             "PFD:GO_BACK_AND_TURN_RIGHT",
             GoToFromCfg(client, "goto/reach", config_path, "back_and_turn_right"),
@@ -560,7 +565,7 @@ def pick_object_from_table(
         )
         smach.StateMachine.add(
             "PFT:GO_TO_OBJECT",
-            GoToFromCfg(client, "goto/reach", config_path, object),
+            GoToFromCfg(client, "goto/reach", config_path, f"{object}_on_table"),
             transitions={"success": "PFT:RESET_ODOM_2", "fail": failure_out},
         )
         smach.StateMachine.add(
@@ -585,6 +590,7 @@ def pick_object_from_table(
             PalGripperGrasp("parallel_gripper_right_controller"),
             transitions={"success": "PFT:GO_BACK", "fail": failure_out},
         )
+        # Go back -------------------------------------------------------------------------
         smach.StateMachine.add(
             "PFT:GO_BACK",
             GoToFromCfg(client, "goto/reach", config_path, "back_and_turn_left"),
@@ -599,7 +605,7 @@ def pick_object_from_table(
     return sm
 
 
-def place_object_on_table(
+def place_object_at_table(
     success_out, failure_out, client, tf_buffer, config_path, object
 ):
     """
@@ -736,6 +742,212 @@ def handover_to_person(success_out, failure_out, client, tf_buffer, config_path)
         smach.StateMachine.add(
             "HTP:CLOSE_TRACKING",
             SetHumanTracking("orbbec_head", False),
+            transitions={"success": success_out, "fail": failure_out},
+        )
+
+    return sm
+
+
+def handover_to_person(success_out, failure_out, client, tf_buffer, config_path):
+    """
+    Builds the SM for handing over picked object to a person
+
+    Args:
+        success_out (str): desired success outcome
+        failure_out (str): desired failure outcome
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+        config_path (str): Path to the yaml file with targets definition
+    Returns:
+        smach.state_machine.StateMachine: Smach state machine
+    """
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=[success_out, failure_out])
+
+    # Open the state machine container
+    with sm:
+        smach.StateMachine.add(
+            "HTP:START_TRACKING",
+            SetHumanTracking("orbbec_head", True),
+            transitions={"success": "HTP:INIT_ODOM", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "HTP:GO_TO_PERSON", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:GO_TO_PERSON",
+            GoToFromCfg(client, "goto/search_and_go", config_path, "person"),
+            transitions={"success": "HTP:HANDOVER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:HANDOVER",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "handover",
+            ),
+            transitions={"success": "HTP:OPEN_GRIPPER", "fail": failure_out},
+        )
+        # TODO: Possibly make the robot say somethig like: "Please, take the object."
+        smach.StateMachine.add(
+            "HTP:OPEN_GRIPPER",
+            PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "HTP:GO_BACK", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:GO_BACK",
+            GoToFromCfg(client, "goto/reach", config_path, "back"),
+            transitions={"success": "HTP:HOMING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "HTP:CLOSE_TRACKING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:CLOSE_TRACKING",
+            SetHumanTracking("orbbec_head", False),
+            transitions={"success": success_out, "fail": failure_out},
+        )
+
+    return sm
+
+
+def pick_object_from_cabinet(
+    success_out, failure_out, client, tf_buffer, config_path, file_folder_path, object
+):
+    """
+    Builds the SM for picking 'object' from the cabinet (right door).
+
+    Args:
+        success_out (str): desired success outcome
+        failure_out (str): desired failure outcome
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+        config_path (str): Path to the yaml file with targets definition
+        file_folder_path (str): Path to the folder containing the demo
+        object (str): name of the object to pick
+    Returns:
+        smach.state_machine.StateMachine: Smach state machine
+    """
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=[success_out, failure_out])
+
+    # Open the state machine container
+    with sm:
+        # Dock to dishwasher --------------------------------------------------------------
+        smach.StateMachine.add(
+            "PFC:INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PFC:DOCK_TO_CABINET", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFC:DOCK_TO_CABINET",
+            GoToFromCfg(client, "goto/reach", config_path, "cabinet"),
+            transitions={"success": "PFC:RESET_ODOM_1", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFC:RESET_ODOM_1",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PFC:PRE_OPEN_CABINET_DOOR", "fail": failure_out},
+        )
+        # Open cabinet right door ---------------------------------------------------------
+        smach.StateMachine.add(
+            "PFC:PRE_OPEN_CABINET_DOOR",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "pre_open_cabinet_right_door_right"
+            ),
+            transitions={
+                "success": "PFC:DOCK_FOR_OPENING_CABINET_DOOR",
+                "fail": failure_out,
+            },
+        )
+        smach.StateMachine.add(
+            "PFC:DOCK_FOR_OPENING_CABINET_DOOR",
+            GoToFromCfg(client, "goto/reach", config_path, "cabinet_right_door"),
+            transitions={"success": "PFC:RESET_ODOM_2", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFC:RESET_ODOM_2",
+            UpdateOdom(client, tf_buffer),
+            transitions={
+                "success": "PFC:RUN_DEMO_OPEN_CABINET_DOOR",
+                "fail": failure_out,
+            },
+        )
+        smach.StateMachine.add(
+            "PFC:RUN_DEMO_OPEN_CABINET_DOOR",
+            RepeatDemo(
+                client,
+                tf_buffer,
+                config_path,
+                "open_cabinet_right_door_right",
+                file_folder_path,
+            ),
+            transitions={"success": "PFC:PRE_OPEN_CABINET_DRAWER", "fail": failure_out},
+        )
+        # Pick object -----------------------------------------------------------------------
+        smach.StateMachine.add(
+            "PFC:PRE_PICK_OBJECT",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "pre_pick_from_cabinet_right",
+            ),
+            transitions={"success": "PFC:GO_TO_OBJECT", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFC:GO_TO_OBJECT",
+            GoToFromCfg(client, "goto/reach", config_path, f"{object}_in_cabinet"),
+            transitions={"success": "PFC:RESET_ODOM_4", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFC:RESET_ODOM_4",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PFC:RUN_DEMO_PICK_OBJECT", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFC:RUN_DEMO_PICK_OBJECT",
+            RepeatDemo(
+                client,
+                tf_buffer,
+                config_path,
+                f"pick_{object}_from_cabinet_right",
+                file_folder_path,
+            ),
+            transitions={"success": "PFC:CLOSE_GRIPPER_2", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFC:CLOSE_GRIPPER_2",
+            PalGripperGrasp("parallel_gripper_right_controller"),
+            transitions={"success": "PFC:GO_BACK_AND_TURN_RIGHT", "fail": failure_out},
+        )
+        # Go back -------------------------------------------------------------------------
+        smach.StateMachine.add(
+            "PFC:GO_BACK_AND_TURN_RIGHT",
+            GoToFromCfg(client, "goto/reach", config_path, "back_and_turn_right"),
+            transitions={"success": "PFC:POST_PICK", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFC:POST_PICK",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "post_pick_from_cabinet_right",
+            ),
+            transitions={"success": "PFC:HOMING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFC:HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": success_out, "fail": failure_out},
         )
 
