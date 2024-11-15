@@ -705,7 +705,7 @@ close_cabinet_right_drawer_right:
 
 # Navigation goals
 cabinet:
-  ref_frame: "orbbec_head/pose_tag_103"
+  ref_frame: "orbbec_head/pose_tag_102"
   goal:
     translation: [1.62, -0.454, -1.025]
     rotation: [0, 0, 1, 0]
