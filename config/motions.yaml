@@ -39,6 +39,12 @@ back_and_turn_left:
     translation: [-1, 0, 0]
     rotation: [0, 0, 0.7071068, 0.7071068]
 
+right_and_turn_left:
+  ref_frame: "base_link"
+  goal:
+    translation: [0, -0.25, 0]
+    rotation: [0, 0, 0.7071068, 0.7071068]
+
 ##################################################################
 ####################### DISHWASHER MOTIONS #######################
 ##################################################################
@@ -100,7 +106,7 @@ grasp_dishwasher_top_drawer_left:
   base_link_frame: "ci/base_link"
   ref_frame: "orbbec_left/pose_tag_38"
   offset:
-    translation: [0.07, 0.01, -0.02]
+    translation: [0.07, 0.0, 0.02]
     rotation: [0, 0, 1, 0]
     time: 6.0
 
@@ -120,7 +126,7 @@ pull_dishwasher_top_drawer_left:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/gripper_left_grasping_frame"
   offset:
-    translation: [-0.36, -0.035, 0.02]
+    translation: [-0.36, 0.035, -0.02]
     rotation: [0, 0, 0, 1]
     time: 10.0
 
@@ -211,6 +217,33 @@ post_pick_from_dishwasher_right:
   ref_frame: "ci/base_link"
   offset:
     translation: [0.2605, -0.6667, 0.7366]
+    rotation: [0, 0, 0, 1]
+    time: 5.0
+
+# EE way-points
+place_on_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.600, -0.40, 0.885]
+      - [0.750, -0.40, 0.885]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 4.0
+      - 8.0
+
+post_place_on_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.468, -0.411, 0.739]
     rotation: [0, 0, 0, 1]
     time: 5.0
 

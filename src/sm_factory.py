@@ -612,10 +612,10 @@ def place_object_at_dishwasher(
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "pre_pull_dishwasher_top_drawer_left"
             ),
-            transitions={"success": "PAD:RESET_ODOM_3", "fail": failure_out},
+            transitions={"success": "PAD:RESET_ODOM_2", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "PAD:RESET_ODOM_3",
+            "PAD:RESET_ODOM_2",
             UpdateOdom(client, tf_buffer),
             transitions={"success": "PAD:OPEN_GRIPPER_1", "fail": failure_out},
         )
@@ -653,6 +653,49 @@ def place_object_at_dishwasher(
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "release_dishwasher_drawer_left"
             ),
+            transitions={"success": "PAD:GO_RIGHT_AND_TURN_LEFT", "fail": failure_out},
+        )
+        # Rotate and Place ----------------------------------------------------------------
+        smach.StateMachine.add(
+            "PAD:GO_RIGHT_AND_TURN_LEFT",
+            GoToFromCfg(client, "goto/reach", config_path, "right_and_turn_left"),
+            transitions={"success": "PAD:RESET_ODOM_3", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:RESET_ODOM_3",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PAD:PLACE_OBJECT", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:PLACE_OBJECT",
+            FollowWaypointsFromCfg(
+                client, tf_buffer, config_path, "place_on_dishwasher_right"
+            ),
+            transitions={"success": "PAD:OPEN_GRIPPER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:OPEN_GRIPPER",
+            PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "PAD:POST_PLACE", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:POST_PLACE",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "post_place_on_dishwasher_right",
+            ),
+            transitions={"success": "PAD:GO_BACK", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:GO_BACK",
+            GoToFromCfg(client, "goto/reach", config_path, "back"),
+            transitions={"success": "PAD:HOMING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": success_out, "fail": failure_out},
         )
 
