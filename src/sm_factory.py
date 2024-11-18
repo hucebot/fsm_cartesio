@@ -900,7 +900,7 @@ def pick_object_from_cabinet(
                 "open_cabinet_right_door_right",
                 file_folder_path,
             ),
-            transitions={"success": "PFC:PRE_OPEN_CABINET_DRAWER", "fail": failure_out},
+            transitions={"success": "PFC:PRE_PICK_OBJECT", "fail": failure_out},
         )
         # Pick object -----------------------------------------------------------------------
         smach.StateMachine.add(
