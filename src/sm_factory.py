@@ -895,7 +895,7 @@ def pick_object_from_cabinet(
         )
         smach.StateMachine.add(
             "PFC:DOCK_TO_CABINET",
-            GoToFromCfg(client, "goto/reach", config_path, "cabinet"),
+            GoToFromCfg(client, "goto/reach", config_path, "cabinet_left_side"),
             transitions={"success": "PFC:RESET_ODOM_1", "fail": failure_out},
         )
         smach.StateMachine.add(
@@ -993,6 +993,115 @@ def pick_object_from_cabinet(
         )
         smach.StateMachine.add(
             "PFC:HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": success_out, "fail": failure_out},
+        )
+
+    return sm
+
+
+def place_object_at_cabinet(
+    success_out, failure_out, client, tf_buffer, config_path, file_folder_path, object
+):
+    """
+    Builds the SM for placing 'object' at the cabinet (left drawer).
+
+    Args:
+        success_out (str): desired success outcome
+        failure_out (str): desired failure outcome
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+        config_path (str): Path to the yaml file with targets definition
+        file_folder_path (str): Path to the folder containing the demo
+        object (str): name of the object to pick
+    Returns:
+        smach.state_machine.StateMachine: Smach state machine
+    """
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=[success_out, failure_out])
+
+    # Open the state machine container
+    with sm:
+        # Dock to dishwasher --------------------------------------------------------------
+        smach.StateMachine.add(
+            "PAC:INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PAC:DOCK_TO_CABINET", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAC:DOCK_TO_CABINET",
+            GoToFromCfg(client, "goto/reach", config_path, "cabinet_right_side"),
+            transitions={"success": "PAC:RESET_ODOM_1", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAC:RESET_ODOM_1",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PAC:PRE_OPEN_CABINET_DRAWER", "fail": failure_out},
+        )
+        # Open cabinet right door ---------------------------------------------------------
+        smach.StateMachine.add(
+            "PAC:PRE_OPEN_CABINET_DRAWER",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "pre_open_cabinet_left_drawer_left"
+            ),
+            transitions={
+                "success": "PAC:RUN_DEMO_OPEN_DRAWER",
+                "fail": failure_out,
+            },
+        )
+        smach.StateMachine.add(
+            "PAC:RUN_DEMO_OPEN_DRAWER",
+            RepeatDemo(
+                client,
+                tf_buffer,
+                config_path,
+                "open_cabinet_left_drawer_left",
+                file_folder_path,
+            ),
+            transitions={"success": "PAC:GO_RIGHT_AND_TURN_LEFT", "fail": failure_out},
+        )
+        # Rotate and Place ----------------------------------------------------------------
+        smach.StateMachine.add(
+            "PAC:GO_RIGHT_AND_TURN_LEFT",
+            GoToFromCfg(client, "goto/reach", config_path, "right_and_turn_left"),
+            transitions={"success": "PAC:RESET_ODOM_3", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAC:RESET_ODOM_3",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PAC:PLACE_OBJECT", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAC:PLACE_OBJECT",
+            FollowWaypointsFromCfg(
+                client, tf_buffer, config_path, "place_on_cabinet_right"
+            ),
+            transitions={"success": "PAC:OPEN_GRIPPER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAC:OPEN_GRIPPER",
+            PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "PAC:POST_PLACE", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAC:POST_PLACE",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "post_place_on_cabinet_right",
+            ),
+            transitions={"success": "PAC:GO_BACK", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAC:GO_BACK",
+            GoToFromCfg(client, "goto/reach", config_path, "back"),
+            transitions={"success": "PAC:HOMING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAC:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": success_out, "fail": failure_out},
         )
