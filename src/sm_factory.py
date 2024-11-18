@@ -448,7 +448,7 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:GRASP_DRAWER",
             MoveToTargetFromCfg(
-                client, tf_buffer, config_path, f"grasp_dishwasher_{drawer}"
+                client, tf_buffer, config_path, f"grasp_dishwasher_{drawer}_right"
             ),
             transitions={"success": "PFD:CLOSE_GRIPPER_1", "fail": failure_out},
         )
@@ -460,7 +460,7 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:PULL_DRAWER",
             MoveToTargetFromCfg(
-                client, tf_buffer, config_path, f"pull_dishwasher_{drawer}"
+                client, tf_buffer, config_path, f"pull_dishwasher_{drawer}_right"
             ),
             transitions={"success": "PFD:OPEN_GRIPPER_2", "fail": failure_out},
         )
@@ -472,7 +472,7 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:RELEASE_DRAWER",
             MoveToTargetFromCfg(
-                client, tf_buffer, config_path, "release_dishwasher_drawer"
+                client, tf_buffer, config_path, "release_dishwasher_drawer_right"
             ),
             transitions={"success": "PFD:PRE_PICK_OBJECT", "fail": failure_out},
         )
@@ -603,6 +603,55 @@ def place_object_at_dishwasher(
                 config_path,
                 "open_dishwasher_left",
                 file_folder_path,
+            ),
+            transitions={"success": "PAD:PRE_PULL_DRAWER", "fail": failure_out},
+        )
+        # Pull dishwasher drawer ----------------------------------------------------------
+        smach.StateMachine.add(
+            "PAD:PRE_PULL_DRAWER",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "pre_pull_dishwasher_top_drawer_left"
+            ),
+            transitions={"success": "PAD:RESET_ODOM_3", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:RESET_ODOM_3",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PAD:OPEN_GRIPPER_1", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:OPEN_GRIPPER_1",
+            PalGripperRelease("parallel_gripper_left_controller"),
+            transitions={"success": "PAD:GRASP_DRAWER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:GRASP_DRAWER",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "grasp_dishwasher_top_drawer_left"
+            ),
+            transitions={"success": "PAD:CLOSE_GRIPPER_1", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:CLOSE_GRIPPER_1",
+            PalGripperGrasp("parallel_gripper_right_controller"),
+            transitions={"success": "PAD:PULL_DRAWER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:PULL_DRAWER",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "pull_dishwasher_top_drawer_left"
+            ),
+            transitions={"success": "PAD:OPEN_GRIPPER_2", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:OPEN_GRIPPER_2",
+            PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "PAD:RELEASE_DRAWER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:RELEASE_DRAWER",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "release_dishwasher_drawer_left"
             ),
             transitions={"success": success_out, "fail": failure_out},
         )
