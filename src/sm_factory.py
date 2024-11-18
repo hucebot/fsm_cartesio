@@ -533,6 +533,83 @@ def pick_object_from_dishwasher(
     return sm
 
 
+def place_object_at_dishwasher(
+    success_out, failure_out, client, tf_buffer, config_path, file_folder_path
+):
+    """
+    Builds the SM for placing 'object' at the dishwasher.
+
+    Args:
+        success_out (str): desired success outcome
+        failure_out (str): desired failure outcome
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+        config_path (str): Path to the yaml file with targets definition
+        file_folder_path (str): Path to the folder containing the demo
+    Returns:
+        smach.state_machine.StateMachine: Smach state machine
+    """
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=[success_out, failure_out])
+
+    # Open the state machine container
+    with sm:
+        # Dock to dishwasher --------------------------------------------------------------
+        smach.StateMachine.add(
+            "PAD:INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "PAD:GO_TO_DISHWASHER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:GO_TO_DISHWASHER",
+            GoToFromCfg(
+                client, "goto/search_and_go", config_path, "dishwasher_right_side"
+            ),
+            transitions={"success": "PAD:PRE_OPEN_DISHWASHER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:PRE_OPEN_DISHWASHER",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, "pre_open_dishwasher_left"
+            ),
+            transitions={
+                "success": "PAD:DOCK_TO_DISHWASHER",
+                "fail": failure_out,
+            },
+        )
+        smach.StateMachine.add(
+            "PAD:DOCK_TO_DISHWASHER",
+            GoToFromCfg(
+                client, "goto/reach", config_path, "dock_to_dishwasher_with_orbbec_left"
+            ),
+            transitions={"success": "PAD:RESET_ODOM_1", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PAD:RESET_ODOM_1",
+            UpdateOdom(client, tf_buffer),
+            transitions={
+                "success": "PAD:RUN_DEMO_OPEN_DISHWASHER",
+                "fail": failure_out,
+            },
+        )
+        # Open dishwasher -----------------------------------------------------------------
+        smach.StateMachine.add(
+            "PAD:RUN_DEMO_OPEN_DISHWASHER",
+            RepeatDemo(
+                client,
+                tf_buffer,
+                config_path,
+                "open_dishwasher_left",
+                file_folder_path,
+            ),
+            transitions={"success": success_out, "fail": failure_out},
+        )
+
+    return sm
+
+
 def pick_object_from_table(
     success_out, failure_out, client, tf_buffer, config_path, file_folder_path, object
 ):
