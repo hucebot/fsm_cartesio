@@ -1085,13 +1085,10 @@ def place_object_at_cabinet(
             PalGripperRelease("parallel_gripper_right_controller"),
             transitions={"success": "PAC:POST_PLACE", "fail": failure_out},
         )
-        smach.StateMachine.add(
-            "PAC:POST_PLACE",
-            MoveToTargetFromCfg(
-                client,
-                tf_buffer,
-                config_path,
-                "post_place_on_cabinet_right",
+        smach.POST_PLACE.add(
+            "PAC:PLACE_OBJECT",
+            FollowWaypointsFromCfg(
+                client, tf_buffer, config_path, "post_place_on_cabinet_right"
             ),
             transitions={"success": "PAC:GO_BACK", "fail": failure_out},
         )

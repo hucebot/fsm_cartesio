@@ -706,7 +706,7 @@ pre_open_cabinet_left_drawer_left:
   offset:
     translation: [0.22484395, 0.62968189, 0.93971955]
     rotation: [0.6860039, -0.01688307, 0.06495175, 0.72449629]
-    time: 8.0
+    time: 4.0
 
 pre_close_cabinet_left_drawer_left:
   task: "gripper_left_grasping_frame"
@@ -726,8 +726,8 @@ place_on_cabinet_right:
   ref_frame: "ci/base_link"
   offset:
     translation:
-      - [0.55, -0.40, 0.95]
-      - [0.75, -0.40, 0.95]
+      - [0.54, -0.40, 1.05]
+      - [0.80, -0.40, 1.05]
     rotation:
       - [0, 0, 0, 1]
       - [0, 0, 0, 1]
@@ -741,9 +741,15 @@ post_place_on_cabinet_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.470, -0.40, 0.780]
-    rotation: [0, 0, 0, 1]
-    time: 6.0
+    translation:
+      - [0.54, -0.40, 1.05]
+      - [0.470, -0.40, 0.780]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 4.0
+      - 10.0
 
 # Demos
 open_cabinet_right_door_right:
