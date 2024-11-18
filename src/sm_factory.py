@@ -389,7 +389,9 @@ def pick_object_from_dishwasher(
         )
         smach.StateMachine.add(
             "PFD:DOCK_TO_DISHWASHER",
-            GoToFromCfg(client, "goto/reach", config_path, "dishwasher"),
+            GoToFromCfg(
+                client, "goto/search_and_go", config_path, "dishwasher_left_side"
+            ),
             transitions={"success": "PFD:RESET_ODOM_1", "fail": failure_out},
         )
         smach.StateMachine.add(

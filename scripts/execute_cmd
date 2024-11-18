@@ -35,12 +35,12 @@ if __name__ == "__main__":
     # print("Response received")
     # plan = json.loads(res.message)
 
-    pattern_type = "B"
+    pattern_type = "A"
     initial_kitchen = "INRIA"
     target_kitchen = "INRIA"
-    object = "sugar"
+    object = "tomato_soup"
     initial_location = "table"
-    target_location = "table"
+    target_location = "dishwasher"
 
     if pattern_type == "A":  # "A": pick-&-place
         sm_top = assemble_pick_and_place_sm(

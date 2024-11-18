@@ -228,7 +228,7 @@ place_on_dishwasher_right:
   ref_frame: "ci/base_link"
   offset:
     translation:
-      - [0.600, -0.40, 0.885]
+      - [0.550, -0.40, 0.885]
       - [0.750, -0.40, 0.885]
     rotation:
       - [0, 0, 0, 1]
@@ -325,6 +325,12 @@ pick_plate_from_dishwasher_right:
 
 # Navigation goals
 dishwasher:
+  ref_frame: "orbbec_head/pose_tag_103"
+  goal:
+    translation: [1.55, 0, 0]
+    rotation: [0, 0, 1, 0]
+
+dishwasher_left_side:
   ref_frame: "orbbec_head/pose_tag_103"
   goal:
     translation: [1.15, -0.47, 0]
