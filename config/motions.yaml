@@ -313,11 +313,11 @@ place_spam_on_table_right:
   ref_frame: "ci/base_link"
   offset:
     translation:
-      - [0.385, -0.40, 0.812]
-      - [0.750, -0.40, 0.700]
+      - [0.385, -0.40, 0.820]
+      - [0.750, -0.40, 0.620]
     rotation:
       - [0, 0, 0, 1]
-      - [-0.016, 0.518, -0.030, 0.855]
+      - [0, 0, 0, 1]
     time:
       - 4.0
       - 8.0
@@ -329,11 +329,11 @@ place_tomato_soup_on_table_right:
   ref_frame: "ci/base_link"
   offset:
     translation:
-      - [0.385, -0.40, 0.812]
-      - [0.750, -0.40, 0.700]
+      - [0.385, -0.40, 0.820]
+      - [0.750, -0.40, 0.620]
     rotation:
       - [0, 0, 0, 1]
-      - [-0.016, 0.518, -0.030, 0.855]
+      - [0, 0, 0, 1]
     time:
       - 4.0
       - 8.0
@@ -496,13 +496,13 @@ bleach_cleanser_on_table:
 spam_on_table:
   ref_frame: "orbbec_right/pose_tag_3"
   goal:
-    translation: [0.60, -0.65, 0]
+    translation: [0.60, -0.55, 0]
     rotation: [0, 0, 1, 0]
 
 tomato_soup_on_table:
   ref_frame: "orbbec_right/pose_tag_4"
   goal:
-    translation: [0.60, -0.65, 0]
+    translation: [0.60, -0.55, 0]
     rotation: [0, 0, 1, 0]
 
 ##################################################################
@@ -749,11 +749,11 @@ bleach_cleanser_in_cabinet:
 spam_in_cabinet:
   ref_frame: "orbbec_right/pose_tag_3"
   goal:
-    translation: [0.60, -0.65, 0]
+    translation: [0.60, -0.55, 0]
     rotation: [0, 0, 1, 0]
 
 tomato_soup_in_cabinet:
   ref_frame: "orbbec_right/pose_tag_4"
   goal:
-    translation: [0.60, -0.65, 0]
+    translation: [0.60, -0.55, 0]
     rotation: [0, 0, 1, 0]
