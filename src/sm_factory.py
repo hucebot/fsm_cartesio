@@ -86,6 +86,7 @@ def assemble_pick_and_place_sm(
         client,
         tf_buffer,
         config_path,
+        file_folder_path,
         object,
     )
 
@@ -536,7 +537,7 @@ def pick_object_from_dishwasher(
 
 
 def place_object_at_dishwasher(
-    success_out, failure_out, client, tf_buffer, config_path, file_folder_path
+    success_out, failure_out, client, tf_buffer, config_path, file_folder_path, object
 ):
     """
     Builds the SM for placing 'object' at the dishwasher.
@@ -548,6 +549,7 @@ def place_object_at_dishwasher(
         tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
         config_path (str): Path to the yaml file with targets definition
         file_folder_path (str): Path to the folder containing the demo
+        object (str): name of the object to pick
     Returns:
         smach.state_machine.StateMachine: Smach state machine
     """
@@ -787,10 +789,10 @@ def pick_object_from_table(
 
 
 def place_object_at_table(
-    success_out, failure_out, client, tf_buffer, config_path, object
+    success_out, failure_out, client, tf_buffer, config_path, file_folder_path, object
 ):
     """
-    Builds the SM for placing 'object' on the table.
+    Builds the SM for placing 'object' at the table.
 
     Args:
         success_out (str): desired success outcome
@@ -798,6 +800,7 @@ def place_object_at_table(
         client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
         tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
         config_path (str): Path to the yaml file with targets definition
+        file_folder_path (str): Path to the folder containing the demo
         object (str): name of the object to pick
     Returns:
         smach.state_machine.StateMachine: Smach state machine
@@ -854,144 +857,6 @@ def place_object_at_table(
         smach.StateMachine.add(
             "POT:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": success_out, "fail": failure_out},
-        )
-
-    return sm
-
-
-def handover_to_person(success_out, failure_out, client, tf_buffer, config_path):
-    """
-    Builds the SM for handing over picked object to a person
-
-    Args:
-        success_out (str): desired success outcome
-        failure_out (str): desired failure outcome
-        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
-        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
-        config_path (str): Path to the yaml file with targets definition
-    Returns:
-        smach.state_machine.StateMachine: Smach state machine
-    """
-    # Create a SMACH state machine
-    set_custom_loggers()
-    sm = smach.StateMachine(outcomes=[success_out, failure_out])
-
-    # Open the state machine container
-    with sm:
-        smach.StateMachine.add(
-            "HTP:START_TRACKING",
-            SetHumanTracking("orbbec_head", True),
-            transitions={"success": "HTP:INIT_ODOM", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:INIT_ODOM",
-            UpdateOdom(client, tf_buffer),
-            transitions={"success": "HTP:GO_TO_PERSON", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:GO_TO_PERSON",
-            GoToFromCfg(client, "goto/search_and_go", config_path, "person"),
-            transitions={"success": "HTP:HANDOVER", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:HANDOVER",
-            MoveToTargetFromCfg(
-                client,
-                tf_buffer,
-                config_path,
-                "handover",
-            ),
-            transitions={"success": "HTP:OPEN_GRIPPER", "fail": failure_out},
-        )
-        # TODO: Possibly make the robot say somethig like: "Please, take the object."
-        smach.StateMachine.add(
-            "HTP:OPEN_GRIPPER",
-            PalGripperRelease("parallel_gripper_right_controller"),
-            transitions={"success": "HTP:GO_BACK", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:GO_BACK",
-            GoToFromCfg(client, "goto/reach", config_path, "back"),
-            transitions={"success": "HTP:HOMING", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:HOMING",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "HTP:CLOSE_TRACKING", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:CLOSE_TRACKING",
-            SetHumanTracking("orbbec_head", False),
-            transitions={"success": success_out, "fail": failure_out},
-        )
-
-    return sm
-
-
-def handover_to_person(success_out, failure_out, client, tf_buffer, config_path):
-    """
-    Builds the SM for handing over picked object to a person
-
-    Args:
-        success_out (str): desired success outcome
-        failure_out (str): desired failure outcome
-        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
-        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
-        config_path (str): Path to the yaml file with targets definition
-    Returns:
-        smach.state_machine.StateMachine: Smach state machine
-    """
-    # Create a SMACH state machine
-    set_custom_loggers()
-    sm = smach.StateMachine(outcomes=[success_out, failure_out])
-
-    # Open the state machine container
-    with sm:
-        smach.StateMachine.add(
-            "HTP:START_TRACKING",
-            SetHumanTracking("orbbec_head", True),
-            transitions={"success": "HTP:INIT_ODOM", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:INIT_ODOM",
-            UpdateOdom(client, tf_buffer),
-            transitions={"success": "HTP:GO_TO_PERSON", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:GO_TO_PERSON",
-            GoToFromCfg(client, "goto/search_and_go", config_path, "person"),
-            transitions={"success": "HTP:HANDOVER", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:HANDOVER",
-            MoveToTargetFromCfg(
-                client,
-                tf_buffer,
-                config_path,
-                "handover",
-            ),
-            transitions={"success": "HTP:OPEN_GRIPPER", "fail": failure_out},
-        )
-        # TODO: Possibly make the robot say somethig like: "Please, take the object."
-        smach.StateMachine.add(
-            "HTP:OPEN_GRIPPER",
-            PalGripperRelease("parallel_gripper_right_controller"),
-            transitions={"success": "HTP:GO_BACK", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:GO_BACK",
-            GoToFromCfg(client, "goto/reach", config_path, "back"),
-            transitions={"success": "HTP:HOMING", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:HOMING",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "HTP:CLOSE_TRACKING", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "HTP:CLOSE_TRACKING",
-            SetHumanTracking("orbbec_head", False),
             transitions={"success": success_out, "fail": failure_out},
         )
 
@@ -1129,6 +994,75 @@ def pick_object_from_cabinet(
         smach.StateMachine.add(
             "PFC:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": success_out, "fail": failure_out},
+        )
+
+    return sm
+
+
+def handover_to_person(success_out, failure_out, client, tf_buffer, config_path):
+    """
+    Builds the SM for handing over picked object to a person
+
+    Args:
+        success_out (str): desired success outcome
+        failure_out (str): desired failure outcome
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+        config_path (str): Path to the yaml file with targets definition
+    Returns:
+        smach.state_machine.StateMachine: Smach state machine
+    """
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=[success_out, failure_out])
+
+    # Open the state machine container
+    with sm:
+        smach.StateMachine.add(
+            "HTP:START_TRACKING",
+            SetHumanTracking("orbbec_head", True),
+            transitions={"success": "HTP:INIT_ODOM", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "HTP:GO_TO_PERSON", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:GO_TO_PERSON",
+            GoToFromCfg(client, "goto/search_and_go", config_path, "person"),
+            transitions={"success": "HTP:HANDOVER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:HANDOVER",
+            MoveToTargetFromCfg(
+                client,
+                tf_buffer,
+                config_path,
+                "handover",
+            ),
+            transitions={"success": "HTP:OPEN_GRIPPER", "fail": failure_out},
+        )
+        # TODO: Possibly make the robot say somethig like: "Please, take the object."
+        smach.StateMachine.add(
+            "HTP:OPEN_GRIPPER",
+            PalGripperRelease("parallel_gripper_right_controller"),
+            transitions={"success": "HTP:GO_BACK", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:GO_BACK",
+            GoToFromCfg(client, "goto/reach", config_path, "back"),
+            transitions={"success": "HTP:HOMING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "HTP:CLOSE_TRACKING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "HTP:CLOSE_TRACKING",
+            SetHumanTracking("orbbec_head", False),
             transitions={"success": success_out, "fail": failure_out},
         )
 
