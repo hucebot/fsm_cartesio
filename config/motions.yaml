@@ -165,7 +165,7 @@ release_dishwasher_drawer_right:
     time: 2.0
 
 release_dishwasher_drawer_left:
-  task: "gripper_right_grasping_frame"
+  task: "gripper_left_grasping_frame"
   task_base_link: "base_link"
   base_link_frame: "ci/base_link"
   ref_frame: "ci/gripper_left_grasping_frame"

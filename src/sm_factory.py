@@ -633,7 +633,7 @@ def place_object_at_dishwasher(
         )
         smach.StateMachine.add(
             "PAD:CLOSE_GRIPPER_1",
-            PalGripperGrasp("parallel_gripper_right_controller"),
+            PalGripperGrasp("parallel_gripper_left_controller"),
             transitions={"success": "PAD:PULL_DRAWER", "fail": failure_out},
         )
         smach.StateMachine.add(
@@ -645,7 +645,7 @@ def place_object_at_dishwasher(
         )
         smach.StateMachine.add(
             "PAD:OPEN_GRIPPER_2",
-            PalGripperRelease("parallel_gripper_right_controller"),
+            PalGripperRelease("parallel_gripper_left_controller"),
             transitions={"success": "PAD:RELEASE_DRAWER", "fail": failure_out},
         )
         smach.StateMachine.add(
