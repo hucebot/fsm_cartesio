@@ -479,7 +479,7 @@ class MoveToTargetFromCfg(smach.State):
                 if ref_frame[:3] == "ci/":
                     time.sleep(0.1)
                 else:
-                    time.sleep(1)
+                    time.sleep(2)
                 # Express target in base_link (from ref_frame)
                 t = self.tf_buffer.lookup_transform(
                     base_link_frame,
@@ -566,7 +566,7 @@ class FollowWaypointsFromCfg(smach.State):
                 if ref_frame[:3] == "ci/":
                     time.sleep(0.1)
                 else:
-                    time.sleep(1)
+                    time.sleep(2)
                 # Express waypoints in base_link (from ref_frame)
                 t = self.tf_buffer.lookup_transform(
                     base_link_frame,
@@ -654,7 +654,7 @@ class FollowTrajectoryFromCfg(smach.State):
                 if ref_frame[:3] == "ci/":
                     time.sleep(0.1)
                 else:
-                    time.sleep(1)
+                    time.sleep(2)
                 # Express waypoints in base_link (from ref_frame)
                 t = self.tf_buffer.lookup_transform(
                     base_link_frame,
@@ -764,7 +764,7 @@ class GoTo(smach.State):
             smach.logerr(f"Failed to contact action server: {self.action_name}")
             return "fail"
         try:
-            time.sleep(1)
+            time.sleep(2)
             self.client.getTask("base_link").setControlMode(pyci.ControlType.Velocity)
             msg = MoveBaseGoal()
             msg.target_pose.header.frame_id = self.ref_frame
@@ -813,7 +813,7 @@ class GoToFromCfg(smach.State):
             smach.logerr(f"Failed to contact action server: {self.action_name}")
             return "fail"
         try:
-            time.sleep(1)
+            time.sleep(2)
             with open(self.config_path, "r") as file:
                 config = yaml.safe_load(file)
             motion_def = config[self.config_tag]
@@ -965,7 +965,7 @@ class RepeatDemo(smach.State):
                 if ref_frame[:3] == "ci/":
                     time.sleep(0.1)
                 else:
-                    time.sleep(1)
+                    time.sleep(2)
                 # Express waypoints in base_link (from ref_frame)
                 t = self.tf_buffer.lookup_transform(
                     base_link_frame,
