@@ -390,9 +390,7 @@ def pick_object_from_dishwasher(
         )
         smach.StateMachine.add(
             "PFD:DOCK_TO_DISHWASHER",
-            GoToFromCfg(
-                client, "goto/search_and_go", config_path, "dishwasher_left_side"
-            ),
+            GoToFromCfg(client, "goto/reach", config_path, "dishwasher_left_side"),
             transitions={"success": "PFD:RESET_ODOM_1", "fail": failure_out},
         )
         smach.StateMachine.add(
@@ -1085,8 +1083,8 @@ def place_object_at_cabinet(
             PalGripperRelease("parallel_gripper_right_controller"),
             transitions={"success": "PAC:POST_PLACE", "fail": failure_out},
         )
-        smach.POST_PLACE.add(
-            "PAC:PLACE_OBJECT",
+        smach.StateMachine.add(
+            "PAC:POST_PLACE",
             FollowWaypointsFromCfg(
                 client, tf_buffer, config_path, "post_place_on_cabinet_right"
             ),

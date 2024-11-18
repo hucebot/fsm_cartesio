@@ -42,7 +42,7 @@ back_and_turn_left:
 right_and_turn_left:
   ref_frame: "base_link"
   goal:
-    translation: [0, -0.25, 0]
+    translation: [-0.04, -0.25, 0]
     rotation: [0, 0, 0.7071068, 0.7071068]
 
 ##################################################################
@@ -86,7 +86,7 @@ pre_pull_dishwasher_top_drawer_left:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.16, 0.67, 0.70]
+    translation: [0.16, 0.67, 0.67]
     rotation: [0.692, 0.029, 0.017, 0.721]
     time: 8.0
 
@@ -726,14 +726,14 @@ place_on_cabinet_right:
   ref_frame: "ci/base_link"
   offset:
     translation:
-      - [0.54, -0.40, 1.05]
-      - [0.80, -0.40, 1.05]
+      - [0.54, -0.45, 1.05]
+      - [0.80, -0.45, 1.05]
     rotation:
       - [0, 0, 0, 1]
       - [0, 0, 0, 1]
     time:
-      - 6.0
       - 10.0
+      - 14.0
 
 post_place_on_cabinet_right:
   task: "gripper_right_grasping_frame"
@@ -742,14 +742,14 @@ post_place_on_cabinet_right:
   ref_frame: "ci/base_link"
   offset:
     translation:
-      - [0.54, -0.40, 1.05]
-      - [0.470, -0.40, 0.780]
+      - [0.54, -0.45, 1.05]
+      - [0.47, -0.45, 0.780]
     rotation:
       - [0, 0, 0, 1]
       - [0, 0, 0, 1]
     time:
       - 4.0
-      - 10.0
+      - 8.0
 
 # Demos
 open_cabinet_right_door_right:
