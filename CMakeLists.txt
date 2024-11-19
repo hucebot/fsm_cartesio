@@ -50,7 +50,7 @@ catkin_install_python(PROGRAMS
   scripts/go_to_human
   scripts/homing 
   scripts/execute_cmd 
-  scripts/open_door_with_left_fsm 
+  scripts/open_door
   scripts/pick_bowl_from_dishwasher
   scripts/pick_object_from_table
   scripts/update_odom 
