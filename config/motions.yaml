@@ -20,6 +20,25 @@ posture_home:
   "arm_right_7_joint": -1.20
   "torso_lift_joint": 0.30
 
+
+posture_door_passing:
+  "arm_left_1_joint": -1.02
+  "arm_left_2_joint": 1.14
+  "arm_left_3_joint": 2.67
+  "arm_left_4_joint": 2.02
+  "arm_left_5_joint": 1.35
+  "arm_left_6_joint": 0.07
+  "arm_left_7_joint": -1.16
+  "arm_right_1_joint": -0.98
+  "arm_right_2_joint": 1.17
+  "arm_right_3_joint": 2.69
+  "arm_right_4_joint": 2.01
+  "arm_right_5_joint": 1.24
+  "arm_right_6_joint": 0.08
+  "arm_right_7_joint": -1.16
+  "torso_lift_joint": 0.30
+
+
 # Local base maneuvers
 back:
   ref_frame: "base_link"
@@ -982,7 +1001,7 @@ pre_open_door_left:
   offset:
     translation: [0.26542449, 0.72674733, 0.99390238]
     rotation: [0.69853847, 0.0442568, 0.09875992, 0.70734137]
-    time: 4.0
+    time: 8.0
 
 # Demos
 open_door_left:
@@ -1005,7 +1024,7 @@ open_door_left:
 door:
   ref_frame: "orbbec_head/pose_tag_107"
   goal:
-    translation: [1.5, 0.45, 0]
+    translation: [1.5, 0.55, 0]
     rotation: [0, 0, 1, 0]
 
 dock_to_door_with_orbbec_left:
@@ -1017,17 +1036,29 @@ dock_to_door_with_orbbec_left:
 back_from_door:
   ref_frame: "base_link"
   goal:
-    translation: [-2.5, 0, 0]
+    translation: [-1, -0.8, 0]
     rotation: [0, 0, 0, 1]
 
-in_front_of_open_door:
+left_towards_door:
+  ref_frame: "base_link"
+  goal:
+    translation: [0, 1.2, 0]
+    rotation: [0, 0, 0, 1]
+
+forward_towards_door:
+  ref_frame: "base_link"
+  goal:
+    translation: [0.6, 0, 0]
+    rotation: [0, 0, 0, 1]
+    
+dock_in_front_of_open_door:
   ref_frame: "orbbec_head/pose_tag_15"
   goal:
-    translation: [1.0, 0.60, 0]
+    translation: [0.8, 0.56, 0]
     rotation: [0, 0, 1, 0]
 
 enter_door:
   ref_frame: "base_link"
   goal:
-    translation: [2, 0, 0]
+    translation: [0.1, 0, 0]
     rotation: [0, 0, 0, 1]

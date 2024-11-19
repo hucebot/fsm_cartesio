@@ -1242,23 +1242,43 @@ def go_through_door(
         # Rotate and Place ----------------------------------------------------------------
         smach.StateMachine.add(
             "GTD:GO_BACK_FROM_DOOR",
-            GoToFromCfg(client, "goto/reach", config_path, "right_and_turn_left"),
+            GoToFromCfg(client, "goto/reach", config_path, "back_from_door"),
             transitions={"success": "GTD:HOMING", "fail": failure_out},
         )
         smach.StateMachine.add(
             "GTD:HOMING",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            SetPosturalFromCfg(client, config_path, "posture_door_passing", True),
             transitions={"success": "GTD:RESET_ODOM_2", "fail": failure_out},
         )
         smach.StateMachine.add(
             "GTD:RESET_ODOM_2",
             UpdateOdom(client, tf_buffer),
-            transitions={"success": "GTD:IN_FRONT_OF_DOOR", "fail": failure_out},
+            transitions={"success": "GTD:GO_LEFT", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "GTD:IN_FRONT_OF_DOOR",
+            "GTD:GO_LEFT",
+            GoToFromCfg(client, "goto/reach", config_path, "left_towards_door"),
+            transitions={"success": "GTD:RESET_ODOM_3", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:RESET_ODOM_3",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "GTD:GO_FORWARD", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:GO_FORWARD",
+            GoToFromCfg(client, "goto/reach", config_path, "forward_towards_door"),
+            transitions={"success": "GTD:RESET_ODOM_4", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:RESET_ODOM_4",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "GTD:DOCK_IN_FRONT_OF_DOOR", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:DOCK_IN_FRONT_OF_DOOR",
             GoToFromCfg(
-                client, "goto/search_and_go", config_path, "in_front_of_open_door"
+                client, "goto/search_and_go", config_path, "dock_in_front_of_open_door"
             ),
             transitions={"success": "GTD:ENTER_DOOR", "fail": failure_out},
         )
