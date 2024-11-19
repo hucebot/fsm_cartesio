@@ -20,7 +20,6 @@ posture_home:
   "arm_right_7_joint": -1.20
   "torso_lift_joint": 0.30
 
-
 posture_door_passing:
   "arm_left_1_joint": -1.02
   "arm_left_2_joint": 1.14
@@ -37,7 +36,6 @@ posture_door_passing:
   "arm_right_6_joint": 0.08
   "arm_right_7_joint": -1.16
   "torso_lift_joint": 0.30
-
 
 # Local base maneuvers
 back:
@@ -1050,15 +1048,15 @@ forward_towards_door:
   goal:
     translation: [0.6, 0, 0]
     rotation: [0, 0, 0, 1]
-    
+
 dock_in_front_of_open_door:
   ref_frame: "orbbec_head/pose_tag_15"
   goal:
-    translation: [0.8, 0.56, 0]
+    translation: [0.8, 0.58, 0]
     rotation: [0, 0, 1, 0]
 
 enter_door:
   ref_frame: "base_link"
   goal:
-    translation: [0.1, 0, 0]
+    translation: [0.5, 0, 0]
     rotation: [0, 0, 0, 1]
