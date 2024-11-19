@@ -885,7 +885,7 @@ def pick_object_from_cabinet(
 
     # Open the state machine container
     with sm:
-        # Dock to dishwasher --------------------------------------------------------------
+        # Dock to cabinet -----------------------------------------------------------------
         smach.StateMachine.add(
             "PFC:INIT_ODOM",
             UpdateOdom(client, tf_buffer),
@@ -1022,7 +1022,7 @@ def place_object_at_cabinet(
 
     # Open the state machine container
     with sm:
-        # Dock to dishwasher --------------------------------------------------------------
+        # Dock to cabinet -----------------------------------------------------------------
         smach.StateMachine.add(
             "PAC:INIT_ODOM",
             UpdateOdom(client, tf_buffer),
@@ -1167,6 +1167,104 @@ def handover_to_person(success_out, failure_out, client, tf_buffer, config_path)
         smach.StateMachine.add(
             "HTP:CLOSE_TRACKING",
             SetHumanTracking("orbbec_head", False),
+            transitions={"success": success_out, "fail": failure_out},
+        )
+
+    return sm
+
+
+def go_through_door(
+    success_out, failure_out, client, tf_buffer, config_path, file_folder_path
+):
+    """
+    Builds the SM for opening and going through the door.
+
+    Args:
+        success_out (str): desired success outcome
+        failure_out (str): desired failure outcome
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        tf_buffer (tf2_ros.buffer.Buffer): ROS tf2 buffer
+        config_path (str): Path to the yaml file with targets definition
+        file_folder_path (str): Path to the folder containing the demo
+    Returns:
+        smach.state_machine.StateMachine: Smach state machine
+    """
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=[success_out, failure_out])
+
+    # Open the state machine container
+    with sm:
+        # Dock to door --------------------------------------------------------------------
+        smach.StateMachine.add(
+            "GTD:INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "GTD:GO_TO_DOOR", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:GO_TO_DOOR",
+            GoToFromCfg(client, "goto/search_and_go", config_path, "door"),
+            transitions={"success": "GTD:PRE_OPEN_DOOR", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:PRE_OPEN_DOOR",
+            MoveToTargetFromCfg(client, tf_buffer, config_path, "pre_open_door_left"),
+            transitions={
+                "success": "GTD:DOCK_TO_DOOR",
+                "fail": failure_out,
+            },
+        )
+        smach.StateMachine.add(
+            "GTD:DOCK_TO_DOOR",
+            GoToFromCfg(
+                client, "goto/reach", config_path, "dock_to_door_with_orbbec_left"
+            ),
+            transitions={"success": "GTD:RESET_ODOM_1", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:RESET_ODOM_1",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "GTD:RUN_DEMO_OPEN_DOOR", "fail": failure_out},
+        )
+        # Open door -----------------------------------------------------------------------
+        smach.StateMachine.add(
+            "GTD:RUN_DEMO_OPEN_DOOR",
+            RepeatDemo(
+                client,
+                tf_buffer,
+                config_path,
+                "open_door_left",
+                file_folder_path,
+            ),
+            transitions={"success": "GTD:GO_BACK_FROM_DOOR", "fail": failure_out},
+        )
+        # Rotate and Place ----------------------------------------------------------------
+        smach.StateMachine.add(
+            "GTD:GO_BACK_FROM_DOOR",
+            GoToFromCfg(client, "goto/reach", config_path, "right_and_turn_left"),
+            transitions={"success": "GTD:HOMING", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "GTD:RESET_ODOM_2", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:RESET_ODOM_2",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "GTD:IN_FRONT_OF_DOOR", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:IN_FRONT_OF_DOOR",
+            GoToFromCfg(
+                client, "goto/search_and_go", config_path, "in_front_of_open_door"
+            ),
+            transitions={"success": "GTD:ENTER_DOOR", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "GTD:ENTER_DOOR",
+            GoToFromCfg(client, "goto/reach", config_path, "enter_door"),
             transitions={"success": success_out, "fail": failure_out},
         )
 
