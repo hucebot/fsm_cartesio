@@ -47,13 +47,13 @@ back:
 back_and_turn_right:
   ref_frame: "base_link"
   goal:
-    translation: [-1, 0, 0]
+    translation: [-0.8, 0, 0]
     rotation: [0, 0, -0.7071068, 0.7071068]
 
 back_and_turn_left:
   ref_frame: "base_link"
   goal:
-    translation: [-1, 0, 0]
+    translation: [-0.8, 0, 0]
     rotation: [0, 0, 0.7071068, 0.7071068]
 
 right_and_turn_left:
@@ -61,6 +61,12 @@ right_and_turn_left:
   goal:
     translation: [-0.04, -0.25, 0]
     rotation: [0, 0, 0.7071068, 0.7071068]
+
+forward:
+  ref_frame: "base_link"
+  goal:
+    translation: [1, 0, 0]
+    rotation: [0, 0, 0, 1]
 
 ##################################################################
 ####################### DISHWASHER MOTIONS #######################

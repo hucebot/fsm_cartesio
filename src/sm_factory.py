@@ -528,6 +528,11 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "PFD:GO_FORWARD", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFD:GO_FORWARD",
+            GoToFromCfg(client, "goto/reach", config_path, "forward"),
             transitions={"success": success_out, "fail": failure_out},
         )
 
