@@ -749,8 +749,8 @@ place_on_cabinet_right:
   ref_frame: "ci/base_link"
   offset:
     translation:
-      - [0.54, -0.45, 1.05]
-      - [0.80, -0.45, 1.05]
+      - [0.50, -0.46, 1.05]
+      - [0.75, -0.46, 1.05]
     rotation:
       - [0, 0, 0, 1]
       - [0, 0, 0, 1]
@@ -765,8 +765,8 @@ post_place_on_cabinet_right:
   ref_frame: "ci/base_link"
   offset:
     translation:
-      - [0.54, -0.45, 1.05]
-      - [0.47, -0.45, 0.780]
+      - [0.50, -0.40, 1.05]
+      - [0.47, -0.40, 0.780]
     rotation:
       - [0, 0, 0, 1]
       - [0, 0, 0, 1]
