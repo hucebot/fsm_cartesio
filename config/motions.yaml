@@ -950,6 +950,12 @@ cabinet_right_drawer_open:
     translation: [0.6159029, -0.795263, 0.47688617]
     rotation: [-0.02054599, 0.71434416, 0.6986738, 0.03384089]
 
+cabinet_left_drawer_open:
+  ref_frame: "orbbec_leftt/pose_tag_25"
+  goal:
+    translation: [0.65775477, -0.83787098, -0.37471574]
+    rotation: [-0.03035029, 0.74024953, 0.67052776, 0.03875583]
+
 cabinet_right_drawer_close:
   ref_frame: "orbbec_right/pose_tag_26"
   goal:

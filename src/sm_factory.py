@@ -1045,9 +1045,14 @@ def place_object_at_cabinet(
                 client, tf_buffer, config_path, "pre_open_cabinet_left_drawer_left"
             ),
             transitions={
-                "success": "PAC:RUN_DEMO_OPEN_DRAWER",
+                "success": "PAC:DOCK_TO_CABINET_LEFT_DRAWER",
                 "fail": failure_out,
             },
+        )
+        smach.StateMachine.add(
+            "PAC:DOCK_TO_CABINET_LEFT_DRAWER",
+            GoToFromCfg(client, "goto/reach", config_path, "cabinet_right_side"),
+            transitions={"success": "PAC:RUN_DEMO_OPEN_DRAWER", "fail": failure_out},
         )
         smach.StateMachine.add(
             "PAC:RUN_DEMO_OPEN_DRAWER",
