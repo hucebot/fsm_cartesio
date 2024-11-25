@@ -880,11 +880,18 @@ class GoToFromCfg(smach.State):
         self.config_path = config_path
         self.config_tag = config_tag
 
+    def stop_cb(self, data):
+        smach.logerr("Stopping SM")
+        self.act_cli.cancel_goal()
+
     def execute(self, userdata):
         if not self.act_cli.wait_for_server(rospy.Duration.from_sec(5.0)):
             smach.logerr(f"Failed to contact action server: {self.action_name}")
             return "fail"
         try:
+            self.stop_sub = rospy.Subscriber(
+                "fsm_cartesio/stop", EmptyMsg, self.stop_cb
+            )
             time.sleep(2.5)
             with open(self.config_path, "r") as file:
                 config = yaml.safe_load(file)
