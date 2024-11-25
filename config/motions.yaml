@@ -80,6 +80,12 @@ turn_back:
     translation: [0, 0, 0]
     rotation: [0, 0, 1, 0]
 
+setup_after_table:
+  ref_frame: "base_link"
+  goal:
+    translation: [0, 0.50, 0]
+    rotation: [0, 0, -0.3826834, 0.9238795]
+
 ##################################################################
 ####################### DISHWASHER MOTIONS #######################
 ##################################################################
@@ -263,8 +269,8 @@ place_on_dishwasher_right:
   ref_frame: "ci/base_link"
   offset:
     translation:
-      - [0.550, -0.40, 0.885]
-      - [0.750, -0.40, 0.885]
+      - [0.550, -0.45, 0.885]
+      - [0.750, -0.45, 0.885]
     rotation:
       - [0, 0, 0, 1]
       - [0, 0, 0, 1]
@@ -278,7 +284,7 @@ post_place_on_dishwasher_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.468, -0.411, 0.739]
+    translation: [0.468, -0.45, 0.739]
     rotation: [0, 0, 0, 1]
     time: 6.0
 

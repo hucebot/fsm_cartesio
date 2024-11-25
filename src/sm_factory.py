@@ -795,6 +795,11 @@ def pick_object_from_table(
         smach.StateMachine.add(
             "PFT:TURN",
             GoToFromCfg(client, "goto/reach", config_path, "turn_back"),
+            transitions={"success": "PFT:MOVE_TO_CENTER", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFT:MOVE_TO_CENTER",
+            GoToFromCfg(client, "goto/reach", config_path, "setup_after_table"),
             transitions={"success": success_out, "fail": failure_out},
         )
 
