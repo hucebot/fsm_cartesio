@@ -14,6 +14,7 @@ import rospy
 import smach
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from sensor_msgs.msg import JointState
+from std_msgs.msg import Empty as EmptyMsg
 from std_srvs.srv import Empty, EmptyRequest, SetBool, SetBoolRequest
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
@@ -41,7 +42,6 @@ class UpdateOdom(smach.State):
 
     def execute(self, userdata):
         try:
-            self.client.update()
             self.client.getTask("base_link").setControlMode(pyci.ControlType.Velocity)
             self.client.getTask("gripper_left_grasping_frame").setControlMode(
                 pyci.ControlType.Velocity
@@ -353,15 +353,26 @@ class MoveToTarget(smach.State):
         self.target = target
         self.duration = duration
 
+    def stop_cb(self, data):
+        smach.logerr("Stopping SM")
+        self.is_stopped = True
+
     def execute(self, userdata):
         try:
+            self.is_stopped = False
+            self.stop_sub = rospy.Subscriber(
+                "fsm_cartesio/stop", EmptyMsg, self.stop_cb
+            )
             self.client.update()
             task = self.client.getTask(self.task_name)
             task.setBaseLink(self.task_base_link)
             task.setControlMode(pyci.ControlType.Position)
             task.setPoseTarget(self.target, self.duration)
             task.waitReachCompleted(self.duration + 1)
-            return "success"
+            if self.is_stopped:
+                return "fail"
+            else:
+                return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
@@ -385,8 +396,16 @@ class FollowWaypoints(smach.State):
         self.task_base_link = task_base_link
         self.waypoints = waypoints
 
+    def stop_cb(self, data):
+        smach.logerr("Stopping SM")
+        self.is_stopped = True
+
     def execute(self, userdata):
         try:
+            self.is_stopped = False
+            self.stop_sub = rospy.Subscriber(
+                "fsm_cartesio/stop", EmptyMsg, self.stop_cb
+            )
             self.client.update()
             task = self.client.getTask(self.task_name)
             task.setBaseLink(self.task_base_link)
@@ -396,7 +415,10 @@ class FollowWaypoints(smach.State):
                 timeout += wp.time
             task.setWayPoints(self.waypoints)
             task.waitReachCompleted(timeout + 1)
-            return "success"
+            if self.is_stopped:
+                return "fail"
+            else:
+                return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
@@ -422,8 +444,16 @@ class FollowTrajectory(smach.State):
         self.pose_traj = pose_traj
         self.dt = dt
 
+    def stop_cb(self, data):
+        smach.logerr("Stopping SM")
+        self.is_stopped = True
+
     def execute(self, userdata):
         try:
+            self.is_stopped = False
+            self.stop_sub = rospy.Subscriber(
+                "fsm_cartesio/stop", EmptyMsg, self.stop_cb
+            )
             self.client.update()
             task = self.client.getTask(self.task_name)
             task.setBaseLink(self.task_base_link)
@@ -431,7 +461,11 @@ class FollowTrajectory(smach.State):
             for i in range(len(self.pose_traj)):
                 task.setPoseReference(self.pose_traj[i])
                 time.sleep(self.dt)
-            return "success"
+
+            if self.is_stopped:
+                return "fail"
+            else:
+                return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
@@ -455,8 +489,16 @@ class MoveToTargetFromCfg(smach.State):
         self.config_path = config_path
         self.config_tag = config_tag
 
+    def stop_cb(self, data):
+        smach.logerr("Stopping SM")
+        self.is_stopped = True
+
     def execute(self, userdata):
         try:
+            self.is_stopped = False
+            self.stop_sub = rospy.Subscriber(
+                "fsm_cartesio/stop", EmptyMsg, self.stop_cb
+            )
             self.client.update()
             with open(self.config_path, "r") as file:
                 config = yaml.safe_load(file)
@@ -499,7 +541,11 @@ class MoveToTargetFromCfg(smach.State):
                 pose = base_link_to_ref * offset
             task.setPoseTarget(pose, timeout)
             task.waitReachCompleted(timeout + 1)
-            return "success"
+
+            if self.is_stopped:
+                return "fail"
+            else:
+                return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
@@ -523,8 +569,16 @@ class FollowWaypointsFromCfg(smach.State):
         self.config_path = config_path
         self.config_tag = config_tag
 
+    def stop_cb(self, data):
+        smach.logerr("Stopping SM")
+        self.is_stopped = True
+
     def execute(self, userdata):
         try:
+            self.is_stopped = False
+            self.stop_sub = rospy.Subscriber(
+                "fsm_cartesio/stop", EmptyMsg, self.stop_cb
+            )
             self.client.update()
             with open(self.config_path, "r") as file:
                 config = yaml.safe_load(file)
@@ -597,7 +651,12 @@ class FollowWaypointsFromCfg(smach.State):
                     waypoints.append(wp)
             task.setWayPoints(waypoints)
             task.waitReachCompleted(timeout + 1)
-            return "success"
+
+            if self.is_stopped:
+                return "fail"
+            else:
+                return "success"
+
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
@@ -623,8 +682,16 @@ class FollowTrajectoryFromCfg(smach.State):
         self.config_tag = config_tag
         self.file_folder_path = file_folder_path
 
+    def stop_cb(self, data):
+        smach.logerr("Stopping SM")
+        self.is_stopped = True
+
     def execute(self, userdata):
         try:
+            self.is_stopped = False
+            self.stop_sub = rospy.Subscriber(
+                "fsm_cartesio/stop", EmptyMsg, self.stop_cb
+            )
             self.client.update()
             with open(self.config_path, "r") as file:
                 config = yaml.safe_load(file)
@@ -684,8 +751,13 @@ class FollowTrajectoryFromCfg(smach.State):
             # Send demo pose references each 'dt' secs
             for i in range(len(references)):
                 task.setPoseReference(references[i])
+                if self.is_stopped:
+                    return "fail"
                 time.sleep(dt)
-            return "success"
+            if self.is_stopped:
+                return "fail"
+            else:
+                return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
@@ -912,8 +984,17 @@ class RepeatDemo(smach.State):
         self.config_tag = config_tag
         self.file_folder_path = file_folder_path
 
+    def stop_cb(self, data):
+        smach.logerr("Stopping SM")
+        self.is_stopped = True
+
     def execute(self, userdata):
         try:
+
+            self.is_stopped = False
+            self.stop_sub = rospy.Subscriber(
+                "fsm_cartesio/stop", EmptyMsg, self.stop_cb
+            )
             self.client.update()
 
             with open(self.config_path, "r") as file:
@@ -999,8 +1080,14 @@ class RepeatDemo(smach.State):
                 )
                 task.setPoseReference(references[i])
                 gripper_cmd_pub.publish(gripper_cmd_msg)
+                if self.is_stopped:
+                    return "fail"
                 time.sleep(dt)
-            return "success"
+
+            if self.is_stopped:
+                return "fail"
+            else:
+                return "success"
         except Exception as error:
             smach.logerr(f"An error occurred: {type(error).__name__}")
             smach.logerr(error)
