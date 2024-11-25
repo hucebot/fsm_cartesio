@@ -40,7 +40,7 @@ if __name__ == "__main__":
     target_kitchen = "INRIA"
     object = "tomato_soup"
     initial_location = "table"
-    target_location = "dishwasher"
+    target_location = "table"
 
     if pattern_type == "A":  # "A": pick-&-place
         sm_top = assemble_pick_and_place_sm(

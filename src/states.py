@@ -764,7 +764,7 @@ class GoTo(smach.State):
             smach.logerr(f"Failed to contact action server: {self.action_name}")
             return "fail"
         try:
-            time.sleep(2)
+            time.sleep(2.5)
             self.client.getTask("base_link").setControlMode(pyci.ControlType.Velocity)
             msg = MoveBaseGoal()
             msg.target_pose.header.frame_id = self.ref_frame
@@ -813,7 +813,7 @@ class GoToFromCfg(smach.State):
             smach.logerr(f"Failed to contact action server: {self.action_name}")
             return "fail"
         try:
-            time.sleep(2)
+            time.sleep(2.5)
             with open(self.config_path, "r") as file:
                 config = yaml.safe_load(file)
             motion_def = config[self.config_tag]

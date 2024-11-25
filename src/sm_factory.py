@@ -475,6 +475,11 @@ def pick_object_from_dishwasher(
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "release_dishwasher_drawer_right"
             ),
+            transitions={"success": "PFD:STEP_LEFT", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFD:STEP_LEFT",
+            GoToFromCfg(client, "goto/reach", config_path, "left_step"),
             transitions={"success": "PFD:PRE_PICK_OBJECT", "fail": failure_out},
         )
         # Pick object -----------------------------------------------------------------------
@@ -779,12 +784,17 @@ def pick_object_from_table(
         # Go back -------------------------------------------------------------------------
         smach.StateMachine.add(
             "PFT:GO_BACK",
-            GoToFromCfg(client, "goto/reach", config_path, "back_and_turn_left"),
+            GoToFromCfg(client, "goto/reach", config_path, "back"),
             transitions={"success": "PFT:HOMING", "fail": failure_out},
         )
         smach.StateMachine.add(
             "PFT:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "PFT:TURN", "fail": failure_out},
+        )
+        smach.StateMachine.add(
+            "PFT:TURN",
+            GoToFromCfg(client, "goto/reach", config_path, "turn_back"),
             transitions={"success": success_out, "fail": failure_out},
         )
 
