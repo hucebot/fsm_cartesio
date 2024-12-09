@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+
+from cartesian_interface.pyci_all import *
+from sm_factory import assemble_pick_and_place_sm, assemble_pick_and_handover_sm
+
+import rospkg
+import rospy
+import tf2_ros
+from std_srvs.srv import Trigger, TriggerRequest
+
+import json
+
+if __name__ == "__main__":
+
+    rospy.init_node("open_door_smach_node")
+    rospack = rospkg.RosPack()
+
+    # Set up tf2 listener
+    tf_buffer = tf2_ros.Buffer()
+    tf2_ros.TransformListener(tf_buffer)
+
+    # Init CartesI/O client
+    client = pyci.CartesianInterfaceRos()
+
+    file_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
+    config_path = rospack.get_path("fsm_cartesio") + f"/config/motions.yaml"
+
+    # Wait for tf listener
+    rospy.sleep(1)
+
+    # Get request from LLM
+    print("Calling LLM")
+    srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
+    req = TriggerRequest()
+    res = srv_proxy(req)
+    print("Response received")
+    plan = json.loads(res.message)
+
+    pattern_type = plan["pattern_type"]
+    initial_kitchen = plan["initial_kitchen"]
+    target_kitchen = plan["target_kitchen"]
+    object = plan["object"]
+    initial_location = plan["initial_location"]
+    target_location = plan["target_location"]
+    if target_location == "drawer":
+        target_location = "cabinet"
+
+    # pattern_type = "A"
+    # initial_kitchen = "INRIA"
+    # target_kitchen = "INRIA"
+    # object = "bowl"
+    # initial_location = "dishwasher"
+    # target_location = "table"
+
+    if pattern_type == "A":  # "A": pick-&-place
+        sm_top = assemble_pick_and_place_sm(
+            object,
+            initial_kitchen,
+            initial_location,
+            target_kitchen,
+            target_location,
+            client,
+            tf_buffer,
+            config_path,
+            file_folder_path,
+        )
+    elif pattern_type == "B":  # "B": pick-&-handover
+        sm_top = assemble_pick_and_handover_sm(
+            object,
+            initial_kitchen,
+            initial_location,
+            target_kitchen,
+            client,
+            tf_buffer,
+            config_path,
+            file_folder_path,
+        )
+
+    sm_top.execute()

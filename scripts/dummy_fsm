@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+
+from cartesian_interface.pyci_all import *
+from utils import set_custom_loggers
+from states import (
+    MoveToTargetFromCfg,
+    FollowWaypointsFromCfg,
+    FollowTrajectoryFromCfg,
+    SetPosturalFromCfg,
+)
+from sm_factory import build_sm_dummy_left, build_sm_dummy_right
+
+import rospy
+import rospkg
+import smach
+import tf2_ros
+
+
+def main():
+    rospy.init_node("smach_example_state_machine")
+    rospack = rospkg.RosPack()
+
+    # Set up tf2 listener
+    tf_buffer = tf2_ros.Buffer()
+    tf2_ros.TransformListener(tf_buffer)
+
+    # Init CartesI/O client
+    client = pyci.CartesianInterfaceRos()
+
+    # Wait for tf listener
+    rospy.sleep(1)
+
+    # Define parameters
+    config_path = rospack.get_path("fsm_cartesio") + "/config/dummy.yaml"
+    demo_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
+
+    # # Create a SMACH state machine
+    # set_custom_loggers()
+    # sm = smach.StateMachine(outcomes=["fsm_success", "fsm_fail"])
+
+    # # Open the state machine container
+    # with sm:
+    #     smach.StateMachine.add(
+    #         "MOVE_LEFT",
+    #         FollowWaypointsFromCfg(client, tf_buffer, config_path, "left_waypoints"),
+    #         transitions={"success": "MOVE_RIGHT", "fail": "fsm_fail"},
+    #     )
+
+    #     smach.StateMachine.add(
+    #         "MOVE_RIGHT",
+    #         FollowWaypointsFromCfg(client, tf_buffer, config_path, "right_waypoints"),
+    #         transitions={"success": "MOVE_BASE", "fail": "fsm_fail"},
+    #     )
+
+    #     smach.StateMachine.add(
+    #         "MOVE_BASE",
+    #         MoveToTargetFromCfg(client, tf_buffer, config_path, "base_pose"),
+    #         transitions={"success": "TRAJ_LEFT", "fail": "fsm_fail"},
+    #     )
+    #     smach.StateMachine.add(
+    #         "TRAJ_LEFT",
+    #         FollowTrajectoryFromCfg(
+    #             client, tf_buffer, config_path, "dummy_demo_left", demo_folder_path
+    #         ),
+    #         transitions={"success": "TRAJ_RIGHT", "fail": "fsm_fail"},
+    #     )
+    #     smach.StateMachine.add(
+    #         "TRAJ_RIGHT",
+    #         FollowTrajectoryFromCfg(
+    #             client, tf_buffer, config_path, "dummy_demo_right", demo_folder_path
+    #         ),
+    #         transitions={"success": "HOMING", "fail": "fsm_fail"},
+    #     )
+    #     smach.StateMachine.add(
+    #         "HOMING",
+    #         SetPosturalFromCfg(client, config_path, "posture_home", True),
+    #         transitions={"success": "fsm_success", "fail": "fsm_fail"},
+    #     )
+
+    # # Execute the state machine
+    # sm.execute()
+
+    # Create a SM with sm_factory methods
+    sm_top = smach.StateMachine(outcomes=["top_success", "top_fail"])
+    sm_dummy_left = build_sm_dummy_left(
+        "dummy_left_success",
+        "dummy_left_failure",
+        client,
+        tf_buffer,
+        config_path,
+        demo_folder_path,
+    )
+    sm_dummy_right = build_sm_dummy_right(
+        "dummy_right_success",
+        "dummy_right_failure",
+        client,
+        tf_buffer,
+        config_path,
+        demo_folder_path,
+    )
+    with sm_top:
+        smach.StateMachine.add(
+            "DUMMY_LEFT",
+            sm_dummy_left,
+            transitions={
+                "dummy_left_success": "DUMMY_RIGHT",
+                "dummy_left_failure": "top_fail",
+            },
+        )
+        smach.StateMachine.add(
+            "DUMMY_RIGHT",
+            sm_dummy_right,
+            transitions={
+                "dummy_right_success": "top_success",
+                "dummy_right_failure": "top_fail",
+            },
+        )
+    sm_top.execute()
+
+
+if __name__ == "__main__":
+    main()

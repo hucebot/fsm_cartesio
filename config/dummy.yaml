@@ -1,0 +1,76 @@
+posture_home:
+  "arm_left_1_joint": -0.87
+  "arm_left_2_joint": 1.29
+  "arm_left_3_joint": 2.34
+  "arm_left_4_joint": 1.84
+  "arm_left_5_joint": 1.31
+  "arm_left_6_joint": -0.11
+  "arm_left_7_joint": -1.20
+  "arm_right_1_joint": -0.87
+  "arm_right_2_joint": 1.29
+  "arm_right_3_joint": 2.34
+  "arm_right_4_joint": 1.84
+  "arm_right_5_joint": 1.31
+  "arm_right_6_joint": -0.11
+  "arm_right_7_joint": -1.20
+  "torso_lift_joint": 0.30
+
+left_waypoints:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.6693, 0.3481, 0.4492]
+      - [0.5693, 0.3481, 0.4492]
+    rotation:
+      - [0.7296, -0.05501, 0.07221, 0.6778]
+      - [0.7296, -0.05501, 0.07221, 0.6778]
+    time:
+      - 2.0
+      - 4.0
+
+right_waypoints:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.6663, -0.3481, 0.4492]
+      - [0.5663, -0.3481, 0.4492]
+    rotation:
+      - [-0.7296, -0.05501, -0.07221, 0.6778]
+      - [-0.7296, -0.05501, -0.07221, 0.6778]
+    time:
+      - 2.0
+      - 4.0
+
+base_pose:
+  task: "base_link"
+  task_base_link: "world"
+  base_link_frame: "ci/world"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [1.0, 0, 0]
+    rotation: [0, 0, 0.258819, 0.9659258]
+    time: 4.0
+
+dummy_demo_right:
+  file: "dummy_demo_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  go_to_start_time: 4.0
+  dt: 0.05
+
+dummy_demo_left:
+  file: "dummy_demo_left.npy"
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  go_to_start_time: 4.0
+  dt: 0.05

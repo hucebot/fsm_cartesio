@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+
+from cartesian_interface.pyci_all import *
+from utils import set_custom_loggers
+from states import (
+    GoTo,
+    SetPosturalFromCfg,
+    UpdateOdom,
+)
+
+import rospkg
+import rospy
+import smach
+import tf2_ros
+from std_msgs.msg import Float32
+from std_srvs.srv import Trigger, TriggerRequest
+
+
+def main():
+    rospy.init_node("open_door_smach_node")
+    rospack = rospkg.RosPack()
+
+    # Set up tf2 listener
+    tf_buffer = tf2_ros.Buffer()
+    tf2_ros.TransformListener(tf_buffer)
+
+    # Init CartesI/O client
+    client = pyci.CartesianInterfaceRos()
+
+    # Wait for tf listener
+    rospy.sleep(1)
+
+    # Define SM parameters
+    config_path = rospack.get_path("fsm_cartesio") + "/config/dummy.yaml"
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=["fsm_success", "fsm_fail"])
+
+    # Open the state machine container
+    with sm:
+        # Go to human -----------------------------------------------------------
+        smach.StateMachine.add(
+            "INIT_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "HOMING", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "GO_TO_HUMAN", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "GO_TO_HUMAN",
+            GoTo(
+                client,
+                "goto/reach",
+                "orbbec_head/human",
+                [0.8, 0, 0, 0, 0, 0, 1],
+            ),
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+        )
+
+    # Execute the state machine
+    sm.execute()
+
+
+if __name__ == "__main__":
+    main()

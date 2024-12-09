@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+
+from cartesian_interface.pyci_all import *
+from utils import set_custom_loggers
+from states import (
+    SetPosturalFromCfg,
+)
+
+import rospy
+import rospkg
+import smach
+
+
+def main():
+    rospy.init_node("smach_example_state_machine")
+    rospack = rospkg.RosPack()
+
+    # Init CartesI/O client
+    client = pyci.CartesianInterfaceRos()
+
+    # Define parameters
+    config_path = rospack.get_path("fsm_cartesio") + "/config/dummy.yaml"
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=["fsm_success", "fsm_fail"])
+
+    # Open the state machine container
+    with sm:
+        smach.StateMachine.add(
+            "HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+        )
+
+    # Execute the state machine
+    sm.execute()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+from cartesian_interface.pyci_all import *
+from utils import set_custom_loggers
+from states import UpdateOdom, GoTo
+
+import rospy
+import smach
+import tf2_ros
+
+
+def main():
+    rospy.init_node("open_door_smach_node")
+
+    # Set up tf2 listener
+    tf_buffer = tf2_ros.Buffer()
+    tf2_ros.TransformListener(tf_buffer)
+
+    # Init CartesI/O client
+    client = pyci.CartesianInterfaceRos()
+
+    # Wait for tf listener
+    rospy.sleep(1)
+
+    # Create a SMACH state machine
+    set_custom_loggers()
+    sm = smach.StateMachine(outcomes=["fsm_success", "fsm_fail"])
+
+    tag_name = "orbbec_head/pose_tag_104"
+    tag_offset = [1.45, 0.37, 0, 0, 0, 1, 0]
+
+    # Open the state machine container
+    with sm:
+        smach.StateMachine.add(
+            "UPDATE_ODOM",
+            UpdateOdom(client, tf_buffer),
+            transitions={"success": "GO_TO", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "GO_TO",
+            GoTo(client, "goto/reach", tag_name, tag_offset),
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+        )
+
+    # Execute the state machine
+    sm.execute()
+
+
+if __name__ == "__main__":
+    main()

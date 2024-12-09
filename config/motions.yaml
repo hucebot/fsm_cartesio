@@ -1,0 +1,1092 @@
+##################################################################
+######################## GENERAL MOTIONS #########################
+##################################################################
+
+# Postures
+posture_home:
+  "arm_left_1_joint": -0.87
+  "arm_left_2_joint": 1.29
+  "arm_left_3_joint": 2.34
+  "arm_left_4_joint": 1.84
+  "arm_left_5_joint": 1.31
+  "arm_left_6_joint": -0.11
+  "arm_left_7_joint": -1.20
+  "arm_right_1_joint": -0.87
+  "arm_right_2_joint": 1.29
+  "arm_right_3_joint": 2.34
+  "arm_right_4_joint": 1.84
+  "arm_right_5_joint": 1.31
+  "arm_right_6_joint": -0.11
+  "arm_right_7_joint": -1.20
+  "torso_lift_joint": 0.30
+
+posture_door_passing:
+  "arm_left_1_joint": -1.02
+  "arm_left_2_joint": 1.14
+  "arm_left_3_joint": 2.67
+  "arm_left_4_joint": 2.02
+  "arm_left_5_joint": 1.35
+  "arm_left_6_joint": 0.07
+  "arm_left_7_joint": -1.16
+  "arm_right_1_joint": -0.98
+  "arm_right_2_joint": 1.17
+  "arm_right_3_joint": 2.69
+  "arm_right_4_joint": 2.01
+  "arm_right_5_joint": 1.24
+  "arm_right_6_joint": 0.08
+  "arm_right_7_joint": -1.16
+  "torso_lift_joint": 0.30
+
+# Local base maneuvers
+back:
+  ref_frame: "base_link"
+  goal:
+    translation: [-0.4, 0, 0]
+    rotation: [0, 0, 0, 1]
+
+back_and_turn_right:
+  ref_frame: "base_link"
+  goal:
+    translation: [-0.8, 0, 0]
+    rotation: [0, 0, -0.7071068, 0.7071068]
+
+back_and_turn_left:
+  ref_frame: "base_link"
+  goal:
+    translation: [-0.8, 0, 0]
+    rotation: [0, 0, 0.7071068, 0.7071068]
+
+right_and_turn_left:
+  ref_frame: "base_link"
+  goal:
+    translation: [-0.10, -0.25, 0]
+    rotation: [0, 0, 0.7071068, 0.7071068]
+
+forward:
+  ref_frame: "base_link"
+  goal:
+    translation: [1, 0, 0]
+    rotation: [0, 0, 0, 1]
+
+left_step:
+  ref_frame: "base_link"
+  goal:
+    translation: [0, 0.10, 0]
+    rotation: [0, 0, 0, 1]
+
+turn_back:
+  ref_frame: "base_link"
+  goal:
+    translation: [0, 0, 0]
+    rotation: [0, 0, 1, 0]
+
+setup_after_table:
+  ref_frame: "base_link"
+  goal:
+    translation: [0, 0.50, 0]
+    rotation: [0, 0, -0.3826834, 0.9238795]
+
+##################################################################
+####################### DISHWASHER MOTIONS #######################
+##################################################################
+
+# EE targets
+pre_open_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.2605, -0.6667, 0.7366]
+    rotation: [0.7247, -0.01393, 0.01238, -0.6889]
+    time: 8.0
+
+pre_open_dishwasher_left:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.15003749, 0.69417392, 0.84013056]
+    rotation: [0.67413139, 0.12824862, -0.02570648, 0.72693765]
+    time: 5.0
+
+pre_pull_dishwasher_top_drawer_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.38, -0.68, 0.67]
+    rotation: [-0.7166, 0.0018, 0.0336, 0.6967]
+    time: 8.0
+
+pre_pull_dishwasher_top_drawer_left:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.16, 0.67, 0.67]
+    rotation: [0.692, 0.029, 0.017, 0.721]
+    time: 8.0
+
+grasp_dishwasher_top_drawer_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_38"
+  offset:
+    translation: [0.07, 0.01, -0.02]
+    rotation: [0, 1, 0, 0]
+    time: 6.0
+
+grasp_dishwasher_top_drawer_left:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_left/pose_tag_38"
+  offset:
+    translation: [0.07, 0.01, 0.02]
+    rotation: [0, 0, 1, 0]
+    time: 6.0
+
+pull_dishwasher_top_drawer_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/gripper_right_grasping_frame"
+  offset:
+    translation: [-0.36, -0.035, 0.02]
+    rotation: [0, 0, 0, 1]
+    time: 10.0
+
+pull_dishwasher_top_drawer_left:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/gripper_left_grasping_frame"
+  offset:
+    translation: [-0.36, 0.035, -0.02]
+    rotation: [0, 0, 0, 1]
+    time: 10.0
+
+pre_pull_dishwasher_bottom_drawer_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.38, -0.68, 0.48]
+    rotation: [-0.7166, 0.0018, 0.0336, 0.6967]
+    time: 10.0
+
+grasp_dishwasher_bottom_drawer_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_37"
+  offset:
+    translation: [0.07, 0.01, 0]
+    rotation: [0, 1, 0, 0]
+    time: 6.0
+
+pull_dishwasher_bottom_drawer_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/gripper_right_grasping_frame"
+  offset:
+    translation: [-0.36, -0.045, 0.02]
+    rotation: [0, 0, 0, 1]
+    time: 10.0
+
+release_dishwasher_drawer_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/gripper_right_grasping_frame"
+  offset:
+    translation: [-0.10, 0.01, 0]
+    rotation: [0, 0, 0, 1]
+    time: 2.0
+
+release_dishwasher_drawer_left:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/gripper_left_grasping_frame"
+  offset:
+    translation: [-0.10, 0.01, 0]
+    rotation: [0, 0, 0, 1]
+    time: 2.0
+
+pre_pick_bowl_from_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.2173, -0.8442, 0.8346]
+    rotation: [0.7294, -0.1777, -0.2184, -0.6235]
+    time: 8.0
+
+pre_pick_mug_from_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.100, -0.6250, 0.8222]
+    rotation: [0.0863, -0.2580, -0.1264, -0.9540]
+    time: 8.0
+
+pre_pick_plate_from_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.155, -0.560, 0.730]
+    rotation: [-0.716, 0.215, 0.128, 0.652]
+    time: 8.0
+
+post_pick_from_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.2605, -0.6667, 0.7366]
+    rotation: [0, 0, 0, 1]
+    time: 5.0
+
+# EE way-points
+place_on_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.550, -0.45, 0.885]
+      - [0.750, -0.45, 0.885]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 6.0
+      - 10.0
+
+post_place_on_dishwasher_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.468, -0.45, 0.739]
+    rotation: [0, 0, 0, 1]
+    time: 6.0
+
+# Demos
+open_dishwasher_right:
+  file: "open_dishwasher_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_34"
+  go_to_start_time: 5.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+open_dishwasher_left:
+  file: "open_dishwasher_left.npy"
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_left/pose_tag_35"
+  go_to_start_time: 2.0
+  dt: 0.05
+  gripper_controller: "gripper_left_controller"
+  gripper_joints:
+    - "gripper_left_left_finger_joint"
+    - "gripper_left_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_bowl_from_dishwasher_right:
+  file: "pick_bowl_from_dishwasher_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_11"
+  go_to_start_time: 2.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_mug_from_dishwasher_right:
+  file: "pick_mug_from_dishwasher_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_10"
+  go_to_start_time: 2.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_plate_from_dishwasher_right:
+  file: "pick_plate_from_dishwasher_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_12"
+  go_to_start_time: 2.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+# Navigation goals
+dishwasher:
+  ref_frame: "orbbec_head/pose_tag_103"
+  goal:
+    translation: [1.55, 0, 0]
+    rotation: [0, 0, 1, 0]
+
+dishwasher_left_side:
+  ref_frame: "orbbec_head/pose_tag_103"
+  goal:
+    translation: [1.15, -0.47, 0]
+    rotation: [0, 0, 1, 0]
+
+dishwasher_right_side:
+  ref_frame: "orbbec_head/pose_tag_103"
+  goal:
+    translation: [1.15, 0.90, 0]
+    rotation: [0, 0, 1, 0]
+
+dock_to_dishwasher_with_orbbec_left:
+  ref_frame: "orbbec_left/pose_tag_35"
+  goal:
+    translation: [0.63728224, -0.79251336, -0.4354853]
+    rotation: [-0.0770398, 0.74148578, 0.6661058, 0.02380689]
+
+##################################################################
+######################### TABLE MOTIONS ##########################
+##################################################################
+
+# EE targets
+pre_pick_from_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.23, -0.60, 0.60]
+    rotation: [0, 0, 0, 1]
+    time: 6.0
+
+post_place_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.70, -0.50, 0.95]
+    rotation: [0, 0, 0, 1]
+    time: 6.0
+
+# EE way-points
+place_mustard_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.50, 0.900]
+      - [0.750, -0.50, 0.780]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 6.0
+      - 10.0
+
+place_sugar_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.50, 0.900]
+      - [0.750, -0.50, 0.780]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 6.0
+      - 10.0
+
+place_bleach_cleanser_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.50, 0.900]
+      - [0.750, -0.50, 0.780]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 6.0
+      - 10.0
+
+place_spam_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.50, 0.900]
+      - [0.750, -0.50, 0.730]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 6.0
+      - 10.0
+
+place_tomato_soup_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.50, 0.900]
+      - [0.750, -0.50, 0.730]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 6.0
+      - 10.0
+
+place_bowl_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.50, 0.900]
+      - [0.750, -0.50, 0.810]
+    rotation:
+      - [-0.740, -0.010, -0.025, 0.672]
+      - [-0.708, 0.215, 0.179, 0.648]
+    time:
+      - 6.0
+      - 10.0
+
+place_mug_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.50, 0.900]
+      - [0.750, -0.50, 0.800]
+    rotation:
+      - [0, 0, 0, 1]
+      - [-0.016, 0.518, -0.030, 0.855]
+    time:
+      - 6.0
+      - 10.0
+
+place_plate_on_table_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.385, -0.50, 0.900]
+      - [0.750, -0.50, 0.820]
+    rotation:
+      - [0, 0, 0, 1]
+      - [0, 0, 0, 1]
+    time:
+      - 3.0
+      - 8.0
+
+# Demos
+pick_mustard_from_table_right:
+  file: "pick_mustard_from_table_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_0"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_sugar_from_table_right:
+  file: "pick_sugar_from_table_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_1"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_bleach_cleanser_from_table_right:
+  file: "pick_bleach_cleanser_from_table_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_2"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_spam_from_table_right:
+  file: "pick_spam_from_table_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_3"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_tomato_soup_from_table_right:
+  file: "pick_tomato_soup_from_table_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_4"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+# Navigation goals
+table:
+  ref_frame: "orbbec_head/pose_tag_104"
+  goal:
+    translation: [1.70, 0, 0]
+    rotation: [0, 0, 1, 0]
+
+table_for_placing:
+  ref_frame: "orbbec_head/pose_tag_104"
+  goal:
+    translation: [1.35, 0, 0]
+    rotation: [0, 0, 1, 0]
+
+mustard_on_table:
+  ref_frame: "orbbec_right/pose_tag_0"
+  goal:
+    translation: [0.60, -0.60, 0]
+    rotation: [0, 0, 1, 0]
+
+sugar_on_table:
+  ref_frame: "orbbec_right/pose_tag_1"
+  goal:
+    translation: [0.60, -0.60, 0]
+    rotation: [0, 0, 1, 0]
+
+bleach_cleanser_on_table:
+  ref_frame: "orbbec_right/pose_tag_2"
+  goal:
+    translation: [0.60, -0.60, 0]
+    rotation: [0, 0, 1, 0]
+
+spam_on_table:
+  ref_frame: "orbbec_right/pose_tag_3"
+  goal:
+    translation: [0.60, -0.60, 0]
+    rotation: [0, 0, 1, 0]
+
+tomato_soup_on_table:
+  ref_frame: "orbbec_right/pose_tag_4"
+  goal:
+    translation: [0.60, -0.60, 0]
+    rotation: [0, 0, 1, 0]
+
+##################################################################
+####################### HANDOVER MOTIONS #########################
+##################################################################
+
+# EE targets
+handover:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.60, -0.40, 0.85]
+    rotation: [0, 0, 0, 1]
+    time: 5.0
+
+# Navigation goals
+person:
+  ref_frame: "orbbec_head/human"
+  goal:
+    translation: [1.1, -0.40, 0]
+    rotation: [0, 0, 1, 0]
+
+##################################################################
+######################## CABINET MOTIONS #########################
+##################################################################
+
+# EE targets
+pre_open_cabinet_right_door_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.02241496, -0.53682289, 0.49800928]
+    rotation: [-0.11154249, -0.00300246, -0.08151645, 0.99040614]
+    time: 8.0
+
+pre_pick_from_cabinet_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.28, -0.55, 0.28]
+    rotation: [0, 0, 0, 1]
+    time: 6.0
+
+post_pick_from_cabinet_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.2605, -0.6667, 0.7366]
+    rotation: [0, 0, 0, 1]
+    time: 5.0
+
+pre_open_cabinet_right_drawer_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.02015858, -0.60074888, 0.91285572]
+    rotation: [-0.70600747, 0.02567667, 0.07279537, 0.70398508]
+    time: 8.0
+
+pre_close_cabinet_right_drawer_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [-0.06486194, -0.57947285, 0.89770368]
+    rotation: [-0.71608756, -0.00678632, 0.14571128, 0.68259854]
+    time: 8.0
+
+pre_open_cabinet_left_drawer_left:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.22484395, 0.62968189, 0.93971955]
+    rotation: [0.6860039, -0.01688307, 0.06495175, 0.72449629]
+    time: 4.0
+
+pre_close_cabinet_left_drawer_left:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [-0.06121887, 0.66814718, 0.86656738]
+    rotation: [0.69248783, 0.03529586, 0.12106739, 0.7103221]
+    time: 4.0
+
+# EE way-points
+place_on_cabinet_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.50, -0.52, 1.05]
+      - [0.75, -0.52, 1.05]
+    rotation:
+      - [-0.042, 0.102, -0.007, 0.994]
+      - [-0.042, 0.102, -0.007, 0.994]
+    time:
+      - 10.0
+      - 14.0
+
+post_place_on_cabinet_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation:
+      - [0.50, -0.50, 1.05]
+      - [0.40, -0.50, 0.780]
+    rotation:
+      - [-0.042, 0.102, -0.007, 0.994]
+      - [0, 0, 0, 1]
+    time:
+      - 4.0
+      - 8.0
+
+# Demos
+open_cabinet_right_door_right:
+  file: "open_cabinet_right_door_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_30"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_mustard_from_cabinet_right:
+  file: "pick_mustard_from_cabinet_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_0"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_sugar_from_cabinet_right:
+  file: "pick_sugar_from_cabinet_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_1"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_bleach_cleanser_from_cabinet_right:
+  file: "pick_bleach_cleanser_from_cabinet_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_2"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_spam_from_cabinet_right:
+  file: "pick_spam_from_cabinet_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_3"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+pick_tomato_soup_from_cabinet_right:
+  file: "pick_tomato_soup_from_cabinet_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_4"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+open_cabinet_right_drawer_right:
+  file: "open_cabinet_right_drawer_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_26"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+close_cabinet_right_drawer_right:
+  file: "close_cabinet_right_drawer_right.npy"
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_right/pose_tag_26"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_right_controller"
+  gripper_joints:
+    - "gripper_right_left_finger_joint"
+    - "gripper_right_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+open_cabinet_left_drawer_left:
+  file: "open_cabinet_left_drawer_left.npy"
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_left/pose_tag_25"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_left_controller"
+  gripper_joints:
+    - "gripper_left_left_finger_joint"
+    - "gripper_left_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+close_cabinet_left_drawer_left:
+  file: "close_cabinet_left_drawer_left.npy"
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_left/pose_tag_25"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_left_controller"
+  gripper_joints:
+    - "gripper_left_left_finger_joint"
+    - "gripper_left_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+# Navigation goals
+cabinet:
+  ref_frame: "orbbec_head/pose_tag_102"
+  goal:
+    translation: [1.7, 0, -1.025]
+    rotation: [0, 0, 1, 0]
+
+cabinet_left_side:
+  ref_frame: "orbbec_head/pose_tag_102"
+  goal:
+    translation: [1.62, -0.454, -1.025]
+    rotation: [0, 0, 1, 0]
+
+cabinet_right_side:
+  ref_frame: "orbbec_head/pose_tag_102"
+  goal:
+    translation: [1.15696623, 0.49552177, -1.02888535]
+    rotation: [0, 0, 1, 0]
+
+cabinet_right_door:
+  ref_frame: "orbbec_right/pose_tag_30"
+  goal:
+    translation: [0.65695561, -0.6350704, -0.61606219]
+    rotation: [-0.03107879, 0.03807321, 0.99877112, -0.00638712]
+
+cabinet_right_drawer_open:
+  ref_frame: "orbbec_right/pose_tag_26"
+  goal:
+    translation: [0.6159029, -0.795263, 0.47688617]
+    rotation: [-0.02054599, 0.71434416, 0.6986738, 0.03384089]
+
+cabinet_left_drawer_open:
+  ref_frame: "orbbec_leftt/pose_tag_25"
+  goal:
+    translation: [0.66, -0.82, -0.39]
+    rotation: [-0.0217, 0.7435, 0.6684, 0.0038]
+
+cabinet_right_drawer_close:
+  ref_frame: "orbbec_right/pose_tag_26"
+  goal:
+    translation: [0.27207883, -0.79102998, 0.4756705]
+    rotation: [-0.06451456, 0.72563114, 0.68248714, 0.05923359]
+
+mustard_in_cabinet:
+  ref_frame: "orbbec_right/pose_tag_0"
+  goal:
+    translation: [0.60, -0.55, 0]
+    rotation: [0, 0, 1, 0]
+
+sugar_in_cabinet:
+  ref_frame: "orbbec_right/pose_tag_1"
+  goal:
+    translation: [0.60, -0.55, 0]
+    rotation: [0, 0, 1, 0]
+
+bleach_cleanser_in_cabinet:
+  ref_frame: "orbbec_right/pose_tag_2"
+  goal:
+    translation: [0.60, -0.55, 0]
+    rotation: [0, 0, 1, 0]
+
+spam_in_cabinet:
+  ref_frame: "orbbec_right/pose_tag_3"
+  goal:
+    translation: [0.60, -0.55, 0]
+    rotation: [0, 0, 1, 0]
+
+tomato_soup_in_cabinet:
+  ref_frame: "orbbec_right/pose_tag_4"
+  goal:
+    translation: [0.60, -0.55, 0]
+    rotation: [0, 0, 1, 0]
+
+##################################################################
+######################### DOOR MOTIONS ###########################
+##################################################################
+
+# EE targets
+pre_open_door_left:
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.26542449, 0.72674733, 0.99390238]
+    rotation: [0.69853847, 0.0442568, 0.09875992, 0.70734137]
+    time: 8.0
+
+# Demos
+open_door_left:
+  file: "open_door_left.npy"
+  task: "gripper_left_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "orbbec_left/pose_tag_107"
+  go_to_start_time: 4.0
+  dt: 0.05
+  gripper_controller: "gripper_left_controller"
+  gripper_joints:
+    - "gripper_left_left_finger_joint"
+    - "gripper_left_right_finger_joint"
+  gripper_max: 0.044
+  gripper_min: 0.001
+
+# Navigation goals
+
+door:
+  ref_frame: "orbbec_head/pose_tag_107"
+  goal:
+    translation: [1.5, 0.55, 0]
+    rotation: [0, 0, 1, 0]
+
+dock_to_door_with_orbbec_left:
+  ref_frame: "orbbec_left/pose_tag_107"
+  goal:
+    translation: [0.79191688, 0.58751281, -1.17503292]
+    rotation: [-0.01932805, 0.04255623, 0.99738777, 0.055073]
+
+back_from_door:
+  ref_frame: "base_link"
+  goal:
+    translation: [-1, -0.8, 0]
+    rotation: [0, 0, 0, 1]
+
+left_towards_door:
+  ref_frame: "base_link"
+  goal:
+    translation: [0, 1.2, 0]
+    rotation: [0, 0, 0, 1]
+
+forward_towards_door:
+  ref_frame: "base_link"
+  goal:
+    translation: [0.6, 0, 0]
+    rotation: [0, 0, 0, 1]
+
+dock_in_front_of_open_door:
+  ref_frame: "orbbec_head/pose_tag_15"
+  goal:
+    translation: [0.8, 0.58, 0]
+    rotation: [0, 0, 1, 0]
+
+enter_door:
+  ref_frame: "base_link"
+  goal:
+    translation: [0.5, 0, 0]
+    rotation: [0, 0, 0, 1]
