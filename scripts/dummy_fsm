@@ -34,54 +34,56 @@ def main():
     config_path = rospack.get_path("fsm_cartesio") + "/config/dummy.yaml"
     demo_folder_path = rospack.get_path("fsm_cartesio") + "/config/demo"
 
-    # # Create a SMACH state machine
-    # set_custom_loggers()
-    # sm = smach.StateMachine(outcomes=["fsm_success", "fsm_fail"])
+    # Set custom logging settings
+    set_custom_loggers()
 
-    # # Open the state machine container
-    # with sm:
-    #     smach.StateMachine.add(
-    #         "MOVE_LEFT",
-    #         FollowWaypointsFromCfg(client, tf_buffer, config_path, "left_waypoints"),
-    #         transitions={"success": "MOVE_RIGHT", "fail": "fsm_fail"},
-    #     )
+    # Example (1): Create a smach SM with CartesI/O states
+    sm0 = smach.StateMachine(outcomes=["fsm_success", "fsm_fail"])
 
-    #     smach.StateMachine.add(
-    #         "MOVE_RIGHT",
-    #         FollowWaypointsFromCfg(client, tf_buffer, config_path, "right_waypoints"),
-    #         transitions={"success": "MOVE_BASE", "fail": "fsm_fail"},
-    #     )
+    # Open the state machine container
+    with sm0:
+        smach.StateMachine.add(
+            "MOVE_LEFT",
+            FollowWaypointsFromCfg(client, tf_buffer, config_path, "left_waypoints"),
+            transitions={"success": "MOVE_RIGHT", "fail": "fsm_fail"},
+        )
 
-    #     smach.StateMachine.add(
-    #         "MOVE_BASE",
-    #         MoveToTargetFromCfg(client, tf_buffer, config_path, "base_pose"),
-    #         transitions={"success": "TRAJ_LEFT", "fail": "fsm_fail"},
-    #     )
-    #     smach.StateMachine.add(
-    #         "TRAJ_LEFT",
-    #         FollowTrajectoryFromCfg(
-    #             client, tf_buffer, config_path, "dummy_demo_left", demo_folder_path
-    #         ),
-    #         transitions={"success": "TRAJ_RIGHT", "fail": "fsm_fail"},
-    #     )
-    #     smach.StateMachine.add(
-    #         "TRAJ_RIGHT",
-    #         FollowTrajectoryFromCfg(
-    #             client, tf_buffer, config_path, "dummy_demo_right", demo_folder_path
-    #         ),
-    #         transitions={"success": "HOMING", "fail": "fsm_fail"},
-    #     )
-    #     smach.StateMachine.add(
-    #         "HOMING",
-    #         SetPosturalFromCfg(client, config_path, "posture_home", True),
-    #         transitions={"success": "fsm_success", "fail": "fsm_fail"},
-    #     )
+        smach.StateMachine.add(
+            "MOVE_RIGHT",
+            FollowWaypointsFromCfg(client, tf_buffer, config_path, "right_waypoints"),
+            transitions={"success": "MOVE_BASE", "fail": "fsm_fail"},
+        )
 
-    # # Execute the state machine
-    # sm.execute()
+        smach.StateMachine.add(
+            "MOVE_BASE",
+            MoveToTargetFromCfg(client, tf_buffer, config_path, "base_pose"),
+            transitions={"success": "TRAJ_LEFT", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "TRAJ_LEFT",
+            FollowTrajectoryFromCfg(
+                client, tf_buffer, config_path, "dummy_demo_left", demo_folder_path
+            ),
+            transitions={"success": "TRAJ_RIGHT", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "TRAJ_RIGHT",
+            FollowTrajectoryFromCfg(
+                client, tf_buffer, config_path, "dummy_demo_right", demo_folder_path
+            ),
+            transitions={"success": "HOMING", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            transitions={"success": "fsm_success", "fail": "fsm_fail"},
+        )
 
-    # Create a SM with sm_factory methods
-    sm_top = smach.StateMachine(outcomes=["top_success", "top_fail"])
+    # Execute the state machine
+    sm0.execute()
+
+    # Example (1): Create a smach SM with sm_factory methods
+    sm1 = smach.StateMachine(outcomes=["top_success", "top_fail"])
     sm_dummy_left = build_sm_dummy_left(
         "dummy_left_success",
         "dummy_left_failure",
@@ -98,7 +100,7 @@ def main():
         config_path,
         demo_folder_path,
     )
-    with sm_top:
+    with sm1:
         smach.StateMachine.add(
             "DUMMY_LEFT",
             sm_dummy_left,
@@ -115,7 +117,7 @@ def main():
                 "dummy_right_failure": "top_fail",
             },
         )
-    sm_top.execute()
+    sm1.execute()
 
 
 if __name__ == "__main__":

@@ -252,12 +252,12 @@ def build_sm_dummy_left(
     # Open the state machine container
     with sm:
         smach.StateMachine.add(
-            "MOVE_LEFT",
+            "DUMMY_LEFT:MOVE",
             FollowWaypointsFromCfg(client, tf_buffer, config_path, "left_waypoints"),
-            transitions={"success": "TRAJ_LEFT", "fail": failure_out},
+            transitions={"success": "DUMMY_LEFT:TRAJ", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "TRAJ_LEFT",
+            "DUMMY_LEFT:TRAJ",
             FollowTrajectoryFromCfg(
                 client, tf_buffer, config_path, "dummy_demo_left", file_folder_path
             ),
@@ -291,12 +291,12 @@ def build_sm_dummy_right(
     # Open the state machine container
     with sm:
         smach.StateMachine.add(
-            "MOVE_RIGHT",
+            "DUMMY_RIGHT:MOVE",
             FollowWaypointsFromCfg(client, tf_buffer, config_path, "right_waypoints"),
-            transitions={"success": "TRAJ_RIGHT", "fail": failure_out},
+            transitions={"success": "DUMMY_RIGHT:TRAJ", "fail": failure_out},
         )
         smach.StateMachine.add(
-            "TRAJ_RIGHT",
+            "DUMMY_RIGHT:TRAJ",
             FollowTrajectoryFromCfg(
                 client, tf_buffer, config_path, "dummy_demo_right", file_folder_path
             ),
@@ -533,11 +533,6 @@ def pick_object_from_dishwasher(
         smach.StateMachine.add(
             "PFD:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "PFD:GO_FORWARD", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "PFD:GO_FORWARD",
-            GoToFromCfg(client, "goto/reach", config_path, "forward"),
             transitions={"success": success_out, "fail": failure_out},
         )
 
@@ -790,16 +785,6 @@ def pick_object_from_table(
         smach.StateMachine.add(
             "PFT:HOMING",
             SetPosturalFromCfg(client, config_path, "posture_home", True),
-            transitions={"success": "PFT:TURN", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "PFT:TURN",
-            GoToFromCfg(client, "goto/reach", config_path, "turn_back"),
-            transitions={"success": "PFT:MOVE_TO_CENTER", "fail": failure_out},
-        )
-        smach.StateMachine.add(
-            "PFT:MOVE_TO_CENTER",
-            GoToFromCfg(client, "goto/reach", config_path, "setup_after_table"),
             transitions={"success": success_out, "fail": failure_out},
         )
 

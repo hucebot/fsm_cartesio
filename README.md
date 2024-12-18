@@ -9,13 +9,13 @@ You can try a docker example with a simulated Tiago Dual (omnibase) developed by
 To build the docker image, from the **inria_fsm_cartesio/docker** folder, run:
 
 ```bash
-docker build -t opensot_fsm .
+bash build.sh
 ```
 
 To run the container, form the **inria_fsm_cartesio/docker** folder, run:
 
 ```bash
-bash run_docker.sh
+bash launch.sh
 ```
 
 Then run:
@@ -24,14 +24,19 @@ Then run:
 terminator
 ```
 
-Inside the `terminator`, open two terminals. In one run:
+Inside `terminator`, open three terminals.
+In the first start the `roscore`.
+
+In the second launch CartesI/O example:
 
 ```bash
-roslaunch tiago_dual_cartesio_config cartesio.launch
+mon launch tiago_dual_cartesio_config cartesio.launch
 ```
 
-And in the second, run:
+And in the third, run the dummy FSM:
 
 ```bash
 rosrun fsm_cartesio dummy_fsm
 ```
+
+The `dummy_fsm` script offers a basic example on how to start creating smach FSM using CartesI/O functionalities.

@@ -42,8 +42,6 @@ if __name__ == "__main__":
     object = plan["object"]
     initial_location = plan["initial_location"]
     target_location = plan["target_location"]
-    if target_location == "drawer":
-        target_location = "cabinet"
 
     # pattern_type = "A"
     # initial_kitchen = "INRIA"
