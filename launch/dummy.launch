@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="fsm_cartesio" type="dummy_fsm" name="dummy_fsm_node" output="screen"/>
+</launch>
+
