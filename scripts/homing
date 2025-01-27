@@ -12,7 +12,7 @@ import smach
 
 
 def main():
-    rospy.init_node("smach_example_state_machine")
+    rospy.init_node("homing_smach_node")
     rospack = rospkg.RosPack()
 
     # Init CartesI/O client

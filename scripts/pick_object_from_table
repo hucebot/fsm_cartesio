@@ -4,12 +4,9 @@ from cartesian_interface.pyci_all import *
 from utils import set_custom_loggers
 from states import (
     MoveToTargetFromCfg,
-    FollowWaypointsFromCfg,
     GoToFromCfg,
-    PalGripperGrasp,
     PalGripperRelease,
     RepeatDemo,
-    SetPosturalFromCfg,
     UpdateOdom,
 )
 
@@ -17,12 +14,9 @@ import rospkg
 import rospy
 import smach
 import tf2_ros
-from std_msgs.msg import Float32
-from std_srvs.srv import Trigger, TriggerRequest
-
 
 def main():
-    rospy.init_node("open_door_smach_node")
+    rospy.init_node("pick_object_from_table_smach_node")
     rospack = rospkg.RosPack()
 
     # Set up tf2 listener
@@ -34,26 +28,6 @@ def main():
 
     # Wait for tf listener
     rospy.sleep(1)
-
-    # # Set 'time_from_start' param in the ros_control_bridge
-    # ctrl_bridge_time_pub = rospy.Publisher(
-    #     "/ros_control_bridge/time_from_start", Float32, queue_size=1
-    # )
-    # time_msg = Float32()
-    # time_msg.data = 0.2
-    # wait_start = time.time()
-    # while ctrl_bridge_time_pub.get_num_connections() < 1:
-    #     if time.time() - wait_start > 10:
-    #         smach.logerr(f"No connections to /ros_control_bridge/time_from_start")
-    #         sys.exit(0)
-    # ctrl_bridge_time_pub.publish(time_msg)
-
-    # # Get request from LLM
-    # srv_proxy = rospy.ServiceProxy("whisper_llm", Trigger)
-    # req = TriggerRequest()
-    # res = srv_proxy(req)
-    # plan = json.loads(res.message)
-    # object_to_pick = plan["actions"]["object"]
 
     object_to_pick = "sugar"
     demo_tag = f"pick_{object_to_pick}_from_table_right"

@@ -12,7 +12,7 @@ import json
 
 if __name__ == "__main__":
 
-    rospy.init_node("open_door_smach_node")
+    rospy.init_node("execute_cmd_smach_node")
     rospack = rospkg.RosPack()
 
     # Set up tf2 listener

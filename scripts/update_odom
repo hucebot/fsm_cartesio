@@ -10,7 +10,7 @@ import tf2_ros
 
 
 def main():
-    rospy.init_node("open_door_smach_node")
+    rospy.init_node("update_odom_smach_node")
 
     # Set up tf2 listener
     tf_buffer = tf2_ros.Buffer()

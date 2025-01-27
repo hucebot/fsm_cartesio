@@ -45,13 +45,8 @@ include_directories(
 
 catkin_install_python(PROGRAMS 
   scripts/dummy_fsm 
-  scripts/go_to_tag 
-  scripts/back_to_human
-  scripts/go_to_human
   scripts/homing 
   scripts/execute_cmd 
-  scripts/open_door
-  scripts/pick_bowl_from_dishwasher
   scripts/pick_object_from_table
   scripts/update_odom 
   src/sm_factory.py
@@ -59,5 +54,5 @@ catkin_install_python(PROGRAMS
   src/utils.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
   
-install(DIRECTORY launch config
+install(DIRECTORY config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

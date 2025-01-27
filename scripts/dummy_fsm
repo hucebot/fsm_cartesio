@@ -17,7 +17,7 @@ import tf2_ros
 
 
 def main():
-    rospy.init_node("smach_example_state_machine")
+    rospy.init_node("dummy_example_smach_node")
     rospack = rospkg.RosPack()
 
     # Set up tf2 listener
