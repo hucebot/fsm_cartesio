@@ -90,6 +90,7 @@ WORKDIR /home/forest_ws/src
 
 RUN git clone https://github.com/stack-of-tasks/pinocchio.git
 WORKDIR /home/forest_ws/src/pinocchio
+RUN git checkout tags/v3.2.0
 RUN git submodule init && git submodule update
 WORKDIR /home/forest_ws/build/pinocchio
 RUN cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_WITH_URDF_SUPPORT=ON -DBUILD_WITH_COLLISION_SUPPORT=ON -DBUILD_PYTHON_INTERFACE=OFF ../../src/pinocchio && make -j8 && make install
@@ -117,6 +118,7 @@ RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cm
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/Simple-Robotics/proxsuite.git
 WORKDIR /home/forest_ws/src/proxsuite
+RUN git checkout f19f07b51f66268db1f16cbeb538e891bb6d4e21
 RUN git submodule init && git submodule update
 WORKDIR /home/forest_ws/build/proxsuite
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DBUILD_WITH_VECTORIZATION_SUPPORT=OFF -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/proxsuite && make -j8 && make install
@@ -139,7 +141,7 @@ RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cm
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/ADVRHumanoids/CartesianInterface.git
 WORKDIR /home/forest_ws/src/CartesianInterface
-RUN git checkout 3.0-devel
+RUN git checkout local_api_fix
 WORKDIR /home/forest_ws/build/CartesianInterface
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/CartesianInterface && make -j8 && make install
 
@@ -170,8 +172,6 @@ RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cm
 # tiago_dual_cartesio_config
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git
-WORKDIR /home/forest_ws/src/tiago_dual_cartesio_config
-RUN git checkout euRobin_nov24
 
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/EnricoMingo/tiago_dual_robot.git
