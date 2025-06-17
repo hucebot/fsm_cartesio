@@ -44,6 +44,7 @@ include_directories(
 #############
 
 catkin_install_python(PROGRAMS 
+  scripts/test_6d_pose 
   scripts/dummy_fsm 
   scripts/homing 
   scripts/execute_cmd 

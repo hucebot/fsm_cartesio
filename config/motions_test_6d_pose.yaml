@@ -1,0 +1,48 @@
+##################################################################
+######################## GENERAL MOTIONS #########################
+##################################################################
+
+# Postures
+posture_home:
+  "arm_left_1_joint": -0.87
+  "arm_left_2_joint": 1.29
+  "arm_left_3_joint": 2.34
+  "arm_left_4_joint": 1.84
+  "arm_left_5_joint": 1.31
+  "arm_left_6_joint": -0.11
+  "arm_left_7_joint": -1.20
+  "arm_right_1_joint": -0.87
+  "arm_right_2_joint": 1.29
+  "arm_right_3_joint": 2.34
+  "arm_right_4_joint": 1.84
+  "arm_right_5_joint": 1.31
+  "arm_right_6_joint": -0.11
+  "arm_right_7_joint": -1.20
+  "torso_lift_joint": 0.30
+
+
+
+##################################################################
+####################### DISHWASHER MOTIONS #######################
+##################################################################
+
+# EE targets
+pre_pick_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "ci/base_link"
+  offset:
+    translation: [0.2605, -0.6667, 0.7366]
+    rotation: [0.7247, -0.01393, 0.01238, -0.6889]
+    time: 8.0
+
+grasp_mug_right:
+  task: "gripper_right_grasping_frame"
+  task_base_link: "base_link"
+  base_link_frame: "ci/base_link"
+  ref_frame: "mug"
+  offset:
+    translation: [0.07, 0.01, -0.02]
+    rotation: [0, 1, 0, 0]
+    time: 6.0
