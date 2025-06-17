@@ -8,6 +8,7 @@ from states import (
     PalGripperRelease,
     PalGripperGrasp,
     UpdateOdom,
+    SetPosturalFromCfg,
 )
 
 import rospkg
@@ -43,6 +44,11 @@ def main():
         smach.StateMachine.add(
             "INIT_ODOM",
             UpdateOdom(client, tf_buffer),
+            transitions={"success": "HOMING", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "HOMING",
+            SetPosturalFromCfg(client, config_path, "posture_home", True),
             transitions={"success": "PRE_PICK", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
@@ -50,10 +56,10 @@ def main():
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "pre_pick_right"
             ),
-            transitions={"success": "GRASP", "fail": "fsm_fail"},
+            transitions={"success": "GO_TO_GRASP", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "GRASP",
+            "GO_TO_GRASP",
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, f"grasp_{item}_right"
             ),

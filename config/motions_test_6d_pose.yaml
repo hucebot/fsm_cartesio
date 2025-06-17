@@ -33,9 +33,9 @@ pre_pick_right:
   base_link_frame: "ci/base_link"
   ref_frame: "ci/base_link"
   offset:
-    translation: [0.2605, -0.6667, 0.7366]
-    rotation: [0.7247, -0.01393, 0.01238, -0.6889]
-    time: 8.0
+    translation: [0.588, -0.294, 0.633]
+    rotation: [-0.675, 0.182, 0.682, 0.214]
+    time: 10.0
 
 grasp_mug_right:
   task: "gripper_right_grasping_frame"
@@ -43,6 +43,6 @@ grasp_mug_right:
   base_link_frame: "ci/base_link"
   ref_frame: "mug"
   offset:
-    translation: [0.07, 0.01, -0.02]
+    translation: [0.0, 0.0, 0.02]
     rotation: [0, 1, 0, 0]
     time: 6.0
