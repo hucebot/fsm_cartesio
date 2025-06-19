@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+
+from cartesian_interface.pyci_all import *
+import tf2_ros
+import rospy
+from sensor_msgs.msg import PointCloud2
+from geometry_msgs.msg import PoseStamped
+
+_pcl_msg = PointCloud2()
+
+def move_to_target(client, task_name, task_base_link, target, duration):
+    """
+    Constructs the state object.
+
+    Args:
+        client (cartesian_interface.pyci.CartesianInterfaceRos): CartesI/O API client
+        task_name (str): CartesI/O Task name
+        task_base_link (str): Base link for the task
+        target (xbot2_interface.pyaffine3.Affine3): Reference pose
+        duration (float): Movement Duration
+    """
+
+    client.update()
+    task = client.getTask(task_name)
+    task.setBaseLink(task_base_link)
+    task.setPoseTarget(target, duration)
+    task.waitReachCompleted(duration + 1)
+
+def cb_pcl(msg):
+    global _pcl_msg
+    _pcl_msg = msg
+
+def main():
+    global _pcl_msg
+    rospy.init_node("test_grasp_node")
+
+    # Set up tf2 listener
+    tf_buffer = tf2_ros.Buffer()
+    tf2_ros.TransformListener(tf_buffer)
+
+    # Init CartesI/O client
+    client = pyci.CartesianInterfaceRos()
+    
+    # Subscribe to the point cloud topic
+    rospy.Subscriber("/grasp/point_cloud/object", PointCloud2, cb_pcl)
+
+    # Wait for tf listener
+    rospy.sleep(1)
+
+    rospy.loginfo(rospy.get_caller_id() + "Node initialized")
+
+    task_name = "gripper_right_grasping_frame"
+    task_base_link = "base_link"
+
+    # Pre-pick pose
+    target = Affine3()
+    target.translation = [0.595, -0.294, 0.730]
+    target.quaternion = [-0.563, 0.428, 0.478, 0.521]
+    duration = 10.0
+    move_to_target(client, task_name, task_base_link, target, duration)
+    rospy.loginfo(rospy.get_caller_id() + "Moved to pre-pick pose")
+
+    rospy.loginfo(rospy.get_caller_id() + "Sending point cloud msg")
+    pub = rospy.Publisher('/grasp/point_cloud/object', PointCloud2, queue_size=1)
+    while pub.get_num_connections() < 1:
+        pass
+    pub.publish(_pcl_msg)
+
+    rospy.loginfo(rospy.get_caller_id() + "Waiting for grasp pose msg")
+    grasp_pose_msg = rospy.wait_for_message('/grasp_net/pose', PoseStamped, timeout=10)
+    rospy.loginfo(rospy.get_caller_id() + "Received grasp pose msg")
+
+    rospy.spin()
+
+if __name__ == '__main__':
+    main()

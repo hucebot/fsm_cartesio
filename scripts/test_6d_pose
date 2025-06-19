@@ -41,14 +41,14 @@ def main():
 
     # Open the state machine container
     with sm:
+        # smach.StateMachine.add(
+        #     "HOMING",
+        #     SetPosturalFromCfg(client, config_path, "posture_home", True),
+        #     transitions={"success": "OPEN_GRIPPER", "fail": "fsm_fail"},
+        # )
         smach.StateMachine.add(
-            "INIT_ODOM",
-            UpdateOdom(client, tf_buffer),
-            transitions={"success": "HOMING", "fail": "fsm_fail"},
-        )
-        smach.StateMachine.add(
-            "HOMING",
-            SetPosturalFromCfg(client, config_path, "posture_home", True),
+            "OPEN_GRIPPER",
+            PalGripperRelease("parallel_gripper_right_controller"),
             transitions={"success": "PRE_PICK", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
@@ -56,10 +56,17 @@ def main():
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, "pre_pick_right"
             ),
-            transitions={"success": "GO_TO_GRASP", "fail": "fsm_fail"},
+            transitions={"success": "GO_OVER", "fail": "fsm_fail"},
         )
         smach.StateMachine.add(
-            "GO_TO_GRASP",
+            "GO_OVER",
+            MoveToTargetFromCfg(
+                client, tf_buffer, config_path, f"over_{item}_right"
+            ),
+            transitions={"success": "GO_GRASP", "fail": "fsm_fail"},
+        )
+        smach.StateMachine.add(
+            "GO_GRASP",
             MoveToTargetFromCfg(
                 client, tf_buffer, config_path, f"grasp_{item}_right"
             ),
